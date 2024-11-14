@@ -13,21 +13,13 @@ require("core.plugin_config.markdown_preview")
 require("core.plugin_config.swagger-preview")
 require("core.plugin_config.nvimtree_config")
 
-require("core.plugin_config.coloriser")
-require("core.plugin_config.alpha")
-require("core.plugin_config.telescope-ui-select")
-require("core.plugin_config.nvim-session-manager")
 
--- require("core.plugin_config.tabout")
-require("core.plugin_config.mini_surround")
-require("core.plugin_config.tressj")
-require("core.plugin_config.conform")
 
-require("core.plugin_config.neoclip")
--- require("core.plugin_config.noice")
 
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-config")
 
+
 require("core.plugin_config.black")
 -- require("core.plugin_config.nvim-cmp")
+
