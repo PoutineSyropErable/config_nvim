@@ -1,3 +1,6 @@
+-- Detect if the OS is Linux
+local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
+
 require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	"tpope/vim-commentary",
@@ -117,31 +120,17 @@ require("lazy").setup({
 		end,
 	},
 
-	{
-		"alexghergh/nvim-tmux-navigation",
-		config = function()
-			nvim_tmux_nav = require("nvim-tmux-navigation")
-
-			nvim_tmux_nav.setup({
-				disable_when_zoomed = true, -- defaults to false
-			})
-
-			--    vim.keymap.set('n', "<C-h>", nvim_tmux_nav.NvimTmuxNavigateLeft)
-			--    vim.keymap.set('n', "<C-j>", nvim_tmux_nav.NvimTmuxNavigateDown)
-			--    vim.keymap.set('n', "<C-k>", nvim_tmux_nav.NvimTmuxNavigateUp)
-			--    vim.keymap.set('n', "<C-l>", nvim_tmux_nav.NvimTmuxNavigateRight)
-			--    vim.keymap.set('n', "<C-\\>", nvim_tmux_nav.NvimTmuxNavigateLastActive)
-			--    vim.keymap.set('n', "<C-Space>", nvim_tmux_nav.NvimTmuxNavigateNext)
-
-			--	vim.keymap.set('', "<C-s>j", nvim_tmux_nav.NvimTmuxNavigateLeft)
-			--	vim.keymap.set('', "<C-s>k", nvim_tmux_nav.NvimTmuxNavigateDown)
-			--	vim.keymap.set('', "<C-s>i", nvim_tmux_nav.NvimTmuxNavigateUp)
-			--	vim.keymap.set('', "<C-s>l", nvim_tmux_nav.NvimTmuxNavigateRight)
-			--	vim.keymap.set('', "<C-s>,", nvim_tmux_nav.NvimTmuxNavigateLastActive)
-			--	vim.keymap.set('', "<C-s>Space", nvim_tmux_nav.NvimTmuxNavigateNext)
-		end,
-	},
-
+	is_linux
+			and {
+				"alexghergh/nvim-tmux-navigation",
+				config = function()
+					nvim_tmux_nav = require("nvim-tmux-navigation")
+					nvim_tmux_nav.setup({
+						disable_when_zoomed = true, -- defaults to false
+					})
+				end,
+			}
+		or nil, -- Use `nil` if the condition is false to skip loading
 	"TamaMcGlinn/quickfixdd",
 	"szw/vim-maximizer",
 
