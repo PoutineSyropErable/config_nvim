@@ -34,6 +34,7 @@ require("conform").setup({
 		typescript = { "prettier", stop_after_first = true },
 		typescriptreact = { "prettier", stop_after_first = true },
 		go = { "gofumpt", "golines", "goimports-reviser" },
+		x = { "clang-format" },
 		c = { "clang-format" }, -- ~/.clang-format contains the style
 		cpp = { "clang-format" },
 		css = { "prettier" },
