@@ -145,6 +145,7 @@ keymap.set("n", "<leader>sk", "<C-w>-") -- make split window height shorter
 keymap.set("n", "<leader>si", "<C-w>+") -- make split windows height taller
 keymap.set("n", "<leader>sl", "<C-w>>5") -- make split windows width bigger
 keymap.set("n", "<leader>sj", "<C-w><5") -- make split windows width smaller
+vim.keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
 
 ---- Resize splits with Ctrl + arrow keys
 vim.api.nvim_set_keymap("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })

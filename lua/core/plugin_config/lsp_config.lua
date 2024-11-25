@@ -94,21 +94,28 @@ lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
 		"clangd",
-		"--background-index", -- Enable background indexing
-		"--clang-tidy", -- Enable clang-tidy diagnostics
+		"--background-index",   -- Enable background indexing
+		"--clang-tidy",         -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
-		"--cross-file-rename", -- Support for renaming symbols across files
+		"--cross-file-rename",  -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
-	filetypes = { "c", "cpp", "objc", "objcpp" },
-	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clangd", "Makefile", ".git", "compile_flags.txt"),
+	filetypes = { "c", "cpp", "objc", "objcpp", "x" },
+	root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", "compile_flags.txt", "Makefile",
+		"build.sh", ".git"
+
+	),
 	settings = {
 		clangd = {
 			fallbackFlags = { "-std=c++17" }, -- Adjust this if using a different C++ standard
 		},
 	},
+	on_attach = function(client, bufnr)
+		local root = client.config.root_dir
+		print("Clangd root directory detected: " .. (root or "none"))
+	end,
 })
 
 -- require("lint").linters_by_ft = {
