@@ -2,7 +2,7 @@
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
 require("lazy").setup({
-	{ "catppuccin/nvim",         name = "catppuccin", priority = 1000 },
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	"tpope/vim-commentary",
 	"mattn/emmet-vim",
 	"nvim-tree/nvim-tree.lua",
@@ -15,12 +15,12 @@ require("lazy").setup({
 
 	-- DAP core and UI setup
 	{
-		"mfussenegger/nvim-dap",        -- Main nvim-dap plugin
+		"mfussenegger/nvim-dap", -- Main nvim-dap plugin
 		dependencies = {
-			"rcarriga/nvim-dap-ui",     -- UI for nvim-dap
+			"rcarriga/nvim-dap-ui", -- UI for nvim-dap
 			"nvim-telescope/telescope-dap.nvim", -- Telescope integration with DAP
 			"theHamsta/nvim-dap-virtual-text", -- Inline variable text while debugging
-			"nvim-neotest/nvim-nio",    -- Required dependency for nvim-dap-ui
+			"nvim-neotest/nvim-nio", -- Required dependency for nvim-dap-ui
 		},
 		config = function()
 			local dap = require("dap")
@@ -49,7 +49,7 @@ require("lazy").setup({
 		"mfussenegger/nvim-dap-python",
 		dependencies = { "mfussenegger/nvim-dap" }, -- Ensure nvim-dap is loaded first
 		lazy = true,
-		ft = { "python" },                    -- Only load when editing Python files
+		ft = { "python" }, -- Only load when editing Python files
 	},
 
 	-- BASH DAP support?
@@ -81,7 +81,7 @@ require("lazy").setup({
 		-- use opts = {} for passing setup options
 		-- this is equivalent to setup({}) function
 	},
-	{ "akinsho/toggleterm.nvim", version = "*",       config = true },
+	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
@@ -121,16 +121,16 @@ require("lazy").setup({
 	},
 
 	is_linux
-	and {
-		"alexghergh/nvim-tmux-navigation",
-		config = function()
-			nvim_tmux_nav = require("nvim-tmux-navigation")
-			nvim_tmux_nav.setup({
-				disable_when_zoomed = true, -- defaults to false
-			})
-		end,
-	}
-	or nil, -- Use `nil` if the condition is false to skip loading
+			and {
+				"alexghergh/nvim-tmux-navigation",
+				config = function()
+					nvim_tmux_nav = require("nvim-tmux-navigation")
+					nvim_tmux_nav.setup({
+						disable_when_zoomed = true, -- defaults to false
+					})
+				end,
+			}
+		or nil, -- Use `nil` if the condition is false to skip loading
 	"TamaMcGlinn/quickfixdd",
 	"szw/vim-maximizer",
 
@@ -176,7 +176,7 @@ require("lazy").setup({
 	"hrsh7th/cmp-path",
 	"hrsh7th/cmp-cmdline",
 	"saadparwaiz1/cmp_luasnip",
-	"mfussenegger/nvim-lint",
+	-- "mfussenegger/nvim-lint",
 	"clangd/clangd",
 	"Civitasv/cmake-tools.nvim",
 	"elkowar/yuck.vim",
