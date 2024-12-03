@@ -94,18 +94,24 @@ lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
 		"clangd",
-		"--background-index",   -- Enable background indexing
-		"--clang-tidy",         -- Enable clang-tidy diagnostics
+		"--offset-encoding=utf-16",
+		"--background-index", -- Enable background indexing
+		"--clang-tidy", -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
-		"--cross-file-rename",  -- Support for renaming symbols across files
+		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
 	filetypes = { "c", "cpp", "objc", "objcpp", "x" },
-	root_dir = lspconfig.util.root_pattern(".clangd", "compile_commands.json", "compile_flags.txt", "Makefile",
-		"build.sh", ".git"
-
+	root_dir = lspconfig.util.root_pattern(
+		"compile_commands.json",
+		".clang-format",
+		".clangd",
+		"compile_flags.txt",
+		"Makefile",
+		"build.sh",
+		".git"
 	),
 	settings = {
 		clangd = {
@@ -114,7 +120,7 @@ lspconfig.clangd.setup({
 	},
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
-		print("Clangd root directory detected: " .. (root or "none"))
+		-- print("Clangd root directory detected: " .. (root or "none"))
 	end,
 })
 
@@ -206,7 +212,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 	pattern = { "*.hl", "hypr*.conf" },
 	callback = function(event)
-		print(string.format("starting hyprls for %s", vim.inspect(event)))
+		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
 		vim.lsp.start({
 			name = "hyprlang",
 			cmd = { "hyprls" },
