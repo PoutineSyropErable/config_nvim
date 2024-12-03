@@ -182,6 +182,7 @@ keymap.set("n", "<C-w>h", ":vsplit<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>v", ":split<CR>", { noremap = true, silent = true })
 
 -- Keymap for closing the current tab using Ctrl+w X
+keymap.set("n", "<C-q>", ": bd!<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>x", ": w | bd!<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>d", ":close<CR>", { noremap = true, silent = true })
 
@@ -265,6 +266,9 @@ keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Git Commits
 
 keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
 
+vim.keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
+vim.keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
+
 -- ---------------------------------------------ufo
 local ufo = require("ufo")
 -- Key mappings
@@ -280,8 +284,10 @@ end, { desc = "Peek Fold" })
 ---------------------------------------------LSP
 keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
 keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
 keymap.set("n", "<leader>gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
 keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
+keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
 keymap.set("n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
 keymap.set("n", "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>")
 keymap.set("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
