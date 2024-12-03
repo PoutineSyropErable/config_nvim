@@ -30,4 +30,5 @@ require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-config")
 
 require("core.plugin_config.black")
+-- Completions are in completions.lua, not nvim.cmp
 -- require("core.plugin_config.nvim-cmp")

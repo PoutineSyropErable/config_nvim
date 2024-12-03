@@ -3,7 +3,6 @@
 --inside nvimtree, do g? to get information
 
 -- control+space for buffer completion on the other
-
 ------------------------------------- Setups for Split window management ----------------------------
 local function opts(desc)
 	return {
@@ -24,6 +23,7 @@ local keymap = vim.keymap
 
 ----------------------------------------- Clipboard
 vim.api.nvim_set_keymap("n", "<leader>y", '"+y', { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>C", '"+yy', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>p", '"+p', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>v", '"+p', { noremap = true, silent = true })
@@ -129,6 +129,7 @@ vim.api.nvim_set_keymap("n", "<leader>o", ":Oil<CR>", { noremap = true, silent =
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
 keymap.set("n", "<leader>qq", ":q!<CR>") -- quit without saving
+keymap.set("n", "<leader>bd", ": bd!<CR>", { noremap = true, silent = true, desc = ":bd close buffer" })
 keymap.set("n", "<leader>ww", ":wa<CR>") -- save
 keymap.set("n", "<leader>wa", ":wa<CR>") -- save all buffers
 keymap.set("n", "gx", ":!open <c-r><c-a><CR>") -- open URL under cursor
@@ -182,7 +183,6 @@ keymap.set("n", "<C-w>h", ":vsplit<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>v", ":split<CR>", { noremap = true, silent = true })
 
 -- Keymap for closing the current tab using Ctrl+w X
-keymap.set("n", "<C-q>", ": bd!<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>x", ": w | bd!<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-w>d", ":close<CR>", { noremap = true, silent = true })
 
@@ -282,6 +282,7 @@ vim.keymap.set("n", "<leader>zK", function()
 end, { desc = "Peek Fold" })
 
 ---------------------------------------------LSP
+local cmp = require("cmp")
 keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
 keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
 keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
@@ -299,7 +300,11 @@ keymap.set("n", "<leader>gl", "<cmd>lua vim.diagnostic.open_float()<CR>")
 keymap.set("n", "<leader>gp", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
 keymap.set("n", "<leader>gn", "<cmd>lua vim.diagnostic.goto_next()<CR>")
 keymap.set("n", "<leader>tr", "<cmd>lua vim.lsp.buf.document_symbol()<CR>")
-keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
+-- keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
+--^^ deprecated
+
+-- Map <C-Space> to trigger completion in insert mode
+-- vim.keymap.set("i", "<C-Space>", cmp.mapping.complete(), { noremap = true, silent = true })
 
 ---------------------------------------------------------------- Harpoon
 keymap.set("n", "<leader>ha", require("harpoon.mark").add_file)
