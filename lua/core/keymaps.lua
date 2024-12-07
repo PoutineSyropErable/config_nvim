@@ -46,6 +46,9 @@ vim.api.nvim_set_keymap("v", "<C-V>", '"+p', { noremap = true, silent = true })
 keymap.set("", "<C-a>", "ggVG<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>a", "ggVG<CR>", { noremap = true, silent = true })
 keymap.set("", "<leader>a", "ggVG<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>rd", function()
+	print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected"))
+end, { desc = "Print LSP Root Directory" })
 
 vim.api.nvim_set_keymap("", "<C-c>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -642,5 +645,5 @@ vim.api.nvim_set_keymap("n", "zb", "zb", { noremap = true, silent = true })
 ----------------------------------------------- END OF CONFIG FILE
 
 vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
-print("Vim configuration reloaded")
+-- print("Vim configuration reloaded")
 --print(vim.env.TERM)
