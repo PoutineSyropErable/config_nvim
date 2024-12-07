@@ -1,6 +1,6 @@
 require("mason-lspconfig").setup({
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
-	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd" },
+	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer" },
 })
 
 require("mason-tool-installer").setup({
@@ -72,10 +72,10 @@ lspconfig.clangd.setup({
 		-- clangd command with additional options
 		"clangd",
 		"--offset-encoding=utf-16",
-		"--background-index", -- Enable background indexing
-		"--clang-tidy", -- Enable clang-tidy diagnostics
+		"--background-index",   -- Enable background indexing
+		"--clang-tidy",         -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
-		"--cross-file-rename", -- Support for renaming symbols across files
+		"--cross-file-rename",  -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 	},
@@ -101,19 +101,40 @@ lspconfig.clangd.setup({
 	end,
 })
 
--- require("lint").linters_by_ft = {
--- 	c = { "gcc" }, -- Set GCC as the linter for C files
--- 	cpp = { "g++" }, -- Set G++ as the linter for C++ files
--- }
 
--- require("lint").linters.gcc = {
--- 	cmd = "gcc", -- Command to invoke GCC
--- 	stdin = false, -- Don't use stdin for input (GCC reads files directly)
--- 	args = { "-fsyntax-only" }, -- GCC argument to only check syntax, without producing an executable
--- 	stream = "stderr", -- Parse errors/warnings from stderr (where GCC outputs diagnostics)
--- 	ignore_exitcode = true, -- Don't stop parsing if GCC exits with non-zero (error) code
--- 	parser = require("lint.parser").from_errorformat("%f:%l:%c: %trror: %m,%f:%l:%c: %tarning: %m"),
--- }
+lspconfig.rust_analyzer.setup({
+	cmd = { "rust-analyzer" },
+	capabilities = lsp_defaults.capabilities,                                       -- Enable LSP capabilities
+	filetypes = { "rust" },                                                         -- Apply to Rust files
+	root_dir = lspconfig.util.root_pattern("Cargo.toml", "rust-project.json", ".git"), -- Detect project root
+	settings = {
+		["rust-analyzer"] = {
+			assist = {
+				importGranularity = "module",
+				importPrefix = "by_self",
+			},
+			cargo = {
+				loadOutDirsFromCheck = true,
+				allFeatures = true,
+			},
+			procMacro = {
+				enable = true, -- Enable procedural macros
+			},
+			check = {
+				command = "clippy", -- Use Clippy for on-save linting
+			},
+		},
+	},
+	on_attach = function(client, bufnr)
+		-- Keymaps specific to Rust LSP
+		local opts = { buffer = bufnr }
+		vim.keymap.set("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+		vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+		vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
+	end,
+})
+
+
 
 local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
 
