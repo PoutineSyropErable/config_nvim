@@ -73,10 +73,10 @@ lspconfig.clangd.setup({
 		-- clangd command with additional options
 		"clangd",
 		"--offset-encoding=utf-16",
-		"--background-index",   -- Enable background indexing
-		"--clang-tidy",         -- Enable clang-tidy diagnostics
+		"--background-index", -- Enable background indexing
+		"--clang-tidy", -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
-		"--cross-file-rename",  -- Support for renaming symbols across files
+		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 	},
@@ -103,11 +103,10 @@ lspconfig.clangd.setup({
 	end,
 })
 
-
 lspconfig.rust_analyzer.setup({
 	cmd = { "rust-analyzer" },
-	capabilities = lsp_defaults.capabilities,                                       -- Enable LSP capabilities
-	filetypes = { "rust" },                                                         -- Apply to Rust files
+	capabilities = lsp_defaults.capabilities, -- Enable LSP capabilities
+	filetypes = { "rust" }, -- Apply to Rust files
 	root_dir = lspconfig.util.root_pattern("Cargo.toml", "rust-project.json", ".git"), -- Detect project root
 	settings = {
 		["rust-analyzer"] = {
@@ -129,14 +128,13 @@ lspconfig.rust_analyzer.setup({
 	},
 	on_attach = function(client, bufnr)
 		-- Keymaps specific to Rust LSP
+		_G.MyRootDir = client.config.root_dir
 		local opts = { buffer = bufnr }
-		vim.keymap.set("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-		vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-		vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
+		-- vim.keymap.set("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+		-- vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+		-- vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
 	end,
 })
-
-
 
 local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
 
