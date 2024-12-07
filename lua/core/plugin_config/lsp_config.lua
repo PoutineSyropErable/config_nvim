@@ -23,6 +23,7 @@ require("mason-tool-installer").setup({
 
 local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
+_G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities =
 	vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
@@ -97,6 +98,7 @@ lspconfig.clangd.setup({
 	},
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
+		_G.MyRootDir = client.config.root_dir
 		-- print("Clangd root directory detected: " .. (root or "none"))
 	end,
 })
@@ -165,6 +167,11 @@ lspconfig.jdtls.setup({
 		},
 	},
 	capabilities = lsp_defaults.capabilities,
+	on_attach = function(client, bufnr)
+		-- Update the global variable when the LSP attaches
+		_G.MyRootDir = client.config.root_dir
+		-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+	end,
 })
 
 local opts = { noremap = true, silent = true }
