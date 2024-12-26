@@ -25,6 +25,11 @@ local function tab_formatter_go()
 end
 
 require("conform").setup({
+	formatters = {
+		black = {
+			prepend_args = { "--line-length", "140" }, -- Set the line length for black
+		},
+	},
 	formatters_by_ft = {
 		lua = { "stylua" },
 		python = { "black" },
