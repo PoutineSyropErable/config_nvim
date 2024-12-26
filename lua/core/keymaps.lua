@@ -494,6 +494,11 @@ vim.api.nvim_set_keymap("v", "jk", "<Esc>", { noremap = true })
 vim.api.nvim_set_keymap("i", "JK", "<Esc>", { noremap = true })
 vim.api.nvim_set_keymap("v", "JK", "<Esc>", { noremap = true })
 
+vim.api.nvim_set_keymap("i", "jl", "<Esc>", { noremap = true })
+vim.api.nvim_set_keymap("v", "jl", "<Esc>", { noremap = true })
+vim.api.nvim_set_keymap("i", "JL", "<Esc>", { noremap = true })
+vim.api.nvim_set_keymap("v", "JK", "<Esc>", { noremap = true })
+
 -- Map Enter in normal mode to add a new line
 vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
