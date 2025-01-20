@@ -618,12 +618,7 @@ end
 -- Bind the function to <C-H>
 vim.api.nvim_set_keymap("n", "<C-g>", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>rc",
-	"<Cmd>lua Replace_with_confirmation()<CR>",
-	{ noremap = true, silent = true }
-)
+vim.api.nvim_set_keymap("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
 
 -- Lua function for interactive replacement
@@ -646,6 +641,68 @@ vim.api.nvim_create_user_command("ReplaceFrancois", ReplaceFrancois, {})
 vim.api.nvim_set_keymap("n", "zt", "zt", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "zz", "zz", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "zb", "zb", { noremap = true, silent = true })
+
+--------------------------------- WRITE FUNCTIONS MACRO --------------------------------------
+
+function write_function_simple()
+	local input = vim.fn.input("Enter variable name: ")
+	if input and input ~= "" then
+		vim.api.nvim_put({ string.format("print(f'%s = {%s}')", input, input) }, "l", true, true)
+	end
+end
+
+function write_function_newline()
+	local input = vim.fn.input("Enter variable name: ")
+	if input and input ~= "" then
+		vim.api.nvim_put({ string.format("print(f'%s = \n{%s}\n')", input, input) }, "l", true, true)
+	end
+end
+
+local function write_function_debug()
+	local input = vim.fn.input("Enter variable name: ")
+	if input and input ~= "" then
+		local debug_code = string.format(
+			[[if DEBUG_:
+    print(f'type(%s) = {type(%s)}')
+    try:
+        print(f'np.shape(%s) = {np.shape(%s)}')
+    except Exception as e:
+        print('Some error about not having a shape:', e)
+    print(f'%s = \n{%s}\n')]],
+			input,
+			input,
+			input,
+			input,
+			input,
+			input
+		)
+		vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
+	end
+end
+
+function not_invert()
+	local word = vim.fn.expand("<cword>")
+	local replacements = {
+		["true"] = "false",
+		["false"] = "true",
+		["True"] = "False",
+		["False"] = "True",
+	}
+
+	if replacements[word] then
+		-- Use vim.cmd to replace the word under the cursor
+		vim.cmd("normal! ciw" .. replacements[word])
+	else
+		print("NotInvert: No matching word to invert")
+	end
+end
+
+-- Bind the functions to keymaps
+vim.keymap.set("n", "<leader>wfs", write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
+vim.keymap.set("n", "<leader>wfn", write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
+
+vim.keymap.set("n", "<leader>wfd", write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
+vim.keymap.set("n", "<leader>ni", not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
 
 ----------------------------------------------- END OF CONFIG FILE
 
