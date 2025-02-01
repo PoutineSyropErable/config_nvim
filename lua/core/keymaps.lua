@@ -208,16 +208,25 @@ keymap.set("n", "<leader>cp", "[c") -- previous diff hunk
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
 
--- Setup Flash
 flash.setup({
 	event = "VeryLazy",
 	opts = {},
+	modes = {
+		char = {
+			enabled = true, -- Ensure `f`, `t`, `F`, `T` work with Flash.nvim
+			jump_labels = true, -- Show labels after `f` or `t`
+			multi_line = true, -- Allow jumping across lines
+			highlight = {
+				matches = true, -- Ensure matches are highlighted
+				backdrop = false, -- Prevent dimming of non-matching text
+			},
+		},
+	},
 })
 
 -- Define key mappings using vim.keymap.set
 -- vim.api.nvim_set_keymap("o", "f", "f", { noremap = true, silent = true })
-vim.keymap.set({ "n", "x", "o" }, "f", flash.jump, { desc = "Flash" })
-vim.keymap.set({ "n", "x", "o" }, "rj", "f")
+vim.keymap.set({ "n", "x", "o" }, "rj", flash.jump, { desc = "Flash jump" })
 vim.keymap.set({ "n", "x", "o" }, "rt", flash.treesitter, { desc = "Flash Treesitter" })
 vim.keymap.set("o", "ro", flash.remote, { desc = "Remote Flash" })
 vim.keymap.set({ "o", "x" }, "rs", flash.treesitter_search, { desc = "Treesitter Search" })
@@ -225,9 +234,9 @@ vim.keymap.set("c", "rT", flash.toggle, { desc = "Toggle Flash Search" })
 
 --------------------------------------------TREESJ
 -- Key mappings for TreeSJ commands
-vim.api.nvim_set_keymap("n", "<leader>tm", ":TSJToggle<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>ts", ":TSJSplit<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>tj", ":TSJJoin<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>Tm", ":TSJToggle<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>Ts", ":TSJSplit<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>Tj", ":TSJJoin<CR>", { noremap = true, silent = true })
 
 --------------------------------------------mini.surround
 local surrounds_mappings_see_mini_surround_lua = {
@@ -245,12 +254,12 @@ local surrounds_mappings_see_mini_surround_lua = {
 
 ---------------------- ----------------------Telescope
 local builtin = require("telescope.builtin")
-keymap.set("n", "<leader>fo", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
+keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
 keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find Keymaps" })
 
 keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
-keymap.set("n", "<leader>fs", builtin.current_buffer_fuzzy_find, { desc = "Current buffer fuzzy find" })
 keymap.set("n", "<leader>fS", builtin.grep_string, { desc = "grep string" })
+keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, { desc = "Current buffer fuzzy find" })
 
 keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
 keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
@@ -269,6 +278,8 @@ keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Git Commits
 
 keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
 
+vim.keymap.set("n", "<C-o>", "<C-o>", { desc = "Jump Backward in Jump List" })
+vim.keymap.set("n", "<C-p>", "<C-i>", { desc = "Jump Forward in Jump List" })
 vim.keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
 vim.keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
 
@@ -349,13 +360,13 @@ keymap.set("n", "<leader>go", function()
 	end
 end)
 
-keymap.set("n", "<leader>tc", function()
+keymap.set("n", "<leader>dTc", function()
 	if vim.bo.filetype == "python" then
 		require("dap-python").test_class()
 	end
 end)
 
-keymap.set("n", "<leader>tm", function()
+keymap.set("n", "<leader>dTm", function()
 	if vim.bo.filetype == "python" then
 		require("dap-python").test_method()
 	end
@@ -396,24 +407,7 @@ keymap.set("n", "<leader>de", function()
 end)
 
 ---------------------------------- Terminal
-local term_map = require("terminal.mappings")
-keymap.set({ "n", "x" }, "<leader>ts", term_map.operator_send, { expr = true })
-keymap.set("n", "<leader>To", term_map.toggle, { desc = "Toggle " })
-keymap.set("n", "<leader>TO", term_map.toggle({ open_cmd = "enew" }))
-keymap.set("n", "<leader>Tr", term_map.run)
-keymap.set("n", "<leader>TR", term_map.run(nil, { layout = { open_cmd = "enew" } }))
-keymap.set("n", "<leader>Tk", term_map.kill)
-keymap.set("n", "<leader>T]", term_map.cycle_next)
-keymap.set("n", "<leader>T[", term_map.cycle_prev)
-keymap.set("n", "<leader>Tl", term_map.move({ open_cmd = "belowright vnew" }))
-keymap.set("n", "<leader>TL", term_map.move({ open_cmd = "botright vnew" }))
-keymap.set("n", "<leader>Th", term_map.move({ open_cmd = "belowright new" }))
-keymap.set("n", "<leader>TH", term_map.move({ open_cmd = "botright new" }))
-keymap.set("n", "<leader>Tf", term_map.move({ open_cmd = "float" }))
-
-vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
-
+----Float Term:
 vim.keymap.set(
 	"n",
 	"<leader>tm",
@@ -423,6 +417,37 @@ vim.keymap.set(
 
 keymap.set("n", "<leader>tp", "<cmd>FloatermPrev<CR>")
 keymap.set("n", "<leader>tn", "<cmd>FloatermNext<CR>")
+
+---- Terminal Mappings
+local term_map = require("terminal.mappings")
+
+-- Send selected text to terminal
+keymap.set({ "n", "x" }, "<leader>Ms", term_map.operator_send, { expr = true, desc = "Send selection to terminal" })
+
+-- Toggle terminal visibility
+keymap.set("n", "<leader>Mo", term_map.toggle, { desc = "Toggle terminal" })
+keymap.set("n", "<leader>MO", term_map.toggle({ open_cmd = "enew" }), { desc = "Toggle terminal in new buffer" })
+
+-- Run command in terminal
+keymap.set("n", "<leader>Mr", term_map.run, { desc = "Run command in terminal" })
+keymap.set("n", "<leader>MR", term_map.run(nil, { layout = { open_cmd = "enew" } }), { desc = "Run command in a new buffer" })
+
+-- Kill the current terminal session
+keymap.set("n", "<leader>Mk", term_map.kill, { desc = "Kill terminal session" })
+
+-- Cycle between open terminals
+keymap.set("n", "<leader>M]", term_map.cycle_next, { desc = "Cycle to next terminal" })
+keymap.set("n", "<leader>M[", term_map.cycle_prev, { desc = "Cycle to previous terminal" })
+
+-- Move terminal to different locations
+keymap.set("n", "<leader>Ml", term_map.move({ open_cmd = "belowright vnew" }), { desc = "Move terminal to right split" })
+keymap.set("n", "<leader>ML", term_map.move({ open_cmd = "botright vnew" }), { desc = "Move terminal to far-right split" })
+keymap.set("n", "<leader>Mh", term_map.move({ open_cmd = "belowright new" }), { desc = "Move terminal to bottom split" })
+keymap.set("n", "<leader>MH", term_map.move({ open_cmd = "botright new" }), { desc = "Move terminal to far-bottom split" })
+keymap.set("n", "<leader>Mf", term_map.move({ open_cmd = "float" }), { desc = "Move terminal to floating window" })
+
+vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
 
 --------------------------------------Tmux
 
@@ -541,6 +566,7 @@ vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true }
 vim.api.nvim_set_keymap("n", "<C-d>", "<C-d>", { noremap = true, silent = true })
 -- map Ctrl+f to scroll up 1/2 screen
 vim.api.nvim_set_keymap("n", "<C-e>", "<C-u>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "<C-e>", "<C-u>", { noremap = true, silent = true })
 
 --scroll down/up one line (change the viewport)
 vim.api.nvim_set_keymap("n", "<C-f>", "<C-e>", { noremap = true, silent = true })
@@ -618,8 +644,13 @@ end
 -- Bind the function to <C-H>
 vim.api.nvim_set_keymap("n", "<C-g>", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>rc",
+	"<Cmd>lua Replace_with_confirmation()<CR>",
+	{ noremap = true, silent = true, desc = "Replace with confirmation" }
+)
+vim.api.nvim_set_keymap("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
 
 -- Lua function for interactive replacement
 function ReplaceFrancois()
@@ -641,46 +672,232 @@ vim.api.nvim_create_user_command("ReplaceFrancois", ReplaceFrancois, {})
 vim.api.nvim_set_keymap("n", "zt", "zt", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "zz", "zz", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "zb", "zb", { noremap = true, silent = true })
+------------------------------------------ SYMBOL SEARCH FUNCTION FOR MACROS ---------------
+local telescope = require("telescope.builtin")
+local finders = require("telescope.finders")
+local pickers = require("telescope.pickers")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+
+-- Function to fetch symbols (LSP + buffer fallback)
+local function get_symbols()
+	local symbols = {}
+
+	-- 🔹 1. Fetch top-level and function-local symbols from LSP
+	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+	local lsp_results = vim.lsp.buf_request_sync(0, "textDocument/documentSymbol", params, 1000)
+	if lsp_results then
+		for _, server in pairs(lsp_results) do
+			for _, item in pairs(server.result or {}) do
+				-- Add top-level symbols
+				table.insert(symbols, {
+					name = item.name,
+					kind = vim.lsp.protocol.SymbolKind[item.kind] or "Unknown",
+				})
+
+				-- 🔹 If a symbol has children (e.g., function-local vars), add them
+				if item.children then
+					for _, child in pairs(item.children) do
+						table.insert(symbols, {
+							name = child.name,
+							kind = vim.lsp.protocol.SymbolKind[child.kind] or "Local Variable",
+						})
+					end
+				end
+			end
+		end
+	end
+
+	-- 🔹 2. Try fetching workspace symbols (across imported files)
+	local workspace_results = vim.lsp.buf_request_sync(0, "workspace/symbol", { query = "" }, 1000)
+	if workspace_results then
+		for _, server in pairs(workspace_results) do
+			for _, item in pairs(server.result or {}) do
+				table.insert(symbols, {
+					name = item.name,
+					kind = vim.lsp.protocol.SymbolKind[item.kind] or "Unknown",
+				})
+			end
+		end
+	end
+
+	-- 🔹 3. Fallback: Extract words from buffer if no LSP symbols
+	if #symbols == 0 then
+		local word_set = {}
+		for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+			for word in line:gmatch("[A-Za-z_][A-Za-z0-9_]*") do
+				if not word_set[word] then
+					table.insert(symbols, { name = word, kind = "Buffer Word" })
+					word_set[word] = true
+				end
+			end
+		end
+	end
+
+	return symbols
+end
+
+-- Function to show symbols in Telescope and call `callback` with the selected symbol
+local function select_symbol(callback)
+	local symbols = get_symbols()
+
+	if #symbols == 0 then
+		print("No symbols found!")
+		return
+	end
+
+	pickers
+		.new({}, {
+			prompt_title = "Select Symbol",
+			finder = finders.new_table({
+				results = symbols,
+				entry_maker = function(entry)
+					return {
+						value = entry.name,
+						display = entry.name .. " (" .. entry.kind .. ")",
+						ordinal = entry.name,
+					}
+				end,
+			}),
+			sorter = conf.generic_sorter({}),
+			attach_mappings = function(_, map)
+				map("i", "<CR>", function(prompt_bufnr)
+					local selection = action_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					if selection and callback then
+						callback(selection.value) -- Call the callback function with selected value
+					end
+				end)
+				return true
+			end,
+		})
+		:find()
+end
+
+local function get_variable_name(callback)
+	select_symbol(callback) -- Calls select_symbol and passes `callback`
+end
 
 --------------------------------- WRITE FUNCTIONS MACRO --------------------------------------
 
-function write_function_simple()
-	local input = vim.fn.input("Enter variable name: ")
-	if input and input ~= "" then
-		vim.api.nvim_put({ string.format("print(f'%s = {%s}')", input, input) }, "l", true, true)
+_G.debug_utils = {}
+
+local function get_indent()
+	local indent_level = vim.fn.indent(".") -- Get indentation level in spaces
+	local tab_width = vim.o.shiftwidth > 0 and vim.o.shiftwidth or vim.o.tabstop
+
+	if vim.o.expandtab then
+		return string.rep(" ", indent_level) -- Use spaces if expandtab is set
+	else
+		local num_tabs = math.floor(indent_level / tab_width)
+		local num_spaces = indent_level % tab_width
+		return string.rep("\t", num_tabs) .. string.rep(" ", num_spaces) -- Use actual tabs if expandtab is off
 	end
 end
 
-function write_function_newline()
-	local input = vim.fn.input("Enter variable name: ")
-	if input and input ~= "" then
-		vim.api.nvim_put({ string.format("print(f'%s = \n{%s}\n')", input, input) }, "l", true, true)
-	end
+-- Simple write function to print variable name and value.
+function _G.debug_utils.write_function_simple()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local print_statement = string.format("%sprint(f'%s = {%s}')", indent, input, input)
+			vim.api.nvim_put({ print_statement }, "l", true, true)
+		end
+	end)
 end
 
-local function write_function_debug()
-	local input = vim.fn.input("Enter variable name: ")
-	if input and input ~= "" then
-		local debug_code = string.format(
-			[[if DEBUG_:
-    print(f'type(%s) = {type(%s)}')
-    try:
-        print(f'np.shape(%s) = {np.shape(%s)}')
-    except Exception as e:
-        print('Some error about not having a shape:', e)
-    print(f'%s = \n{%s}\n')]],
-			input,
-			input,
-			input,
-			input,
-			input,
-			input
-		)
-		vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
-	end
+-- Write function for NumPy variables to print shape and value.
+function _G.debug_utils.write_function_numpy()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local debug_code = string.format(
+				[[%sprint(f'np.shape(%s) = {np.shape(%s)}')
+%sprint(f'%s = {%s}')]],
+				indent,
+				input,
+				input,
+				indent,
+				input,
+				input
+			)
+			vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
+		end
+	end)
 end
 
-function not_invert()
+-- Write function for NumPy variables to print shape and value (new line version).
+function _G.debug_utils.write_function_np_newline()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local debug_code = string.format(
+				[[%sprint(f'np.shape(%s) = {np.shape(%s)}')
+%sprint(f'%s = \n{%s}\n')]],
+				indent,
+				input,
+				input,
+				indent,
+				input,
+				input
+			)
+			vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
+		end
+	end)
+end
+
+-- Print variable value on a new line for better readability.
+function _G.debug_utils.write_function_newline()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			vim.api.nvim_put({ indent .. string.format("print(f'%s = \n{%s}\n')", input, input) }, "l", true, true)
+		end
+	end)
+end
+
+-- Enhanced debug function for more robust NumPy variable checks.
+function _G.debug_utils.write_function_debug()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local debug_code = string.format(
+				[[%sif DEBUG_:
+%s	print(f'type(%s) = {type(%s)}')
+%s	try:
+%s		print(f'np.shape(%s) = {np.shape(%s)}')
+%s	except Exception as e:
+%s		print('Some error about not having a shape:', e)
+%s	print(f'%s = \n{%s}\n')]],
+				indent,
+				indent,
+				input,
+				input,
+				indent,
+				indent,
+				input,
+				input,
+				indent,
+				indent,
+				indent,
+				input,
+				input
+			)
+			vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
+		end
+	end)
+end
+
+---- Bind the functions to keymaps -----
+vim.keymap.set("n", "<leader>wfs", _G.debug_utils.write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
+vim.keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, { noremap = true, silent = true, desc = "Write Function Numpy" })
+vim.keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, { noremap = true, silent = true, desc = "Write Function Numpy NewLine" })
+vim.keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
+vim.keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
+--------------------------------- GENERAL UTILS MACRO --------------------------------------
+_G.general_utils_franck = {}
+function _G.general_utils_franck.not_invert()
 	local word = vim.fn.expand("<cword>")
 	local replacements = {
 		["true"] = "false",
@@ -690,19 +907,52 @@ function not_invert()
 	}
 
 	if replacements[word] then
-		-- Use vim.cmd to replace the word under the cursor
 		vim.cmd("normal! ciw" .. replacements[word])
 	else
 		print("NotInvert: No matching word to invert")
 	end
 end
 
--- Bind the functions to keymaps
-vim.keymap.set("n", "<leader>wfs", write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
-vim.keymap.set("n", "<leader>wfn", write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
+function _G.general_utils_franck.search_word(direction)
+	-- Get the word under the cursor
+	local word = vim.fn.expand("<cword>")
+	if word == nil or word == "" then
+		print("No word under cursor!")
+		return
+	end
 
-vim.keymap.set("n", "<leader>wfd", write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
-vim.keymap.set("n", "<leader>ni", not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
+	-- Perform the search
+	local found = false
+	if direction == "next" then
+		found = vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "W") -- Case-sensitive forward search
+	elseif direction == "prev" then
+		found = vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "bW") -- Case-sensitive backward search
+	else
+		print("Invalid direction: Use 'next' or 'prev'")
+		return
+	end
+
+	if found ~= 0 then
+		print("Found word: " .. word)
+	else
+		print("Word not found: " .. word)
+	end
+end
+
+-- Bind to functions for next and previous search
+function _G.general_utils_franck.SearchNextWord()
+	_G.general_utils_franck.search_word("next")
+end
+
+function _G.general_utils_franck.SearchPrevWord()
+	_G.general_utils_franck.search_word("prev")
+end
+
+---- Bind the functions to keymaps ----
+vim.keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
+-- Key mappings for leader + left/right
+vim.keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
+vim.keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
 
 ----------------------------------------------- END OF CONFIG FILE
 
