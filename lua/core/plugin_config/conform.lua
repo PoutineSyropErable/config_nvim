@@ -30,7 +30,7 @@ require("conform").setup({
 			prepend_args = { "--line-length", "140" }, -- Set the line length for black
 		},
 		stylua = {
-			prepend_args = { "--column-width", "140" }, -- Set the column width for stylua
+			prepend_args = { "--column-width", "151" }, -- Set the column width for stylua
 		},
 	},
 	formatters_by_ft = {

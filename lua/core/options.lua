@@ -14,6 +14,8 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.shiftround = true
 vim.opt.expandtab = false
+vim.o.autoindent = true -- Maintain indentation from the previous line
+vim.o.smartindent = true -- More intelligent auto-indentation
 
 vim.cmd([[ set noswapfile ]])
 vim.cmd([[ set termguicolors ]])
