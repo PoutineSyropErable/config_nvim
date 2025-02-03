@@ -55,6 +55,7 @@ require("conform").setup({
 		gleam = { "gleam" },
 		sql = { "sqlfmt" },
 		asm = { "asmfmt" },
+		sh = { "shfmt" },
 	},
 	format_on_save = {
 		timeout_ms = 5000,

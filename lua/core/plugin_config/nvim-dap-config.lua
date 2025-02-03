@@ -1,62 +1,63 @@
-local dap = require('dap')
-local dap_python = require('dap-python')
+local dap = require("dap")
 
--- Set the path to the Python interpreter in your virtual environment
-dap_python.setup('/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python')
+-------------------------------- C/C++ ----------------------------------
 
--- Python Debugging Configuration
-dap.configurations.python = {
-    {
-        type = "python",
-        request = "launch",
-        name = "Launch file",
-        program = "${file}", -- This will launch the currently opened file
-        pythonPath = function()
-            return '/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python' -- Use your virtual environment's Python path
-        end,
-    },
+dap.adapters.gdb = {
+	type = "executable",
+	command = "gdb",
+	args = { "-i", "dap" },
 }
 
+local function get_source_directories()
+	local cwd = vim.fn.getcwd()
+	local dirs = {}
+	local output = vim.fn.systemlist("find " .. cwd .. " -type f -name '*.c' -exec dirname {} \\; | sort -u")
 
--- C/C++ Debugging Configuration
-dap.adapters.cppdbg = {
-    type = 'executable',
-    command = 'lldb-vscode', -- Adjust if you're using a different debugger
-    name = 'lldb',
+	if #output == 0 then
+		table.insert(dirs, cwd) -- Default to project root if empty
+	else
+		for _, dir in ipairs(output) do
+			table.insert(dirs, dir)
+		end
+	end
+
+	return dirs
+end
+
+dap.configurations.c = {
+	{
+		name = "Build & Debug main",
+		type = "gdb",
+		request = "launch",
+		program = function()
+			local exe_path = vim.fn.getcwd() .. "/build/main"
+			if vim.fn.filereadable(exe_path) == 0 then
+				os.execute("make")
+			end
+			return exe_path
+		end,
+		cwd = vim.fn.getcwd(),
+		stopAtEntry = false,
+		setupCommands = vim.tbl_flatten({
+			{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
+			{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
+			{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
+			vim.tbl_map(function(dir)
+				return { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false }
+			end, get_source_directories()),
+		}),
+	},
 }
 
-dap.configurations.cpp = {
-    {
-        name = "Launch C++",
-        type = "cppdbg",
-        request = "launch",
-        program = "${workspaceFolder}/path/to/your/executable", -- Adjust this path
-        args = {},
-        stopAtEntry = false,
-        cwd = '${workspaceFolder}',
-        environment = {},
-        externalConsole = false,
-        MIMode = "gdb",
-        setupCommands = {
-            {
-                text = "-enable-pretty-printing",
-                description = "Enable pretty printing",
-                ignoreFailures = true,
-            },
-        },
-    },
-}
+dap.configurations.cpp = dap.configurations.c -- Apply same config for C++
 
-dap.configurations.c = dap.configurations.cpp -- Optional: Use the same configuration for C
-
-
-
+-------------------------------- BASH ----------------------------------
 
 -- DAP Adapter for Bash
 dap.adapters.bashdb = {
-	type = 'executable',
-	command = 'bash-debug-adapter',
-	name = 'bashdb',
+	type = "executable",
+	command = "bash-debug-adapter",
+	name = "bashdb",
 }
 
 -- DAP Configurations for Bash
@@ -73,3 +74,23 @@ dap.configurations.sh = {
 	},
 }
 
+-------------------------------- PYTHON ----------------------------------
+
+require("dap-python").setup(vim.fn.exepath("python3")) -- Use system Python by default
+
+dap.configurations.python = {
+	{
+		type = "python",
+		request = "launch",
+		name = "Launch file",
+		program = "${file}", -- Run the currently open file
+		pythonPath = function()
+			-- Use the active virtual environment if available
+			if vim.env.VIRTUAL_ENV then
+				return vim.env.VIRTUAL_ENV .. "/bin/python"
+			end
+			-- Otherwise, fallback to system Python
+			return vim.fn.exepath("python3") or "python"
+		end,
+	},
+}
