@@ -34,18 +34,15 @@ vim.api.nvim_set_keymap("v", "<leader>v", '"+p', { noremap = true, silent = true
 
 vim.api.nvim_set_keymap("n", "<C-c>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-x>", '"+d', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-C>", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-V>", '"+p', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("v", "<C-C>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<C-c>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<C-x>", '"+d', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-V>", '"+p', { noremap = true, silent = true })
 
+vim.api.nvim_set_keymap("", "<C-C>", '"+y', { noremap = true, silent = true })
+vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
 -- Select all text (Help when vscode loads this)
 keymap.set("", "<C-a>", "ggVG<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>a", "ggVG<CR>", { noremap = true, silent = true })
-keymap.set("", "<leader>a", "ggVG<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>rd", function()
 	print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected"))
 end, { desc = "Print LSP Root Directory" })
@@ -123,6 +120,7 @@ vim.api.nvim_set_keymap(
 vim.api.nvim_set_keymap("n", "<leader>nr", ":source %<CR>", { noremap = true, silent = true })
 -- Key mapping to toggle NvimTree
 vim.api.nvim_set_keymap("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>tf", ":NvimTreeFindFile<CR>")
 -- Oil go backward with backspace
 keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
 --keymap.set("n", "<BS>", require("oil").open, { desc = "Open parent directory" })
@@ -220,23 +218,24 @@ flash.setup({
 				matches = true, -- Ensure matches are highlighted
 				backdrop = false, -- Prevent dimming of non-matching text
 			},
+			label = { after = { 0, 1 } },
 		},
 	},
 })
 
 -- Define key mappings using vim.keymap.set
--- vim.api.nvim_set_keymap("o", "f", "f", { noremap = true, silent = true })
+
 vim.keymap.set({ "n", "x", "o" }, "rj", flash.jump, { desc = "Flash jump" })
+vim.keymap.set("n", "rT", flash.toggle, { desc = "Toggle Flash Search" })
 vim.keymap.set({ "n", "x", "o" }, "rt", flash.treesitter, { desc = "Flash Treesitter" })
 vim.keymap.set("o", "ro", flash.remote, { desc = "Remote Flash" })
 vim.keymap.set({ "o", "x" }, "rs", flash.treesitter_search, { desc = "Treesitter Search" })
-vim.keymap.set("c", "rT", flash.toggle, { desc = "Toggle Flash Search" })
 
 --------------------------------------------TREESJ
 -- Key mappings for TreeSJ commands
-vim.api.nvim_set_keymap("n", "<leader>Tm", ":TSJToggle<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>Ts", ":TSJSplit<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>Tj", ":TSJJoin<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>jm", ":TSJToggle<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>js", ":TSJSplit<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>jj", ":TSJJoin<CR>", { noremap = true, silent = true })
 
 --------------------------------------------mini.surround
 local surrounds_mappings_see_mini_surround_lua = {
@@ -296,9 +295,10 @@ vim.keymap.set("n", "<leader>zK", function()
 end, { desc = "Peek Fold" })
 
 ---------------------------------------------LSP
-local cmp = require("cmp")
 keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
-keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+-- keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+keymap.set("n", "gd", "<Cmd>Telescope lsp_definitions<CR>", { noremap = true, silent = true })
+
 keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
 keymap.set("n", "<leader>gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
 keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
@@ -316,9 +316,6 @@ keymap.set("n", "<leader>gn", "<cmd>lua vim.diagnostic.goto_next()<CR>")
 keymap.set("n", "<leader>tr", "<cmd>lua vim.lsp.buf.document_symbol()<CR>")
 -- keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
 --^^ deprecated
-
--- Map <C-Space> to trigger completion in insert mode
--- vim.keymap.set("i", "<C-Space>", cmp.mapping.complete(), { noremap = true, silent = true })
 
 ---------------------------------------------------------------- Harpoon
 keymap.set("n", "<leader>ha", require("harpoon.mark").add_file)
@@ -372,39 +369,59 @@ keymap.set("n", "<leader>dTm", function()
 	end
 end)
 
---------------------------------------------- Debugging
-keymap.set("n", "<leader>bb", "<cmd>lua require'dap'.toggle_breakpoint()<cr>")
-keymap.set("n", "<leader>bc", "<cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<cr>")
-keymap.set("n", "<leader>bl", "<cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<cr>")
-keymap.set("n", "<leader>br", "<cmd>lua require'dap'.clear_breakpoints()<cr>")
-keymap.set("n", "<leader>ba", "<cmd>Telescope dap list_breakpoints<cr>")
+--------------------------------------------- Debugging (nvim-dap)
+-- Breakpoint Management
+keymap.set("n", "<leader>bb", "<cmd>lua require'dap'.toggle_breakpoint()<cr>", { desc = "Toggle breakpoint at current line" })
+keymap.set(
+	"n",
+	"<leader>bc",
+	"<cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<cr>",
+	{ desc = "Set conditional breakpoint" }
+)
+keymap.set(
+	"n",
+	"<leader>bl",
+	"<cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<cr>",
+	{ desc = "Set log point (executes a log message instead of stopping execution)" }
+)
+keymap.set("n", "<leader>br", "<cmd>lua require'dap'.clear_breakpoints()<cr>", { desc = "Clear all breakpoints" })
+keymap.set("n", "<leader>ba", "<cmd>Telescope dap list_breakpoints<cr>", { desc = "List all breakpoints (Telescope UI)" })
 
-keymap.set("n", "<leader>dc", "<cmd>lua require'dap'.continue()<cr>")
-keymap.set("n", "<leader>dj", "<cmd>lua require'dap'.step_over()<cr>")
-keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>")
-keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>")
+-- Debugging Execution
+keymap.set("n", "<leader>dc", "<cmd>lua require'dap'.continue()<cr>", { desc = "Start/continue debugging session" })
+keymap.set("n", "<leader>dj", "<cmd>lua require'dap'.step_over()<cr>", { desc = "Step over (skip function calls)" })
+keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>", { desc = "Step into function calls" })
+keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>", { desc = "Step out of current function" })
+
+-- Debugging Stop/Disconnect
 keymap.set("n", "<leader>dd", function()
 	require("dap").disconnect()
 	require("dapui").close()
-end)
+end, { desc = "Disconnect debugger (keep process running)" })
+
 keymap.set("n", "<leader>dt", function()
 	require("dap").terminate()
 	require("dapui").close()
-end)
-keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>")
-keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.run_last()<cr>")
+end, { desc = "Terminate debugging session (kill process)" })
+
+-- Debugging Tools
+keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", { desc = "Toggle debugger REPL" })
+keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.run_last()<cr>", { desc = "Re-run last debugging session" })
 keymap.set("n", "<leader>di", function()
 	require("dap.ui.widgets").hover()
-end)
+end, { desc = "Hover to inspect variable under cursor" })
+
 keymap.set("n", "<leader>d?", function()
 	local widgets = require("dap.ui.widgets")
 	widgets.centered_float(widgets.scopes)
-end)
-keymap.set("n", "<leader>df", "<cmd>Telescope dap frames<cr>")
-keymap.set("n", "<leader>dh", "<cmd>Telescope dap commands<cr>")
+end, { desc = "Show debugging scopes (floating window)" })
+
+-- Telescope DAP Integrations
+keymap.set("n", "<leader>df", "<cmd>Telescope dap frames<cr>", { desc = "Show stack frames (Telescope UI)" })
+keymap.set("n", "<leader>dh", "<cmd>Telescope dap commands<cr>", { desc = "List DAP commands (Telescope UI)" })
 keymap.set("n", "<leader>de", function()
 	require("telescope.builtin").diagnostics({ default_text = ":E:" })
-end)
+end, { desc = "Show errors and diagnostics (Telescope UI)" })
 
 ---------------------------------- Terminal
 ----Float Term:
@@ -532,17 +549,17 @@ vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true }
 -------- USE    i
 ------------  j k l
 -- rather then hjkl for movement, h is insert ---------------------------
-vim.api.nvim_set_keymap("v", "j", "h", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "l", "l", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "i", "k", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "k", "j", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "h", "i", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "j", "v:count1 .. 'h'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "l", "v:count1 .. 'l'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "i", "v:count1 .. 'k'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "k", "v:count1 .. 'j'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "h", "i", { noremap = true, silent = true }) -- No count needed for Insert Mode
 
-vim.api.nvim_set_keymap("n", "j", "h", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "l", "l", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "i", "k", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "k", "j", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "h", "i", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "j", "v:count1 .. 'h'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "l", "v:count1 .. 'l'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "i", "v:count1 .. 'k'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "k", "v:count1 .. 'j'", { expr = true, noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "h", "i", { noremap = true, silent = true }) -- No count needed for Insert Mode
 
 vim.api.nvim_set_keymap("v", "J", "_", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "L", "$", { noremap = true, silent = true })
@@ -948,14 +965,27 @@ function _G.general_utils_franck.SearchPrevWord()
 	_G.general_utils_franck.search_word("prev")
 end
 
----- Bind the functions to keymaps ----
+-- Function to copy the full file path
+function _G.general_utils_franck.CopyFilePath()
+	local path = vim.fn.expand("%:p") -- Get absolute file path
+	vim.fn.setreg("+", path) -- Copy to system clipboard
+	print("Copied file path: " .. path)
+end
+
+-- Function to copy the directory path
+function _G.general_utils_franck.CopyDirPath()
+	local dir = vim.fn.expand("%:p:h") -- Get directory path of current file
+	vim.fn.setreg("+", dir) -- Copy to system clipboard
+	print("Copied directory path: " .. dir)
+end
+
 vim.keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
--- Key mappings for leader + left/right
+vim.keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, { desc = "Copy file path to clipboard" })
+vim.keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = "Copy directory path to clipboard" })
 vim.keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
 
 ----------------------------------------------- END OF CONFIG FILE
 
-vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
 -- print("Vim configuration reloaded")
 --print(vim.env.TERM)
