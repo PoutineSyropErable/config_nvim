@@ -8,6 +8,61 @@ dap.adapters.gdb = {
 	args = { "-i", "dap" },
 }
 
+local function find_in_build()
+	local build_dir = vim.fn.getcwd() .. "/build/"
+	local executables = vim.fn.systemlist("find " .. build_dir .. " -maxdepth 1 -type f -executable")
+	if #executables > 0 then
+		return executables[1]
+	end
+	return nil
+end
+
+local function find_elf_in_root()
+	local cwd = vim.fn.getcwd()
+	local elf_executables =
+		vim.fn.systemlist("find " .. cwd .. " -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'")
+	if #elf_executables > 0 then
+		return elf_executables[1]
+	end
+	return nil
+end
+
+local function parse_automake()
+	local cwd = vim.fn.getcwd()
+	local automake_file = cwd .. "/AutoMake"
+
+	-- Check if the file exists
+	if vim.fn.filereadable(automake_file) == 0 then
+		return nil
+	end
+
+	-- Read the file line by line
+	for _, line in ipairs(vim.fn.readfile(automake_file)) do
+		local target = line:match('TARGET="(.-)"')
+		if target then
+			return cwd .. "/" .. target -- Return the full path
+		end
+	end
+
+	return nil -- Return nil if no TARGET line was found
+end
+
+local function parse_makefile()
+	local cwd = vim.fn.getcwd()
+	local makefile = cwd .. "/Makefile"
+	local target_cmd = "make --dry-run --always-make --print-data-base | awk -F ': ' '/^TARGET/ {print $2; exit}'"
+	local target = vim.trim(vim.fn.system(target_cmd))
+
+	if target == "" then
+		return cwd .. "/build/main"
+	end
+	return cwd .. "/" .. target
+end
+
+local function find_executable()
+	return parse_automake() or find_in_build() or find_elf_in_root() or parse_makefile()
+end
+
 local function get_source_directories()
 	local cwd = vim.fn.getcwd()
 	local dirs = {}
@@ -30,11 +85,7 @@ dap.configurations.c = {
 		type = "gdb",
 		request = "launch",
 		program = function()
-			local exe_path = vim.fn.getcwd() .. "/build/main"
-			if vim.fn.filereadable(exe_path) == 0 then
-				os.execute("make")
-			end
-			return exe_path
+			return find_executable()
 		end,
 		cwd = vim.fn.getcwd(),
 		stopAtEntry = false,

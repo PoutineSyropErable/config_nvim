@@ -251,6 +251,9 @@ local surrounds_mappings_see_mini_surround_lua = {
 	suffix_next = "n", -- Suffix to search with "next" method
 }
 
+-------------------------------------------- Git
+keymap.set("n", "<leader>lg", ":LazyGit<CR>")
+
 ---------------------- ----------------------Telescope
 local builtin = require("telescope.builtin")
 keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
