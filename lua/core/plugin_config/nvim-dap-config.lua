@@ -1,4 +1,5 @@
 local dap = require("dap")
+dap.set_log_level("TRACE")
 
 -------------------------------- C/C++ ----------------------------------
 
@@ -187,7 +188,7 @@ local function get_source_directories()
 	return dirs
 end
 
-local setupCommands = {
+local GDBsetupCommands = {
 	{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
 	{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
 	{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
@@ -202,27 +203,54 @@ local setupCommands = {
 
 -- Append source directories manually
 for _, dir in ipairs(get_source_directories()) do
-	table.insert(setupCommands, { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false })
+	table.insert(GDBsetupCommands, { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false })
 end
+
+dap.adapters.cppdbg = {
+	id = "cppdbg",
+	type = "executable",
+	command = "/home/francois/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
+}
+
+local setupCommands = {
+	{ text = "-enable-pretty-printing", description = "Enable pretty printing", ignoreFailures = true },
+	{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
+	{ text = "directory " .. vim.fn.getcwd(), description = "Set source directory", ignoreFailures = false },
+	{ text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build", description = "Set debug symbols directory", ignoreFailures = false },
+}
 
 dap.configurations.c = {
 	{
-		name = "Build & Debug main",
-		type = "gdb",
+		name = "C++ Debugger by itself",
+		type = "cppdbg",
 		request = "launch",
 		program = function()
 			return find_executable()
 			-- return vim.fn.getcwd() .. "/build/mysh"
 		end,
 		console = "integratedTerminal", -- Output goes here
-		justMyCode = false, -- Optional: set to true for just your code
+		justMyCode = true, -- Optional: set to true for just your code
 		args = function()
 			return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ")
 		end,
-		cwd = vim.fn.getcwd(),
-		stopAtEntry = false,
+		-- cwd = vim.fn.getcwd(),
+		cwd = "${workspaceFolder}",
+		stopAtEntry = true,
 		setupCommands = setupCommands,
 	},
+	-- {
+	-- 	name = "Attach to GDB Server",
+	-- 	type = "cppdbg",
+	-- 	request = "launch",
+	-- 	MIMode = "gdb",
+	-- 	miDebuggerServerAddress = "localhost:1234",
+	-- 	miDebuggerPath = "/usr/bin/gdb",
+	-- 	cwd = "${workspaceFolder}",
+	-- 	program = function()
+	-- 		return find_executable()
+	-- 		-- return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+	-- 	end,
+	-- },
 }
 
 dap.configurations.cpp = dap.configurations.c -- Apply same config for C++

@@ -58,4 +58,18 @@ vim.opt.listchars = {
 vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
 
 vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim.log")
+
+-- Change color of breakpoints
+vim.fn.sign_define("DapBreakpoint", {
+	text = "🛑", -- This can be any symbol or text for the breakpoint
+	texthl = "DapBreakpointHighlight", -- Custom highlight group for breakpoint color
+	linehl = "", -- Optional: highlight the line (use with care)
+	numhl = "", -- Optional: highlight the line number
+})
+
+-- Define the custom highlight group for the breakpoint color
+vim.cmd([[
+  highlight DapBreakpointHighlight guifg=#0000FF guibg=NONE ctermfg=blue ctermbg=NONE
+]])
+
 -- vim.cmd('set verbose=10')
