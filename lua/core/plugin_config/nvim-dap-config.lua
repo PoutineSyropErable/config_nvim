@@ -5,7 +5,7 @@ local dap = require("dap")
 dap.adapters.gdb = {
 	type = "executable",
 	command = "gdb",
-	args = { "-i", "dap" },
+	args = { "--quiet", "--interpreter=dap" },
 }
 
 local function find_in_build()
@@ -187,6 +187,24 @@ local function get_source_directories()
 	return dirs
 end
 
+local setupCommands = {
+	{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
+	{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
+	{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
+	{
+		text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build",
+		description = "Ensure GDB finds debug symbols",
+		ignoreFailures = false,
+	},
+	{ text = "directory " .. vim.fn.getcwd(), description = "Set source directory", ignoreFailures = false },
+	{ text = "info sources", description = "Check if sources are loaded", ignoreFailures = false },
+}
+
+-- Append source directories manually
+for _, dir in ipairs(get_source_directories()) do
+	table.insert(setupCommands, { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false })
+end
+
 dap.configurations.c = {
 	{
 		name = "Build & Debug main",
@@ -196,29 +214,14 @@ dap.configurations.c = {
 			return find_executable()
 			-- return vim.fn.getcwd() .. "/build/mysh"
 		end,
+		console = "integratedTerminal", -- Output goes here
+		justMyCode = false, -- Optional: set to true for just your code
 		args = function()
 			return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ")
 		end,
 		cwd = vim.fn.getcwd(),
 		stopAtEntry = false,
-		terminal = "integrated",
-		externalConsole = true,
-
-		setupCommands = vim.tbl_flatten({
-			{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
-			{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
-			{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
-			{
-				text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build",
-				description = "Ensure GDB finds debug symbols",
-				ignoreFailures = false,
-			},
-			{ text = "directory " .. vim.fn.getcwd(), description = "Set source directory", ignoreFailures = false },
-			{ text = "info sources", description = "Check if sources are loaded", ignoreFailures = false },
-			vim.tbl_map(function(dir)
-				return { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false }
-			end, get_source_directories()),
-		}),
+		setupCommands = setupCommands,
 	},
 }
 
@@ -249,7 +252,8 @@ dap.configurations.sh = {
 
 -------------------------------- PYTHON ----------------------------------
 
-require("dap-python").setup(vim.fn.exepath("python3")) -- Use system Python by default
+require("dap-python").setup(vim.fn.exepath("python")) -- Use system Python by default
+print("Outisde, using Python: " .. vim.fn.exepath("python"))
 
 dap.configurations.python = {
 	{
@@ -257,12 +261,16 @@ dap.configurations.python = {
 		request = "launch",
 		name = "Launch file",
 		program = "${file}", -- Run the currently open file
+		console = "integratedTerminal", -- Output goes here
+		justMyCode = false, -- Optional: set to true for just your code
 		pythonPath = function()
 			-- Use the active virtual environment if available
 			if vim.env.VIRTUAL_ENV then
+				print("Using virtual environment: " .. vim.env.VIRTUAL_ENV)
 				return vim.env.VIRTUAL_ENV .. "/bin/python"
 			end
 			-- Otherwise, fallback to system Python
+			print("Using system Python: " .. vim.fn.exepath("python3"))
 			return vim.fn.exepath("python3") or "python"
 		end,
 	},
