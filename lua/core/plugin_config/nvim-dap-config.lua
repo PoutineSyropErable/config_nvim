@@ -193,11 +193,17 @@ dap.configurations.c = {
 		type = "gdb",
 		request = "launch",
 		program = function()
-			-- return find_executable()
-			return vim.fn.getcwd() .. "/build/mysh"
+			return find_executable()
+			-- return vim.fn.getcwd() .. "/build/mysh"
+		end,
+		args = function()
+			return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ")
 		end,
 		cwd = vim.fn.getcwd(),
 		stopAtEntry = false,
+		terminal = "integrated",
+		externalConsole = true,
+
 		setupCommands = vim.tbl_flatten({
 			{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
 			{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },

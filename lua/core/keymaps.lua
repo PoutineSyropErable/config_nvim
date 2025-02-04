@@ -403,29 +403,9 @@ keymap.set("n", "<leader>dd", function()
 end, { desc = "Disconnect debugger (keep process running)" })
 
 keymap.set("n", "<leader>dt", function()
-	local dap = require("dap")
-	local dapui = require("dapui")
-
-	if dap.session() then
-		print("[DAP] Terminating debugging session...")
-		dap.terminate()
-		dap.close()
-	end
-
-	dapui.close()
-	require("dap.repl").close() -- Ensure REPL is fully closed
-
-	-- Close all DAP-related floating windows
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		local buf = vim.api.nvim_win_get_buf(win)
-		local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-		if ft == "dap-repl" or ft == "dapui_scopes" or ft == "dapui_watches" then
-			vim.api.nvim_win_close(win, true)
-		end
-	end
-
-	print("[DAP] Debugging session fully terminated.")
-end, { desc = "Fully terminate debugging session (close REPL, UI, buffers)" })
+	require("dap").terminate()
+	require("dapui").close()
+end, { desc = "Terminate debugging session (kill process)" })
 
 -- Debugging Tools
 keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", { desc = "Toggle debugger REPL" })
