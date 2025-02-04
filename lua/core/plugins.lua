@@ -208,8 +208,21 @@ require("lazy").setup({
 	},
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.4",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		tag = "0.1.4", -- Specific version/tag for stable release
+		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
+	},
+
+	-- UI Select extension
+	{
+		"nvim-telescope/telescope-ui-select.nvim",
+		after = "telescope.nvim", -- Load after telescope.nvim
+	},
+
+	-- fzf-native extension (requires building with 'make')
+	{
+		"nvim-telescope/telescope-fzf-native.nvim",
+		build = "make", -- Ensure it's compiled
+		after = "telescope.nvim", -- Load after telescope.nvim
 	},
 
 	{
@@ -226,8 +239,6 @@ require("lazy").setup({
 		end,
 	},
 
-	"nvim-telescope/telescope-ui-select.nvim",
-	{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 	-- Need to configure
 	"folke/flash.nvim",
 	"abecodes/tabout.nvim",
