@@ -403,9 +403,29 @@ keymap.set("n", "<leader>dd", function()
 end, { desc = "Disconnect debugger (keep process running)" })
 
 keymap.set("n", "<leader>dt", function()
-	require("dap").terminate()
-	require("dapui").close()
-end, { desc = "Terminate debugging session (kill process)" })
+	local dap = require("dap")
+	local dapui = require("dapui")
+
+	if dap.session() then
+		print("[DAP] Terminating debugging session...")
+		dap.terminate()
+		dap.close()
+	end
+
+	dapui.close()
+	require("dap.repl").close() -- Ensure REPL is fully closed
+
+	-- Close all DAP-related floating windows
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+		if ft == "dap-repl" or ft == "dapui_scopes" or ft == "dapui_watches" then
+			vim.api.nvim_win_close(win, true)
+		end
+	end
+
+	print("[DAP] Debugging session fully terminated.")
+end, { desc = "Fully terminate debugging session (close REPL, UI, buffers)" })
 
 -- Debugging Tools
 keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", { desc = "Toggle debugger REPL" })
@@ -552,17 +572,17 @@ vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true }
 -------- USE    i
 ------------  j k l
 -- rather then hjkl for movement, h is insert ---------------------------
-vim.api.nvim_set_keymap("n", "j", "v:count1 .. 'h'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "l", "v:count1 .. 'l'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "i", "v:count1 .. 'k'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "k", "v:count1 .. 'j'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "h", "i", { noremap = true, silent = true }) -- No count needed for Insert Mode
+vim.api.nvim_set_keymap("n", "j", "h", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "l", "l", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "i", "k", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "k", "j", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
 
-vim.api.nvim_set_keymap("v", "j", "v:count1 .. 'h'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "l", "v:count1 .. 'l'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "i", "v:count1 .. 'k'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "k", "v:count1 .. 'j'", { expr = true, noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "h", "i", { noremap = true, silent = true }) -- No count needed for Insert Mode
+vim.api.nvim_set_keymap("x", "j", "h", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "l", "l", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "i", "k", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "k", "j", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("x", "h", "i", { noremap = true, silent = true }) -- Keep Insert mode
 
 vim.api.nvim_set_keymap("v", "J", "_", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "L", "$", { noremap = true, silent = true })
