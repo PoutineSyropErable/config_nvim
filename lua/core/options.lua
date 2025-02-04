@@ -55,10 +55,6 @@ vim.opt.listchars = {
 -- Remove `c` and `r` from formatoptions to exclude comments
 --vim.o.formatoptions = vim.o.formatoptions:gsub('c', ''):gsub('r', '')
 
-vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
-
-vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim.log")
-
 -- Change color of breakpoints
 vim.fn.sign_define("DapBreakpoint", {
 	text = "🛑", -- This can be any symbol or text for the breakpoint
@@ -72,4 +68,10 @@ vim.cmd([[
   highlight DapBreakpointHighlight guifg=#0000FF guibg=NONE ctermfg=blue ctermbg=NONE
 ]])
 
+-- vim.opt.wildmenu = true
+-- vim.opt.wildmode = { "list", "longest", "full" } -- Ensure proper completion
+
+vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
+
+vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim.log")
 -- vim.cmd('set verbose=10')

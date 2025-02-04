@@ -3,12 +3,6 @@ dap.set_log_level("TRACE")
 
 -------------------------------- C/C++ ----------------------------------
 
-dap.adapters.gdb = {
-	type = "executable",
-	command = "gdb",
-	args = { "--quiet", "--interpreter=dap" },
-}
-
 local function find_in_build()
 	local build_dir = vim.fn.getcwd() .. "/build/"
 	local safe_build_dir = vim.fn.shellescape(build_dir) -- Escape the path properly
@@ -212,6 +206,12 @@ dap.adapters.cppdbg = {
 	command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
 }
 
+dap.adapters.gdb = {
+	type = "executable",
+	command = "gdb",
+	args = { "--quiet", "--interpreter=dap" },
+}
+
 local setupCommands = {
 	{ text = "-enable-pretty-printing", description = "Enable pretty printing", ignoreFailures = true },
 	{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
@@ -281,7 +281,6 @@ dap.configurations.sh = {
 -------------------------------- PYTHON ----------------------------------
 
 require("dap-python").setup(vim.fn.exepath("python")) -- Use system Python by default
-print("Outisde, using Python: " .. vim.fn.exepath("python"))
 
 dap.configurations.python = {
 	{
