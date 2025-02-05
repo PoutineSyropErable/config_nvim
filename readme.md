@@ -4,7 +4,7 @@ how to install:
 
 ```
 mkdir -p ~/.config/nvim_logs
-mv ~/.config/nvim ~/.config/nvim_backup
+[ -d ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim_backup
 git clone git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
 ```
 
