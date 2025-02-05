@@ -1,14 +1,20 @@
-THE WINDOWS BRANCH IS NOW USELESS
-
 how to install:
 
 ```
+# Ensure the logs directory exists
 mkdir -p ~/.config/nvim_logs
-[ -d ~/.config/nvim ] && mv ~/.config/nvim ~/.config/nvim_backup
-git clone git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+
+# Backup existing ~/.config/nvim if it exists, using numbered backups (~1, ~2, etc.)
+[ -d ~/.config/nvim ] && mv --backup=numbered ~/.config/nvim ~/.config/nvim_backup
+
+# Clone the Neovim configuration repository
+git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+
 ```
 
 Packages to install:
+
+On Arch: (Use Paru or whatever else if thats what you are using. Though if you are on arch you probably dont need my help lol)
 
 ```
 # Install system packages from the official Arch repositories
@@ -29,14 +35,15 @@ gem install solargraph
 go install github.com/hyprland-community/hyprls/cmd/hyprls@latest
 
 
-
-
 ```
+
+---
 
 On MacOS:
+Note: I don't have a mac, so it might not work perfectly, in which case we'll need to go and find out which package manager gives them
 
 ```
-# Install core LSPs and dependencies
+# Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server \
 bash-language-server jdtls go
@@ -51,10 +58,10 @@ gem install solargraph
 brew install hyprland-lsp
 ```
 
-I don't have a mac so here's another possible install commands list if there's failures:
+Here's another list, in case the previous one didn't work. If not, we'll have to merge and modify them
 
 ```
-# Install system packages
+# Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server bash-language-server go jdtls
 
