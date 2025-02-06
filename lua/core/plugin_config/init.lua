@@ -17,7 +17,7 @@ require("core.plugin_config.nvimtree_config")
 
 require("core.plugin_config.coloriser")
 require("core.plugin_config.alpha")
-require("core.plugin_config.nvim-session-manager")
+-- require("core.plugin_config.nvim-session-manager")
 
 -- require("core.plugin_config.tabout")
 require("core.plugin_config.mini_surround")
