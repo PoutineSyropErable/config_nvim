@@ -32,6 +32,9 @@ require("conform").setup({
 		stylua = {
 			prepend_args = { "--column-width", "151" }, -- Set the column width for stylua
 		},
+		prettier = {
+			prepend_args = { "--tab-width", "4", "--use-tabs", "false" },
+		},
 	},
 	formatters_by_ft = {
 		lua = { "stylua" },
@@ -51,6 +54,7 @@ require("conform").setup({
 		-- templ = { "prettier" },
 		html = { "prettier" },
 		json = { "prettier" },
+		jsonc = { "prettier" },
 		markdown = { "prettier" },
 		gleam = { "gleam" },
 		sql = { "sqlfmt" },
