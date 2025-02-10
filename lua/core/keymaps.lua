@@ -351,6 +351,13 @@ keymap.set("n", "<leader>h9", function()
 	require("harpoon.ui").nav_file(9)
 end)
 
+keymap.set("n", "<leader>hb", function()
+	require("harpoon.ui").nav_prev()
+end)
+keymap.set("n", "<leader>hn", function()
+	require("harpoon.ui").nav_next()
+end)
+
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
 -- hence check ftplugin directory in that github thing
