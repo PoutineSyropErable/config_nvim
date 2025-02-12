@@ -20,7 +20,6 @@ local tapi = require("nvim-tree.api")
 -- Set the leader key if not already set
 vim.g.mapleader = " " -- Assuming the leader key is set to space
 local keymap = vim.keymap
-
 ----------------------------------------- Clipboard
 -- vim.api.nvim_set_keymap("n", "<leader>y", '"+y', { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap("v", "<leader>y", '"+y', { noremap = true, silent = true })
@@ -41,9 +40,6 @@ vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
 -- Select all text (Help when vscode loads this)
 keymap.set("", "<C-a>", "ggVG<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>a", "ggVG<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>rd", function()
-	print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected"))
-end, { desc = "Print LSP Root Directory" })
 
 vim.api.nvim_set_keymap("", "<C-c>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -251,30 +247,78 @@ local surrounds_mappings_see_mini_surround_lua = {
 }
 
 -------------------------------------------- Git
+local builtin = require("telescope.builtin")
 keymap.set("n", "<leader>lg", ":LazyGit<CR>")
+keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Search Git Commits" })
+keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Git Commits for Buffer" })
 
 ---------------------------------------------LSP
-keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
--- keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-keymap.set("n", "gd", "<Cmd>Telescope lsp_definitions<CR>", { noremap = true, silent = true })
-keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
-keymap.set("n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
-keymap.set("n", "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-keymap.set("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-keymap.set("n", "<leader>rr", "<cmd>lua vim.lsp.buf.rename()<CR>")
-keymap.set("n", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
-keymap.set("v", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
-keymap.set("n", "<leader>ga", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-keymap.set("n", "<leader>gl", "<cmd>lua vim.diagnostic.open_float()<CR>")
-keymap.set("n", "<leader>gp", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
-keymap.set("n", "<leader>gn", "<cmd>lua vim.diagnostic.goto_next()<CR>")
-keymap.set("n", "<leader>tr", "<cmd>lua vim.lsp.buf.document_symbol()<CR>")
--- keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
---^^ deprecated
+-- Helper function to check if LSP is available
+local function safe_lsp_call(fn)
+	return function()
+		if vim.lsp.buf[fn] then
+			vim.lsp.buf[fn]()
+		else
+			print("LSP function '" .. fn .. "' not available")
+		end
+	end
+end
+
+local function safe_telescope_call(fn)
+	return function()
+		local ok, telescope_builtin = pcall(require, "telescope.builtin")
+		if ok and telescope_builtin[fn] then
+			telescope_builtin[fn]()
+		else
+			print("Telescope function '" .. fn .. "' not available")
+		end
+	end
+end
+
+local opts_lsp = { noremap = true, silent = true }
+vim.api.nvim_set_keymap("n", "$", "<cmd>lua vim.lsp.buf.hover()<CR>", opts_lsp)
+vim.api.nvim_set_keymap("n", "<leader>Br", "<cmd>lua vim.lsp.buf.rename()<CR>", opts_lsp)
+vim.api.nvim_set_keymap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts_lsp)
+
+keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), { noremap = true, silent = true })
+keymap.set("n", "gD", safe_lsp_call("declaration"), { noremap = true, silent = true })
+keymap.set("n", "gi", safe_telescope_call("lsp_implementations"), { noremap = true, silent = true })
+keymap.set("n", "gr", safe_telescope_call("lsp_references"), { noremap = true, silent = true })
+
+-- LSP Information
+keymap.set("n", "<leader>gg", safe_lsp_call("hover"), { noremap = true, silent = true })
+keymap.set("n", "gs", safe_lsp_call("signature_help"), { noremap = true, silent = true })
+
+-- LSP Actions
+keymap.set("n", "<leader>rr", safe_lsp_call("rename"), { noremap = true, silent = true, desc = "rename variable in all occurances" })
+keymap.set("n", "<leader>ga", safe_lsp_call("code_action"), { noremap = true, silent = true })
+
+-- Auto Formatting (Would be useful if I didn't have an auto formatter)
+keymap.set({ "n", "v" }, "<leader>gf", function()
+	if vim.lsp.buf.format then
+		vim.lsp.buf.format({ async = true })
+	else
+		print("LSP function 'format' not available")
+	end
+end, { noremap = true, silent = true })
+
+-- Diagnostics
+keymap.set("n", "<leader>gl", safe_lsp_call("diagnostic.open_float"), { noremap = true, silent = true })
+keymap.set("n", "<leader>gp", safe_lsp_call("diagnostic.goto_prev"), { noremap = true, silent = true })
+keymap.set("n", "<leader>gn", safe_lsp_call("diagnostic.goto_next"), { noremap = true, silent = true })
+
+-- Workspace Folders
+keymap.set("n", "<leader>la", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true })
+keymap.set("n", "<leader>lr", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true })
+keymap.set("n", "<leader>ll", function()
+	if vim.lsp.buf.list_workspace_folders then
+		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+	else
+		print("LSP function 'list_workspace_folders' not available")
+	end
+end, { noremap = true, silent = true })
 
 ---------------------- ----------------------Telescope
-local builtin = require("telescope.builtin")
 keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
 keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find Keymaps" })
 
@@ -293,9 +337,6 @@ keymap.set("n", "<leader>fm", function()
 	builtin.treesitter({ default_text = ":method:" })
 end)
 keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", { desc = "Telescope Neoclip" })
-
-keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Search Git Commits" })
-keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Git Commits for Buffer" })
 
 keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
 
@@ -462,34 +503,6 @@ end
 
 vim.cmd("autocmd! TermOpen term://* lua _set_terminal_keymaps()")
 
------------------- Terminal.nvim Mappings --------------------
-local term_map = require("terminal.mappings")
-
--- Send selected text to terminal
-keymap.set({ "n", "x" }, "<leader>Ms", term_map.operator_send, { expr = true, desc = "Send selection to terminal" })
-
--- Toggle terminal visibility
-keymap.set("n", "<leader>Mo", term_map.toggle, { desc = "Toggle terminal" })
-keymap.set("n", "<leader>MO", term_map.toggle({ open_cmd = "enew" }), { desc = "Toggle terminal in new buffer" })
-
--- Run command in terminal
-keymap.set("n", "<leader>Mr", term_map.run, { desc = "Run command in terminal" })
-keymap.set("n", "<leader>MR", term_map.run(nil, { layout = { open_cmd = "enew" } }), { desc = "Run command in a new buffer" })
-
--- Kile current terminal session
-keymap.set("n", "<leader>Mk", term_map.kill, { desc = "Kill terminal session" })
-
--- Cycetween open terminals
-keymap.set("n", "<leader>M]", term_map.cycle_next, { desc = "Cycle to next terminal" })
-keymap.set("n", "<leader>M[", term_map.cycle_prev, { desc = "Cycle to previous terminal" })
-
--- Movrminal to different locations
-keymap.set("n", "<leader>Ml", term_map.move({ open_cmd = "belowright vnew" }), { desc = "Move terminal to right split" })
-keymap.set("n", "<leader>ML", term_map.move({ open_cmd = "botright vnew" }), { desc = "Move terminal to far-right split" })
-keymap.set("n", "<leader>Mh", term_map.move({ open_cmd = "belowright new" }), { desc = "Move terminal to bottom split" })
-keymap.set("n", "<leader>MH", term_map.move({ open_cmd = "botright new" }), { desc = "Move terminal to far-bottom split" })
-keymap.set("n", "<leader>Mf", term_map.move({ open_cmd = "float" }), { desc = "Move terminal to floating window" })
-
 vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
 
@@ -547,6 +560,14 @@ else
 	keymap.set("", "<C-w><Right>", nvim_tmux_nav.NvimTmuxNavigateRight)
 end
 
+------------------------------ NOTES --------------------------
+-- ✍️ Markdown Preview
+keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>", { noremap = true, silent = true })
+
+-- 📄 LaTeX (Vimtex)
+vim.g.vimtex_view_method = "zathura" -- Use Zathura as the PDF viewer
+keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", { noremap = true, silent = true }) -- Compile LaTeX
+
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
@@ -593,6 +614,8 @@ vim.api.nvim_set_keymap("v", "L", "$", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "I", "H", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "K", "L", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "H", "I", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "h", "I", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "a", "A", { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("n", "J", "_", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "L", "$", { noremap = true, silent = true })
@@ -1012,6 +1035,9 @@ vim.keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = 
 vim.keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
 
+vim.keymap.set("n", "<leader>rd", function()
+	print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected"))
+end, { desc = "Print LSP Root Directory" })
 ----------------------------------------------- END OF CONFIG FILE
 
 -- print("Vim configuration reloaded")
