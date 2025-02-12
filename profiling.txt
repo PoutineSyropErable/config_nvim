@@ -1,0 +1,5 @@
+nvim --startuptime nvim_startup.log
+
+:Lazy profile
+strace -tt -f -o nvim_strace.log nvim
+
