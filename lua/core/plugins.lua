@@ -81,7 +81,11 @@ require("lazy").setup({
 		-- use opts = {} for passing setup options
 		-- this is equivalent to setup({}) function
 	},
-	{ "akinsho/toggleterm.nvim", version = "*", config = true },
+
+	-------------------------------- 	START OF TERMINAL ----------------------------
+
+	-- It just works vv
+	"voldikss/vim-floaterm",
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
@@ -102,7 +106,9 @@ require("lazy").setup({
 			})
 		end,
 	},
+	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 
+	-------------------------------- 	END OF TERMINAL ----------------------------
 	{
 		"numToStr/Comment.nvim",
 		config = function()
@@ -274,7 +280,4 @@ require("lazy").setup({
 	-- 		"rcarriga/nvim-notify",
 	-- 	},
 	-- },
-
-	-- It just works
-	"voldikss/vim-floaterm",
 })

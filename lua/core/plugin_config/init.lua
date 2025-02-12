@@ -22,6 +22,7 @@ require("core.plugin_config.neoclip")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.black")
+require("core.plugin_config.toggleterm")
 
 ------ ##### DEACTIVATED ##### -------
 

@@ -22,15 +22,13 @@ vim.g.mapleader = " " -- Assuming the leader key is set to space
 local keymap = vim.keymap
 
 ----------------------------------------- Clipboard
-vim.api.nvim_set_keymap("n", "<leader>y", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>y", '"+y', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("v", "<leader>y", '"+y', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>C", '"+yy', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>p", '"+p', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>v", '"+p', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<leader>y", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<leader>C", '"+yy', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<leader>p", '"+p', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<leader>v", '"+p', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>p", '"+p', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("v", "<leader>p", '"+p', { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("n", "<C-c>", '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -59,7 +57,7 @@ vim.api.nvim_set_keymap("n", "<leader>u", "<C-a>", { noremap = true, silent = tr
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
 
-----------------------Others
+----------------------Others ----------------------------
 -- Function to get the current file path and copy to clipboard
 function copy_current_file_path()
 	local file_path = vim.fn.expand("%:p") -- Get the absolute path of the current file
@@ -118,14 +116,15 @@ vim.api.nvim_set_keymap(
 
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
 vim.api.nvim_set_keymap("n", "<leader>nr", ":source %<CR>", { noremap = true, silent = true })
--- Key mapping to toggle NvimTree
 vim.api.nvim_set_keymap("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>tf", ":NvimTreeFindFile<CR>")
--- Oil go backward with backspace
 keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
---keymap.set("n", "<BS>", require("oil").open, { desc = "Open parent directory" })
+keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("n", "<leader>o", ":Oil<CR>", { noremap = true, silent = true })
+--- Weird stuff
+vim.keymap.set("n", "<leader>.F", ":NvimTreeFindFile<CR>")
+keymap.set("n", "<leader>.s", "<C-t>", { desc = "toggle tag stack" })
+vim.keymap.set("n", "<leader>.t", ":TestNearest<CR>")
+vim.keymap.set("n", "<leader>.T", ":TestFile<CR>")
 
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
@@ -254,6 +253,26 @@ local surrounds_mappings_see_mini_surround_lua = {
 -------------------------------------------- Git
 keymap.set("n", "<leader>lg", ":LazyGit<CR>")
 
+---------------------------------------------LSP
+keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
+-- keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+keymap.set("n", "gd", "<Cmd>Telescope lsp_definitions<CR>", { noremap = true, silent = true })
+keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
+keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
+keymap.set("n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
+keymap.set("n", "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>")
+keymap.set("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+keymap.set("n", "<leader>rr", "<cmd>lua vim.lsp.buf.rename()<CR>")
+keymap.set("n", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
+keymap.set("v", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
+keymap.set("n", "<leader>ga", "<cmd>lua vim.lsp.buf.code_action()<CR>")
+keymap.set("n", "<leader>gl", "<cmd>lua vim.diagnostic.open_float()<CR>")
+keymap.set("n", "<leader>gp", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
+keymap.set("n", "<leader>gn", "<cmd>lua vim.diagnostic.goto_next()<CR>")
+keymap.set("n", "<leader>tr", "<cmd>lua vim.lsp.buf.document_symbol()<CR>")
+-- keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
+--^^ deprecated
+
 ---------------------- ----------------------Telescope
 local builtin = require("telescope.builtin")
 keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
@@ -284,41 +303,6 @@ vim.keymap.set("n", "<C-o>", "<C-o>", { desc = "Jump Backward in Jump List" })
 vim.keymap.set("n", "<C-p>", "<C-i>", { desc = "Jump Forward in Jump List" })
 vim.keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
 vim.keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
-
--- ---------------------------------------------ufo
-local ufo = require("ufo")
--- Key mappings
-vim.keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
-vim.keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
-vim.keymap.set("n", "<leader>zK", function()
-	local winid = ufo.peekFoldedLinesUnderCursor()
-	if not winid then
-		vim.lsp.buf.hover()
-	end
-end, { desc = "Peek Fold" })
-
----------------------------------------------LSP
-keymap.set("n", "<leader>gg", "<cmd>lua vim.lsp.buf.hover()<CR>")
--- keymap.set("n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-keymap.set("n", "gd", "<Cmd>Telescope lsp_definitions<CR>", { noremap = true, silent = true })
-
-keymap.set("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-keymap.set("n", "<leader>gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-keymap.set("n", "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
-keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
-keymap.set("n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
-keymap.set("n", "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-keymap.set("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-keymap.set("n", "<leader>rr", "<cmd>lua vim.lsp.buf.rename()<CR>")
-keymap.set("n", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
-keymap.set("v", "<leader>gf", "<cmd>lua vim.lsp.buf.format({async = true})<CR>")
-keymap.set("n", "<leader>ga", "<cmd>lua vim.lsp.buf.code_action()<CR>")
-keymap.set("n", "<leader>gl", "<cmd>lua vim.diagnostic.open_float()<CR>")
-keymap.set("n", "<leader>gp", "<cmd>lua vim.diagnostic.goto_prev()<CR>")
-keymap.set("n", "<leader>gn", "<cmd>lua vim.diagnostic.goto_next()<CR>")
-keymap.set("n", "<leader>tr", "<cmd>lua vim.lsp.buf.document_symbol()<CR>")
--- keymap.set("i", "<C-Space>", "<cmd>lua vim.lsp.buf.completion()<CR>")
---^^ deprecated
 
 ---------------------------------------------------------------- Harpoon
 keymap.set("n", "<leader>ha", require("harpoon.mark").add_file)
@@ -358,24 +342,24 @@ keymap.set("n", "<leader>hn", function()
 	require("harpoon.ui").nav_next()
 end)
 
+-- ---------------------------------------------ufo
+local ufo = require("ufo")
+-- Key mappings
+vim.keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
+vim.keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
+vim.keymap.set("n", "<leader>zK", function()
+	local winid = ufo.peekFoldedLinesUnderCursor()
+	if not winid then
+		vim.lsp.buf.hover()
+	end
+end, { desc = "Peek Fold" })
+
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
 -- hence check ftplugin directory in that github thing
 keymap.set("n", "<leader>go", function()
 	if vim.bo.filetype == "python" then
 		vim.api.nvim_command("PyrightOrganizeImports")
-	end
-end)
-
-keymap.set("n", "<leader>dTc", function()
-	if vim.bo.filetype == "python" then
-		require("dap-python").test_class()
-	end
-end)
-
-keymap.set("n", "<leader>dTm", function()
-	if vim.bo.filetype == "python" then
-		require("dap-python").test_method()
 	end
 end)
 
@@ -402,6 +386,18 @@ keymap.set("n", "<leader>dc", "<cmd>lua require'dap'.continue()<cr>", { desc = "
 keymap.set("n", "<leader>dj", "<cmd>lua require'dap'.step_over()<cr>", { desc = "Step over (skip function calls)" })
 keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>", { desc = "Step into function calls" })
 keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>", { desc = "Step out of current function" })
+
+keymap.set("n", "<leader>dTc", function()
+	if vim.bo.filetype == "python" then
+		require("dap-python").test_class()
+	end
+end)
+
+keymap.set("n", "<leader>dTm", function()
+	if vim.bo.filetype == "python" then
+		require("dap-python").test_method()
+	end
+end)
 
 -- Debugging Stop/Disconnect
 keymap.set("n", "<leader>dd", function()
@@ -433,8 +429,8 @@ keymap.set("n", "<leader>de", function()
 	require("telescope.builtin").diagnostics({ default_text = ":E:" })
 end, { desc = "Show errors and diagnostics (Telescope UI)" })
 
----------------------------------- Terminal
-----Float Term:
+----------------------------------------------------- Terminal (PICK ONE) ---------------------------
+-------- Float Term: --------
 vim.keymap.set(
 	"n",
 	"<leader>tm",
@@ -445,7 +441,28 @@ vim.keymap.set(
 keymap.set("n", "<leader>tp", "<cmd>FloatermPrev<CR>")
 keymap.set("n", "<leader>tn", "<cmd>FloatermNext<CR>")
 
----- Terminal Mappings
+-------- ToggleTerm: ---------
+
+-- Toggle floating terminal
+keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", { noremap = true, silent = true, desc = "Floating Terminal" })
+
+-- Toggle horizontal split terminal
+keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", { noremap = true, silent = true, desc = "Horizontal Terminal" })
+
+-- Toggle vertical split terminal
+keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=vertical<CR>", { noremap = true, silent = true, desc = "Vertical Terminal" })
+
+-- Terminal Mode Navigation
+function _set_terminal_keymaps()
+	local opts = { buffer = 0 }
+	keymap.set("t", "<esc>", [[<C-\><C-n>]], opts) -- Exit terminal mode with ESC
+	keymap.set("t", "jk", [[<C-\><C-n>]], opts) -- Alternative ESC
+	keymap.set("t", "qq", [[<C-\><C-n>:q<CR>]], { noremap = true, silent = true })
+end
+
+vim.cmd("autocmd! TermOpen term://* lua _set_terminal_keymaps()")
+
+------------------ Terminal.nvim Mappings --------------------
 local term_map = require("terminal.mappings")
 
 -- Send selected text to terminal
@@ -459,14 +476,14 @@ keymap.set("n", "<leader>MO", term_map.toggle({ open_cmd = "enew" }), { desc = "
 keymap.set("n", "<leader>Mr", term_map.run, { desc = "Run command in terminal" })
 keymap.set("n", "<leader>MR", term_map.run(nil, { layout = { open_cmd = "enew" } }), { desc = "Run command in a new buffer" })
 
--- Kill the current terminal session
+-- Kile current terminal session
 keymap.set("n", "<leader>Mk", term_map.kill, { desc = "Kill terminal session" })
 
--- Cycle between open terminals
+-- Cycetween open terminals
 keymap.set("n", "<leader>M]", term_map.cycle_next, { desc = "Cycle to next terminal" })
 keymap.set("n", "<leader>M[", term_map.cycle_prev, { desc = "Cycle to previous terminal" })
 
--- Move terminal to different locations
+-- Movrminal to different locations
 keymap.set("n", "<leader>Ml", term_map.move({ open_cmd = "belowright vnew" }), { desc = "Move terminal to right split" })
 keymap.set("n", "<leader>ML", term_map.move({ open_cmd = "botright vnew" }), { desc = "Move terminal to far-right split" })
 keymap.set("n", "<leader>Mh", term_map.move({ open_cmd = "belowright new" }), { desc = "Move terminal to bottom split" })
