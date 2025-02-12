@@ -1,3 +1,8 @@
+local function is_git_repo()
+	local git_dir = vim.fn.finddir(".git", ".;")
+	return git_dir ~= "" and git_dir ~= nil
+end
+
 require("lualine").setup({
 	options = {
 		icons_enabled = true,
@@ -15,7 +20,7 @@ require("lualine").setup({
 				"branch",
 				icon = "",
 				cond = function()
-					return vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null") == "true\n"
+					return is_git_repo()
 				end,
 			},
 		},
