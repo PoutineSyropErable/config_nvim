@@ -56,20 +56,6 @@ require("lazy").setup({
 	"bash-lsp/bash-language-server",
 
 	"psf/black",
-	-- {
-	-- 	'jose-elias-alvarez/null-ls.nvim',  -- Required for integrating with Neovim's LSP
-	-- 	dependencies = { 'nvim-lua/plenary.nvim' },
-	-- 	config = function()
-	-- 		local null_ls = require('null-ls')
-	--
-	-- 		null_ls.setup({
-	-- 			sources = {
-	-- 				null_ls.builtins.formatting.black,
-	-- 				null_ls.builtins.formatting.clang_format,
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- },
 
 	"preservim/vimux",
 	"norcalli/nvim-colorizer.lua",
@@ -94,18 +80,6 @@ require("lazy").setup({
 		opts = {},
 	},
 
-	{
-		"rebelot/terminal.nvim",
-		config = function()
-			-- Set up the plugin with default configuration
-			require("terminal").setup({
-				-- Optional: you can provide a custom configuration here
-				layout = { open_cmd = "botright new" },
-				cmd = { vim.o.shell },
-				autoclose = false,
-			})
-		end,
-	},
 	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 
 	-------------------------------- 	END OF TERMINAL ----------------------------
@@ -209,10 +183,49 @@ require("lazy").setup({
 		"vinnymeller/swagger-preview.nvim",
 		run = "npm install -g swagger-ui-watcher",
 	},
+
+	-- ✍️ Markdown Support
 	{
-		"iamcco/markdown-preview.nvim",
-		run = "cd app && npm install",
+		"OXY2DEV/markview.nvim",
+		lazy = false, -- Recommended
+		-- ft = "markdown" -- If you decide to lazy-load anyway
+
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
 	},
+	{
+		"lervag/vimtex",
+		lazy = false, -- we don't want to lazy load VimTeX
+		-- tag = "v2.15", -- uncomment to pin to a specific release
+		init = function()
+			-- VimTeX configuration goes here, e.g.
+			vim.g.vimtex_view_method = "zathura"
+			vim.g.vimtex_view_forward_search_on_start = false
+			vim.g.vimtex_compiler_latexmk = {
+				aux_dir = os.getenv("HOME") .. "/.texfiles/",
+				out_dir = os.getenv("HOME") .. "/.texfiles/",
+			}
+		end,
+	},
+
+	-- 🖼️ Image Preview (Kitty Terminal Required) -- Images
+
+	{
+		"3rd/image.nvim",
+		opts = {},
+	},
+	-- this should be the right one
+
+	-- 📝 Spell Checking
+	{
+		"lewis6991/spellsitter.nvim",
+		config = function()
+			require("spellsitter").setup()
+		end,
+	},
+
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.4", -- Specific version/tag for stable release
@@ -280,4 +293,8 @@ require("lazy").setup({
 	-- 		"rcarriga/nvim-notify",
 	-- 	},
 	-- },
+}, {
+	rocks = {
+		hererocks = true, -- Enables hererocks globally for all plugins
+	},
 })
