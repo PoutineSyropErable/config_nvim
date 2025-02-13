@@ -199,15 +199,6 @@ require("lazy").setup({
 		"lervag/vimtex",
 		lazy = false, -- we don't want to lazy load VimTeX
 		-- tag = "v2.15", -- uncomment to pin to a specific release
-		init = function()
-			-- VimTeX configuration goes here, e.g.
-			vim.g.vimtex_view_method = "zathura"
-			vim.g.vimtex_view_forward_search_on_start = false
-			vim.g.vimtex_compiler_latexmk = {
-				aux_dir = os.getenv("HOME") .. "/.texfiles/",
-				out_dir = os.getenv("HOME") .. "/.texfiles/",
-			}
-		end,
 	},
 
 	-- 🖼️ Image Preview (Kitty Terminal Required) -- Images
@@ -219,12 +210,12 @@ require("lazy").setup({
 	-- this should be the right one
 
 	-- 📝 Spell Checking
-	{
-		"lewis6991/spellsitter.nvim",
-		config = function()
-			require("spellsitter").setup()
-		end,
-	},
+	-- {
+	-- 	"lewis6991/spellsitter.nvim",
+	-- 	config = function()
+	-- 		require("spellsitter").setup()
+	-- 	end,
+	-- },
 
 	{
 		"nvim-telescope/telescope.nvim",
