@@ -26,6 +26,18 @@ local lsp_defaults = lspconfig.util.default_config
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+-- Hyprlang LSP
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+	pattern = { "*.hl", "hypr*.conf" },
+	callback = function(event)
+		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
+		vim.lsp.start({
+			name = "hyprlang",
+			cmd = { "hyprls" },
+			root_dir = vim.fn.getcwd(),
+		})
+	end,
+})
 
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
@@ -168,43 +180,53 @@ require("lspconfig").ts_ls.setup({})
 require("lspconfig").gopls.setup({})
 require("lspconfig").tailwindcss.setup({})
 
--- vim.api.nvim_create_autocmd("LspAttach", {
--- 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
--- 	callback = function(ev)
--- 		-- Enable completion triggered by <c-x><c-o>
--- 		vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
---
--- 		-- Buffer local mappings.
--- 		-- See `:help vim.lsp.*` for documentation on any of the below functions
--- 		local opts = { buffer = ev.buf }
--- 		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
--- 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
--- 		vim.keymap.set("n", "<space>H", vim.lsp.buf.hover, opts)
--- 		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
--- 		vim.keymap.set("n", "<space>la", vim.lsp.buf.add_workspace_folder, opts)
--- 		vim.keymap.set("n", "<space>lr", vim.lsp.buf.remove_workspace_folder, opts)
--- 		vim.keymap.set("n", "<space>ll", function()
--- 			print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
--- 		end, opts)
--- 		vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
--- 		vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
--- 		vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
--- 		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
--- 		vim.keymap.set("n", "<space>f", function()
--- 			vim.lsp.buf.format({ async = true })
--- 		end, opts)
--- 	end,
--- })
+local tex_output = os.getenv("HOME") .. "/.texfiles/"
+local tex_file = "%f" -- Placeholder for the LaTeX file
+local pdf_file = tex_output .. "%p" -- The compiled PDF
 
--- Hyprlang LSP
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-	pattern = { "*.hl", "hypr*.conf" },
-	callback = function(event)
-		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
-		vim.lsp.start({
-			name = "hyprlang",
-			cmd = { "hyprls" },
-			root_dir = vim.fn.getcwd(),
-		})
+lspconfig.texlab.setup({
+	cmd = { "texlab" },
+	filetypes = { "tex", "bib", "plaintex", "latex" },
+	root_dir = lspconfig.util.root_pattern(".git", ".latexmkrc", "main.tex"),
+	settings = {
+		texlab = {
+			build = {
+				executable = "latexmk",
+				args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "-outdir=" .. tex_output, tex_file },
+				onSave = true, -- Compile on save
+				forwardSearchAfter = true,
+			},
+			forwardSearch = {
+				executable = "zathura",
+				args = { "--synctex-forward", "%l:1:%f", pdf_file },
+			},
+			chktex = {
+				onOpenAndSave = true,
+				onEdit = true,
+			},
+			latexindent = {
+				modifyLineBreaks = true,
+			},
+		},
+	},
+	capabilities = lsp_defaults.capabilities,
+	on_attach = function(client, bufnr)
+		_G.MyRootDir = client.config.root_dir
+		-- Debugging info
+		print("LaTeX File: " .. tex_file)
+		print("Output Directory: " .. tex_output)
+		print("PDF File: " .. pdf_file)
+		print("Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -outdir=" .. tex_output .. " " .. tex_file)
+		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
+
+-- VimTeX configuration goes here, e.g.
+vim.g.vimtex_view_method = "zathura"
+vim.g.vimtex_view_forward_search_on_start = false
+vim.g.vimtex_compiler_latexmk = {
+	aux_dir = os.getenv("HOME") .. "/.texfiles/",
+	out_dir = os.getenv("HOME") .. "/.texfiles/",
+	continuous = false, -- Disable VimTeX auto-compilation
+	background = false,
+}
