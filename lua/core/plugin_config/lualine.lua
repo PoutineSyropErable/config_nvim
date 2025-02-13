@@ -15,14 +15,5 @@ require("lualine").setup({
 				path = 1,
 			},
 		},
-		lualine_b = {
-			{
-				"branch",
-				icon = "",
-				cond = function()
-					return is_git_repo()
-				end,
-			},
-		},
 	},
 })

@@ -1,53 +1,71 @@
 local dap = require("dap")
-dap.set_log_level("TRACE")
+-- dap.set_log_level("TRACE")
+
+local function debug_log(func_name, ...)
+	local args = table.concat({ ... }, ", ")
+	print("[DEBUG] Called: " .. func_name .. " with args: " .. args)
+end
 
 -------------------------------- C/C++ ----------------------------------
-
-local function find_in_build()
+local function find_in_build(callback)
+	debug_log("find_in_build")
 	local build_dir = vim.fn.getcwd() .. "/build/"
-	local safe_build_dir = vim.fn.shellescape(build_dir) -- Escape the path properly
+	local safe_build_dir = vim.fn.shellescape(build_dir) -- Escape path
 
-	local executables = vim.fn.systemlist("find " .. safe_build_dir .. " -maxdepth 1 -type f -executable")
-	if #executables > 0 then
-		print("[DAP] find_in_build() found executable: " .. executables[1])
-		return executables[1]
-	end
-	return nil
+	vim.fn.jobstart("find " .. safe_build_dir .. " -maxdepth 1 -type f -executable", {
+		stdout_buffered = true,
+		on_stdout = function(_, data)
+			if data and data[1] and data[1] ~= "" then
+				print("[DAP] find_in_build() found executable: " .. data[1])
+				callback(data[1])
+			else
+				callback(nil)
+			end
+		end,
+	})
 end
 
-local function find_elf_in_root()
+local function find_elf_in_root(callback)
+	debug_log("find_elf_in_root")
 	local cwd = vim.fn.getcwd()
-	local elf_executables =
-		vim.fn.systemlist("find " .. cwd .. " -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'")
-	if #elf_executables > 0 then
-		print("[DAP] find_elf_in_root() found executable: " .. elf_executables[1])
-		return elf_executables[1]
-	end
-	return nil
+
+	vim.fn.jobstart("find " .. cwd .. " -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'", {
+		stdout_buffered = true,
+		on_stdout = function(_, data)
+			if data and data[1] and data[1] ~= "" then
+				print("[DAP] find_elf_in_root() found ELF executable: " .. data[1])
+				callback(data[1])
+			else
+				callback(nil)
+			end
+		end,
+	})
 end
 
-local function parse_automake()
+local function parse_automake(callback)
+	debug_log("parse_automake")
 	local cwd = vim.fn.getcwd()
 	local automake_file = cwd .. "/AutoMake"
 
-	-- Check if the file exists
 	if vim.fn.filereadable(automake_file) == 0 then
-		return nil
+		callback(nil)
+		return
 	end
 
-	-- Read the file line by line
 	for _, line in ipairs(vim.fn.readfile(automake_file)) do
 		local target = line:match('TARGET="(.-)"')
 		if target then
 			print("[DAP] parse_automake() found executable: " .. cwd .. "/" .. target)
-			return cwd .. "/" .. target
+			callback(cwd .. "/" .. target)
+			return
 		end
 	end
 
-	return nil -- Return nil if no TARGET line was found
+	callback(nil) -- No TARGET found
 end
 
 local function parse_makefile()
+	debug_log("parse_makefile")
 	local cwd = vim.fn.getcwd()
 	local makefile = cwd .. "/Makefile"
 	local target_cmd = "make --dry-run --always-make --print-data-base | awk -F ': ' '/^TARGET/ {print $2; exit}'"
@@ -63,6 +81,7 @@ local function parse_makefile()
 end
 
 local function compile_project()
+	debug_log("compile_project")
 	local cwd = vim.fn.getcwd()
 	print("\n\n")
 	print("[DEBUG] Current working directory: " .. cwd)
@@ -149,6 +168,7 @@ local function compile_project()
 end
 
 local function find_executable()
+	debug_log("find_executable")
 	compile_project()
 	local exe = parse_automake() or find_in_build() or find_elf_in_root() or parse_makefile()
 
@@ -167,7 +187,27 @@ local function find_executable()
 end
 
 local function get_source_directories()
+	debug_log("get_source_directories")
+
 	local cwd = vim.fn.getcwd()
+	local home = os.getenv("HOME")
+
+	-- 🚨 Prevent scanning dangerous locations
+	if cwd == "/" or cwd == home then
+		print("[WARN] get_source_directories() aborted: Unsafe directory")
+		return {}
+	end
+
+	-- Ensure the directory is deep enough
+	local subdirs = {}
+	for dir in cwd:gmatch("[^/]+") do
+		table.insert(subdirs, dir)
+	end
+	if #subdirs < 3 then
+		print("[WARN] get_source_directories() aborted: Not deep enough")
+		return {}
+	end
+
 	local dirs = {}
 	local output = vim.fn.systemlist("find " .. cwd .. " -type f -name '*.c' -exec dirname {} \\; | sort -u")
 
@@ -182,22 +222,28 @@ local function get_source_directories()
 	return dirs
 end
 
-local GDBsetupCommands = {
-	{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
-	{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
-	{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
-	{
-		text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build",
-		description = "Ensure GDB finds debug symbols",
-		ignoreFailures = false,
-	},
-	{ text = "directory " .. vim.fn.getcwd(), description = "Set source directory", ignoreFailures = false },
-	{ text = "info sources", description = "Check if sources are loaded", ignoreFailures = false },
-}
+local function get_GDBsetupCommands()
+	local cwd = vim.fn.getcwd()
+	local commands = {
+		{ text = "-enable-pretty-printing", description = "Enable GDB pretty printing", ignoreFailures = true },
+		{ text = "set auto-load safe-path /", description = "Allow auto-loading of symbols", ignoreFailures = false },
+		{ text = "set breakpoint pending on", description = "Enable pending breakpoints", ignoreFailures = false },
+		{
+			text = "set debug-file-directory " .. cwd .. "/build",
+			description = "Ensure GDB finds debug symbols",
+			ignoreFailures = false,
+		},
+		{ text = "directory " .. cwd, description = "Set source directory", ignoreFailures = false },
+		{ text = "info sources", description = "Check if sources are loaded", ignoreFailures = false },
+	}
 
--- Append source directories manually
-for _, dir in ipairs(get_source_directories()) do
-	table.insert(GDBsetupCommands, { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false })
+	-- **Only append source directories when actually needed**
+	local src_dirs = get_source_directories()
+	for _, dir in ipairs(src_dirs) do
+		table.insert(commands, { text = "directory " .. dir, description = "Add source directory", ignoreFailures = false })
+	end
+
+	return commands
 end
 
 dap.adapters.cppdbg = {
