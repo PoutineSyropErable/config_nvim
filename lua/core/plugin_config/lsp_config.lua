@@ -184,14 +184,17 @@ require("lspconfig").ts_ls.setup({})
 require("lspconfig").gopls.setup({})
 require("lspconfig").tailwindcss.setup({})
 
-local tex_file = "%f" -- LaTeX source file
-local pdf_file = "%p" -- PDF in the same directory as the tex file
-local tex_output = os.getenv("HOME") .. "/.texfiles/"
+local lspconfig = require("lspconfig")
+
+local tex_output = os.getenv("HOME") .. "/.texfiles/" -- Directory for auxiliary files
+local pdf_output_dir = vim.fn.expand("%:p:h") -- Directory where the PDF should be saved
+local tex_file = vim.fn.expand("%:p") -- Full path to the LaTeX file
+local pdf_file = pdf_output_dir .. "/" .. vim.fn.expand("%:t:r") .. ".pdf" -- PDF filename based on the LaTeX file
 
 lspconfig.texlab.setup({
 	cmd = { "texlab" },
 	filetypes = { "tex", "bib", "plaintex", "latex" },
-	root_dir = lspconfig.util.root_pattern(".git", ".latexmkrc", "main.tex"),
+	root_dir = require("lspconfig.util").root_pattern(".git", ".latexmkrc", "main.tex"),
 	settings = {
 		texlab = {
 			build = {
@@ -200,19 +203,20 @@ lspconfig.texlab.setup({
 					"-pdf",
 					"-interaction=nonstopmode",
 					"-synctex=1",
-					"-auxdir=" .. tex_output, -- Store aux files in ~/.texfiles/
-					"-outdir=" .. tex_output, -- Store temp files in ~/.texfiles/
-					"%f", -- Compile current file
+					"-aux-directory=" .. tex_output, -- Store aux files in ~/.texfiles/
+					"-output-directory=" .. pdf_output_dir, -- PDF in the same directory as the LaTeX file
+					-- "-synctex-directory=" .. tex_output,
+					tex_file,
 				},
 				onSave = true, -- Compile on save
 				forwardSearchAfter = true,
 			},
 			forwardSearch = {
 				executable = "zathura",
-				args = { "--synctex-forward", "%l:1:%f", "%p" }, -- PDF remains in source folder
+				args = { "--synctex-forward", "%l:1:%f", pdf_file }, -- Ensure correct PDF file is opened
 			},
 			chktex = {
-				onOpenAndSave = true,
+				onOpenAndSave = true, -- Lint on file open and save
 				onEdit = true,
 			},
 			latexindent = {
@@ -220,17 +224,19 @@ lspconfig.texlab.setup({
 			},
 		},
 	},
-	capabilities = lsp_defaults.capabilities,
+	capabilities = require("cmp_nvim_lsp").default_capabilities(),
 	on_attach = function(client, bufnr)
-		_G.MyRootDir = client.config.root_dir
-		local tex_file = vim.api.nvim_buf_get_name(bufnr) -- Get current file name
-		local pdf_file = tex_file:gsub("%.tex$", ".pdf") -- Compute expected PDF path
-
-		print("LaTeX File: " .. tex_file)
-		print("Auxiliary Output Directory: " .. tex_output)
-		print("PDF File: " .. pdf_file)
+		print("LaTeX File:", tex_file)
+		print("Aux Directory:", tex_output)
+		print("PDF Output Directory:", pdf_output_dir)
+		print("PDF File:", pdf_file)
 		print(
-			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -auxdir=" .. tex_output .. " -outdir=" .. tex_output .. " " .. tex_file
+			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
+				.. tex_output
+				.. " -output-directory="
+				.. pdf_output_dir
+				.. " "
+				.. tex_file
 		)
 		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
@@ -240,10 +246,10 @@ vim.g.vimtex_view_method = "zathura"
 vim.g.vimtex_view_forward_search_on_start = false
 vim.g.vimtex_compiler_latexmk = {
 	aux_dir = tex_output, -- Move auxiliary files to ~/.texfiles/
-	out_dir = tex_output, -- Store build artifacts in ~/.texfiles/
-	callback = 1,
-	continuous = false, -- Disable VimTeX auto-compilation
-	background = false,
+	out_dir = pdf_output_dir, -- Store build artifacts in ~/.texfiles/
+	callback = true,
+	continuous = true, -- Disable VimTeX auto-compilation
+	background = true,
 }
 
 -- Hyprlang LSP
