@@ -1,3 +1,8 @@
+local function disableSpell()
+	-- disable spell checking for terminals
+	vim.opt.spell = false
+end
+
 require("toggleterm").setup({
 	size = function(term)
 		if term.direction == "horizontal" then
@@ -6,6 +11,9 @@ require("toggleterm").setup({
 			return vim.o.columns * 0.4
 		end
 	end,
+	on_open = disableSpell(),
+	on_create = disableSpell(),
+
 	open_mapping = [[<C-t>]], -- Open terminal with Ctrl+\
 	hide_numbers = true, -- Hide line numbers in terminal
 	shade_terminals = false,

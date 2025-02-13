@@ -17,6 +17,7 @@ vim.opt.rtp:prepend(lazypath)
 require("core.options")
 require("core.plugins")
 require("core.plugin_config")
+require("core.spellcheck")
 require("core.keymaps")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
