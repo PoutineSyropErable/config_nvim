@@ -209,14 +209,6 @@ require("lazy").setup({
 	},
 	-- this should be the right one
 
-	-- 📝 Spell Checking
-	-- {
-	-- 	"lewis6991/spellsitter.nvim",
-	-- 	config = function()
-	-- 		require("spellsitter").setup()
-	-- 	end,
-	-- },
-
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.4", -- Specific version/tag for stable release
