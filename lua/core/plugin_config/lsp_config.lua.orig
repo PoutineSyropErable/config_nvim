@@ -1,4 +1,5 @@
 require("mason-lspconfig").setup({
+
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
 	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
 })
@@ -42,6 +43,18 @@ local lsp_defaults = lspconfig.util.default_config
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+-- Hyprlang LSP
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+	pattern = { "*.hl", "hypr*.conf" },
+	callback = function(event)
+		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
+		vim.lsp.start({
+			name = "hyprlang",
+			cmd = { "hyprls" },
+			root_dir = vim.fn.getcwd(),
+		})
+	end,
+})
 
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
@@ -188,6 +201,13 @@ local tex_output = os.getenv("HOME") .. "/.texfiles/"
 local tex_file = "%f" -- Placeholder for the LaTeX file
 local pdf_file = tex_output .. "%p" -- The compiled PDF
 
+<<<<<<< Updated upstream
+=======
+local tex_output = os.getenv("HOME") .. "/.texfiles/"
+local tex_file = "%f" -- Placeholder for the LaTeX file
+local pdf_file = tex_output .. "%p" -- The compiled PDF
+
+>>>>>>> Stashed changes
 lspconfig.texlab.setup({
 	cmd = { "texlab" },
 	filetypes = { "tex", "bib", "plaintex", "latex" },
@@ -222,6 +242,8 @@ lspconfig.texlab.setup({
 		print("PDF File: " .. pdf_file)
 		print("Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -outdir=" .. tex_output .. " " .. tex_file)
 		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
+<<<<<<< Updated upstream
+=======
 	end,
 })
 
@@ -245,5 +267,16 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 			cmd = { "hyprls" },
 			root_dir = vim.fn.getcwd(),
 		})
+>>>>>>> Stashed changes
 	end,
 })
+
+-- VimTeX configuration goes here, e.g.
+vim.g.vimtex_view_method = "zathura"
+vim.g.vimtex_view_forward_search_on_start = false
+vim.g.vimtex_compiler_latexmk = {
+	aux_dir = os.getenv("HOME") .. "/.texfiles/",
+	out_dir = os.getenv("HOME") .. "/.texfiles/",
+	continuous = false, -- Disable VimTeX auto-compilation
+	background = false,
+}

@@ -565,7 +565,6 @@ end
 keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>", { noremap = true, silent = true })
 
 -- 📄 LaTeX (Vimtex)
-vim.g.vimtex_view_method = "zathura" -- Use Zathura as the PDF viewer
 keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", { noremap = true, silent = true }) -- Compile LaTeX
 
 ------------------------------------------------------------------------------------------------------------
