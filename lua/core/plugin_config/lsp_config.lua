@@ -184,9 +184,9 @@ require("lspconfig").ts_ls.setup({})
 require("lspconfig").gopls.setup({})
 require("lspconfig").tailwindcss.setup({})
 
+local tex_file = "%f" -- LaTeX source file
+local pdf_file = "%p" -- PDF in the same directory as the tex file
 local tex_output = os.getenv("HOME") .. "/.texfiles/"
-local tex_file = "%f" -- Placeholder for the LaTeX file
-local pdf_file = tex_output .. "%p" -- The compiled PDF
 
 lspconfig.texlab.setup({
 	cmd = { "texlab" },
@@ -196,13 +196,20 @@ lspconfig.texlab.setup({
 		texlab = {
 			build = {
 				executable = "latexmk",
-				args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "-outdir=" .. tex_output, tex_file },
+				args = {
+					"-pdf",
+					"-interaction=nonstopmode",
+					"-synctex=1",
+					"-auxdir=" .. tex_output, -- Store aux files in ~/.texfiles/
+					"-outdir=" .. tex_output, -- Store temp files in ~/.texfiles/
+					"%f", -- Compile current file
+				},
 				onSave = true, -- Compile on save
 				forwardSearchAfter = true,
 			},
 			forwardSearch = {
 				executable = "zathura",
-				args = { "--synctex-forward", "%l:1:%f", pdf_file },
+				args = { "--synctex-forward", "%l:1:%f", "%p" }, -- PDF remains in source folder
 			},
 			chktex = {
 				onOpenAndSave = true,
@@ -216,21 +223,25 @@ lspconfig.texlab.setup({
 	capabilities = lsp_defaults.capabilities,
 	on_attach = function(client, bufnr)
 		_G.MyRootDir = client.config.root_dir
-		-- Debugging info
+		local tex_file = vim.api.nvim_buf_get_name(bufnr) -- Get current file name
+		local pdf_file = tex_file:gsub("%.tex$", ".pdf") -- Compute expected PDF path
+
 		print("LaTeX File: " .. tex_file)
-		print("Output Directory: " .. tex_output)
+		print("Auxiliary Output Directory: " .. tex_output)
 		print("PDF File: " .. pdf_file)
-		print("Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -outdir=" .. tex_output .. " " .. tex_file)
+		print(
+			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -auxdir=" .. tex_output .. " -outdir=" .. tex_output .. " " .. tex_file
+		)
 		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
 
--- VimTeX configuration goes here, e.g.
 vim.g.vimtex_view_method = "zathura"
 vim.g.vimtex_view_forward_search_on_start = false
 vim.g.vimtex_compiler_latexmk = {
-	aux_dir = os.getenv("HOME") .. "/.texfiles/",
-	out_dir = os.getenv("HOME") .. "/.texfiles/",
+	aux_dir = tex_output, -- Move auxiliary files to ~/.texfiles/
+	out_dir = tex_output, -- Store build artifacts in ~/.texfiles/
+	callback = 1,
 	continuous = false, -- Disable VimTeX auto-compilation
 	background = false,
 }
