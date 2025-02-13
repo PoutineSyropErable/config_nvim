@@ -43,6 +43,22 @@ _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+local servers = {
+	"bashls",
+	"lua_ls",
+	"pyright",
+	"ts_ls",
+	"clangd",
+	"rust_analyzer",
+	"texlab",
+}
+
+for _, server in ipairs(servers) do
+	lspconfig[server].setup({
+		capabilities = lsp_defaults.capabilities, -- ✅ Use the merged capabilities
+	})
+end
+
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
 	filetypes = { "sh", "bash" },
@@ -224,7 +240,7 @@ lspconfig.texlab.setup({
 			},
 		},
 	},
-	capabilities = require("cmp_nvim_lsp").default_capabilities(),
+	capabilities = lsp_defaults.capabilities,
 	on_attach = function(client, bufnr)
 		print("LaTeX File:", tex_file)
 		print("Aux Directory:", tex_output)
@@ -244,6 +260,9 @@ lspconfig.texlab.setup({
 
 vim.g.vimtex_view_method = "zathura"
 vim.g.vimtex_view_forward_search_on_start = false
+vim.g.vimtex_view_general_viewer = "zathura"
+vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
+
 vim.g.vimtex_compiler_latexmk = {
 	aux_dir = tex_output, -- Move auxiliary files to ~/.texfiles/
 	out_dir = pdf_output_dir, -- Store build artifacts in ~/.texfiles/

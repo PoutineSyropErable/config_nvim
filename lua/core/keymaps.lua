@@ -308,9 +308,9 @@ keymap.set("n", "<leader>gp", safe_lsp_call("diagnostic.goto_prev"), { noremap =
 keymap.set("n", "<leader>gn", safe_lsp_call("diagnostic.goto_next"), { noremap = true, silent = true })
 
 -- Workspace Folders
-keymap.set("n", "<leader>la", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true })
-keymap.set("n", "<leader>lr", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true })
-keymap.set("n", "<leader>ll", function()
+keymap.set("n", "<leader>La", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true })
+keymap.set("n", "<leader>Lr", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true })
+keymap.set("n", "<leader>Ll", function()
 	if vim.lsp.buf.list_workspace_folders then
 		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	else
@@ -561,17 +561,58 @@ else
 end
 
 ------------------------------ NOTES --------------------------
--- ✍️ Markdown Preview
-keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>", { noremap = true, silent = true })
+local function ro(description)
+	return { noremap = true, silent = true, desc = description }
+end
 
--- 📄 LaTeX (Vimtex)
-keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", { noremap = true, silent = true }) -- Compile LaTeX
+---------------  ✍️ Markdown Preview Toggle
+keymap.set("n", "<leader>mt", ":MarkView Toggle<CR>", ro("Toggle Markdown Preview"))
+keymap.set("n", "<leader>ms", ":MarkView Start<CR>", ro("Start Markdown Preview"))
+keymap.set("n", "<leader>me", ":MarkView Enable<CR>", ro("Enable Markdown Preview Globally"))
+keymap.set("n", "<leader>md", ":MarkView Disable<CR>", ro("Disable Markdown Preview Globally"))
+keymap.set("n", "<leader>ma", ":MarkView attach<CR>", ro("Attach to Current Buffer"))
+keymap.set("n", "<leader>mx", ":MarkView detach<CR>", ro("Detach from Current Buffer"))
+keymap.set("n", "<leader>mp", ":MarkView Render<CR>", ro("Render Markdown Preview"))
+keymap.set("n", "<leader>mc", ":MarkView Clear<CR>", ro("Clear Markdown Preview"))
+
+-- 🔄 Split View Mode
+keymap.set("n", "<leader>mo", ":MarkView splitOpen<CR>", ro("Open Split View"))
+keymap.set("n", "<leader>mC", ":MarkView splitClose<CR>", ro("Close Split View"))
+keymap.set("n", "<leader>mT", ":MarkView splitToggle<CR>", ro("Toggle Split View"))
+keymap.set("n", "<leader>mr", ":MarkView splitRedraw<CR>", ro("Redraw Split View"))
+
+-- 🔍 Debugging / Logs
+keymap.set("n", "<leader>mtx", ":MarkView traceExport<CR>", ro("Export Trace Logs"))
+keymap.set("n", "<leader>mts", ":MarkView traceShow<CR>", ro("Show Trace Logs"))
+
+--------------- 📄 LaTeX (Vimtex)
+-- ✍️ VimTeX Keybindings (Explicit)
+vim.keymap.set("n", "<leader>la", ":VimtexContextMenu<CR>", ro("Open VimTeX Context Menu"))
+vim.keymap.set("n", "<leader>lc", ":VimtexClean<CR>", ro("Clean Auxiliary Files"))
+vim.keymap.set("n", "<leader>lC", ":VimtexClean!<CR>", ro("Full Clean (Includes PDF)"))
+vim.keymap.set("n", "<leader>le", ":VimtexErrors<CR>", ro("Show VimTeX Errors"))
+vim.keymap.set("n", "<leader>lG", ":VimtexStatusAll<CR>", ro("Show Status for All VimTeX Sessions"))
+vim.keymap.set("n", "<leader>li", ":VimtexInfo<CR>", ro("Show VimTeX Info"))
+vim.keymap.set("n", "<leader>lI", ":VimtexInfo!<CR>", ro("Show Full VimTeX Info"))
+vim.keymap.set("n", "<leader>lk", ":VimtexStop<CR>", ro("Stop Current Compilation"))
+vim.keymap.set("n", "<leader>lK", ":VimtexStopAll<CR>", ro("Stop All VimTeX Sessions"))
+vim.keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", ro("Start/Continue Compilation"))
+vim.keymap.set("n", "<leader>lL", ":VimtexCompileSelected<CR>", ro("Compile Selected Text"))
+vim.keymap.set("n", "<leader>lm", ":VimtexImapsList<CR>", ro("List VimTeX Input Mappings"))
+vim.keymap.set("n", "<leader>lo", ":VimtexCompileOutput<CR>", ro("Show Compilation Output"))
+vim.keymap.set("n", "<leader>lq", ":VimtexLog<CR>", ro("Show Log File"))
+vim.keymap.set("n", "<leader>ls", ":VimtexToggleMain<CR>", ro("Toggle Main File"))
+vim.keymap.set("n", "<leader>lt", ":VimtexTocOpen<CR>", ro("Open Table of Contents"))
+vim.keymap.set("n", "<leader>lT", ":VimtexTocToggle<CR>", ro("Toggle Table of Contents"))
+vim.keymap.set("n", "<leader>lv", ":VimtexView<CR>", ro("View PDF"))
+vim.keymap.set("n", "<leader>lx", ":VimtexReload<CR>", ro("Reload VimTeX Project"))
+vim.keymap.set("n", "<leader>lX", ":VimtexReloadState<CR>", ro("Reload VimTeX State"))
 
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
---------------------------------START OF MY PERSONAL TWEAKS-------------------------------------------------
+---------------------------------------START OF MY PERSONAL TWEAKS------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
