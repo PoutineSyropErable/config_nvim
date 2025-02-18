@@ -158,21 +158,29 @@ vim.api.nvim_set_keymap("n", "<M-i>", ":resize 5<CR>", { noremap = true, silent 
 vim.api.nvim_set_keymap("n", "<M-k>", ":resize -5<CR>", { noremap = true, silent = true })
 
 --------------------------------------------------------------------------------------- Tab management
--- I don't use tabs
--- keymap.set("n", "<leader>to", ":tabnew<CR>")   -- open a new tab
--- keymap.set("n", "<leader>tx", ":tabclose<CR>") -- close a tab
--- keymap.set("n", "<leader>tn", ":tabn<CR>")     -- next tab
--- keymap.set("n", "<leader>tp", ":tabp<CR>")     -- previous tab
--- keymap.set("n", "<leader>tb", ":tabp<CR>")     -- previous tab
+-- I don't use tabs (but hey)
+vim.keymap.set("n", "<leader>Tc", ":tabnew<CR>", { noremap = true, silent = true }) -- New tab
+vim.keymap.set("n", "<leader>Tx", ":tabclose<CR>", { noremap = true, silent = true }) -- Close tab
+vim.keymap.set("n", "<leader>Tk", ":tabnext<CR>", { noremap = true, silent = true }) -- Next tab
+vim.keymap.set("n", "<leader>Tj", ":tabprevious<CR>", { noremap = true, silent = true }) -- Previous tab
 
---Navigate next and previous buffers ( like tabs but worse?)
-vim.api.nvim_set_keymap("n", "<C-n>", ":bnext<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-b>", ":bprevious<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("", "<C-w>n", ":bnext<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("", "<C-w>b", ":bprevious<CR>", { noremap = true, silent = true })
-
--- Keymap for creating a new tab using Ctrl+w c
 keymap.set("n", "<C-w>c", ":tabnew<CR>", { noremap = true, silent = true })
+
+-- Move Tabs Around
+vim.keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", { noremap = true, silent = true }) -- Move tab left
+vim.keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", { noremap = true, silent = true }) -- Move tab right
+
+-- Navigate buffers (Next/Previous)
+vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+
+-- Move buffers (Reorder in Barbar)
+vim.keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", { noremap = true, silent = true })
 
 --keymaps for splits (vertical and horizontal)
 keymap.set("n", "<C-w>h", ":vsplit<CR>", { noremap = true, silent = true })
