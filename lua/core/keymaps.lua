@@ -200,13 +200,6 @@ keymap.set("", "<C-s>s", ":w<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>q", ":wa | qa!<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>Q", ":qa!<CR>", { noremap = true, silent = true })
 
------------------------------------------------ Diff keymaps
-keymap.set("n", "<leader>cc", ":diffput<CR>") -- put diff from current to other during diff
-keymap.set("n", "<leader>cj", ":diffget 1<CR>") -- get diff from left (local) during merge
-keymap.set("n", "<leader>ck", ":diffget 3<CR>") -- get diff from right (remote) during merge
-keymap.set("n", "<leader>cn", "]c") -- next diff hunk
-keymap.set("n", "<leader>cp", "[c") -- previous diff hunk
-
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
 
@@ -255,11 +248,47 @@ local surrounds_mappings_see_mini_surround_lua = {
 	suffix_next = "n", -- Suffix to search with "next" method
 }
 
--------------------------------------------- Git
+---------------------------------------------------------- Git
 local builtin = require("telescope.builtin")
-keymap.set("n", "<leader>lg", ":LazyGit<CR>")
-keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Search Git Commits" })
-keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Git Commits for Buffer" })
+
+-- Lazygit
+keymap.set("n", "<leader>lg", ":LazyGit<CR>", { desc = "Open LazyGit" })
+
+-- Git History (Telescope)
+keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
+keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Buffer Commits (Telescope)" })
+
+-- Git Status (Fugitive)
+keymap.set("n", "<leader>gs", ":Git<CR>", { desc = "Git status (Fugitive)" })
+
+-- Git Mergetool
+keymap.set("n", "<leader>gm", ":Gvdiffsplit!<CR>", { desc = "Open Git Mergetool" })
+
+-- Reset file to Git index version
+keymap.set("n", "<leader>gr", ":Gread<CR>", { desc = "Reset file to index version" })
+
+-- Stage current file
+keymap.set("n", "<leader>gw", ":Gwrite<CR>", { desc = "Stage current file" })
+
+-- Git Add All
+keymap.set("n", "<leader>ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
+-- Git commit
+keymap.set("n", "<leader>gC", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
+-- Git Push Current Branch
+keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Push current branch to remote" })
+
+-- Git log
+keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" })
+
+-- Git blame (Avoids `<leader>gb` conflict)
+keymap.set("n", "<leader>gB", ":Git blame<CR>", { desc = "Git blame (Fugitive)" })
+
+--------------------- Diff keymaps
+keymap.set("n", "<leader>cc", ":diffput<CR>", { desc = "Put diff from current to other" }) -- Apply current diff to other
+keymap.set("n", "<leader>cj", ":diffget 1<CR>", { desc = "Get diff from left (LOCAL)" }) -- Accept left (local) change
+keymap.set("n", "<leader>ck", ":diffget 3<CR>", { desc = "Get diff from right (REMOTE)" }) -- Accept right (remote) change
+keymap.set("n", "<leader>cn", "]c", { desc = "Jump to next diff hunk" }) -- Jump to next diff
+keymap.set("n", "<leader>cp", "[c", { desc = "Jump to previous diff hunk" }) -- Jump to previous diff
 
 ---------------------------------------------LSP
 -- Helper function to check if LSP is available
@@ -285,47 +314,52 @@ local function safe_telescope_call(fn)
 end
 
 local opts_lsp = { noremap = true, silent = true }
+
+-- LSP Hover
 vim.api.nvim_set_keymap("n", "$", "<cmd>lua vim.lsp.buf.hover()<CR>", opts_lsp)
-vim.api.nvim_set_keymap("n", "<leader>Br", "<cmd>lua vim.lsp.buf.rename()<CR>", opts_lsp)
-vim.api.nvim_set_keymap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts_lsp)
-
-keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), { noremap = true, silent = true })
-keymap.set("n", "gD", safe_lsp_call("declaration"), { noremap = true, silent = true })
-keymap.set("n", "gi", safe_telescope_call("lsp_implementations"), { noremap = true, silent = true })
-keymap.set("n", "gr", safe_telescope_call("lsp_references"), { noremap = true, silent = true })
-
--- LSP Information
-keymap.set("n", "<leader>gg", safe_lsp_call("hover"), { noremap = true, silent = true })
-keymap.set("n", "gs", safe_lsp_call("signature_help"), { noremap = true, silent = true })
 
 -- LSP Actions
-keymap.set("n", "<leader>rr", safe_lsp_call("rename"), { noremap = true, silent = true, desc = "rename variable in all occurances" })
-keymap.set("n", "<leader>ga", safe_lsp_call("code_action"), { noremap = true, silent = true })
+keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), { noremap = true, silent = true, desc = "Rename symbol in all occurrences" })
+keymap.set("n", "<leader>La", safe_lsp_call("code_action"), { noremap = true, silent = true, desc = "Show available code actions" })
 
--- Auto Formatting (Would be useful if I didn't have an auto formatter)
-keymap.set({ "n", "v" }, "<leader>gf", function()
-	if vim.lsp.buf.format then
-		vim.lsp.buf.format({ async = true })
-	else
-		print("LSP function 'format' not available")
-	end
-end, { noremap = true, silent = true })
+-- LSP Definitions & References
+keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), { noremap = true, silent = true, desc = "Go to definition" })
+keymap.set("n", "gD", safe_lsp_call("declaration"), { noremap = true, silent = true, desc = "Go to declaration" })
+keymap.set("n", "gi", safe_telescope_call("lsp_implementations"), { noremap = true, silent = true, desc = "Find implementations" })
+keymap.set("n", "gr", safe_telescope_call("lsp_references"), { noremap = true, silent = true, desc = "Find references" })
 
--- Diagnostics
-keymap.set("n", "<leader>gl", safe_lsp_call("diagnostic.open_float"), { noremap = true, silent = true })
-keymap.set("n", "<leader>gp", safe_lsp_call("diagnostic.goto_prev"), { noremap = true, silent = true })
-keymap.set("n", "<leader>gn", safe_lsp_call("diagnostic.goto_next"), { noremap = true, silent = true })
+-- LSP Information
+keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), { noremap = true, silent = true, desc = "Show LSP hover info" })
+keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), { noremap = true, silent = true, desc = "Show function signature help" })
 
--- Workspace Folders
-keymap.set("n", "<leader>La", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true })
-keymap.set("n", "<leader>Lr", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true })
+-- Workspace Folder Management
+keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true, desc = "Add workspace folder" }) -- Changed from `<leader>La`
+keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true, desc = "Remove workspace folder" }) -- Changed from `<leader>Lr`
 keymap.set("n", "<leader>Ll", function()
 	if vim.lsp.buf.list_workspace_folders then
 		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	else
 		print("LSP function 'list_workspace_folders' not available")
 	end
-end, { noremap = true, silent = true })
+end, { noremap = true, silent = true, desc = "List workspace folders" })
+
+-- Diagnostics
+keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), { noremap = true, silent = true, desc = "Show diagnostic in floating window" }) -- Changed from `<leader>Ll`
+keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), { noremap = true, silent = true, desc = "Go to previous diagnostic" })
+keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), { noremap = true, silent = true, desc = "Go to next diagnostic" })
+
+-- Auto Formatting
+keymap.set({ "n", "v" }, "<leader>Lf", function()
+	if vim.lsp.buf.format then
+		vim.lsp.buf.format({ async = true })
+	else
+		print("LSP function 'format' not available")
+	end
+end, { noremap = true, silent = true, desc = "Format buffer using LSP" })
+
+-- Custom nohup Command Bindings
+keymap.set("n", "<leader>lz", ":noh<CR>", { noremap = true, silent = true, desc = "Disable search highlight (nohup)" })
+keymap.set("n", "<leader>gz", ":noh<CR>", { noremap = true, silent = true, desc = "Disable search highlight (nohup global)" })
 
 ---------------------- ----------------------Telescope
 keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
@@ -355,48 +389,43 @@ vim.keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List"
 vim.keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
 
 ---------------------------------------------------------------- Harpoon
-keymap.set("n", "<leader>ha", require("harpoon.mark").add_file)
-keymap.set("n", "<leader>hh", require("harpoon.ui").toggle_quick_menu)
-keymap.set("n", "<leader>h1", function()
-	require("harpoon.ui").nav_file(1)
-end)
-keymap.set("n", "<leader>h2", function()
-	require("harpoon.ui").nav_file(2)
-end)
-keymap.set("n", "<leader>h3", function()
-	require("harpoon.ui").nav_file(3)
-end)
-keymap.set("n", "<leader>h4", function()
-	require("harpoon.ui").nav_file(4)
-end)
-keymap.set("n", "<leader>h5", function()
-	require("harpoon.ui").nav_file(5)
-end)
-keymap.set("n", "<leader>h6", function()
-	require("harpoon.ui").nav_file(6)
-end)
-keymap.set("n", "<leader>h7", function()
-	require("harpoon.ui").nav_file(7)
-end)
-keymap.set("n", "<leader>h8", function()
-	require("harpoon.ui").nav_file(8)
-end)
-keymap.set("n", "<leader>h9", function()
-	require("harpoon.ui").nav_file(9)
-end)
+local harpoon_ui = require("harpoon.ui") -- Isolate Harpoon UI
+local harpoon_mark = require("harpoon.mark") -- Isolate Harpoon Mark
 
-keymap.set("n", "<leader>hb", function()
-	require("harpoon.ui").nav_prev()
-end)
-keymap.set("n", "<leader>hn", function()
-	require("harpoon.ui").nav_next()
-end)
+-- Add current file to Harpoon
+keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "Add file to Harpoon" })
+
+-- Toggle Harpoon quick menu
+keymap.set("n", "<leader>hh", harpoon_ui.toggle_quick_menu, { desc = "Open Harpoon quick menu" })
+
+-- Navigate to Harpoon file slots (1-9)
+for i = 1, 9 do
+	keymap.set("n", "<leader>h" .. i, function()
+		harpoon_ui.nav_file(i)
+	end, { desc = "Go to Harpoon file " .. i })
+end
+
+-- Cycle through Harpoon files
+keymap.set("n", "<leader>hb", harpoon_ui.nav_prev, { desc = "Go to previous Harpoon file" })
+keymap.set("n", "<leader>hn", harpoon_ui.nav_next, { desc = "Go to next Harpoon file" })
 
 -- ---------------------------------------------ufo
 local ufo = require("ufo")
--- Key mappings
+
+-- Open/Close All Folds
 vim.keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
 vim.keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
+
+-- Open/Close Fold Under Cursor
+vim.keymap.set("n", "<leader>zr", function()
+	ufo.openFoldsExceptKinds({})
+end, { desc = "Open fold under cursor" })
+
+vim.keymap.set("n", "<leader>zm", function()
+	ufo.closeFoldsWith(1)
+end, { desc = "Close fold under cursor" })
+
+-- Peek Folded Lines
 vim.keymap.set("n", "<leader>zK", function()
 	local winid = ufo.peekFoldedLinesUnderCursor()
 	if not winid then
@@ -404,14 +433,24 @@ vim.keymap.set("n", "<leader>zK", function()
 	end
 end, { desc = "Peek Fold" })
 
+-- Jump to Next/Previous Closed Fold
+vim.keymap.set("n", "<leader>zn", function()
+	vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W")
+end, { desc = "Jump to next closed fold" })
+
+vim.keymap.set("n", "<leader>zp", function()
+	vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW")
+end, { desc = "Jump to previous closed fold" })
+
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
 -- hence check ftplugin directory in that github thing
+
 keymap.set("n", "<leader>go", function()
 	if vim.bo.filetype == "python" then
 		vim.api.nvim_command("PyrightOrganizeImports")
 	end
-end)
+end, { noremap = true, silent = true, desc = "Organize Python imports (Pyright)" })
 
 --------------------------------------------- Debugging (nvim-dap)
 -- Breakpoint Management
