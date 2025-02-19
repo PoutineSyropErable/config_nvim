@@ -255,11 +255,11 @@ local builtin = require("telescope.builtin")
 keymap.set("n", "<leader>lg", ":LazyGit<CR>", { desc = "Open LazyGit" })
 
 -- Git History (Telescope)
-keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
+keymap.set("n", "<leader>gC", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
 keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Buffer Commits (Telescope)" })
 
 -- Git Status (Fugitive)
-keymap.set("n", "<leader>gs", ":Git<CR>", { desc = "Git status (Fugitive)" })
+keymap.set("n", "<leader>gf", ":Git<CR>", { desc = "Git status (Fugitive)" })
 
 -- Git Mergetool
 keymap.set("n", "<leader>gm", ":Gvdiffsplit!<CR>", { desc = "Open Git Mergetool" })
@@ -268,12 +268,12 @@ keymap.set("n", "<leader>gm", ":Gvdiffsplit!<CR>", { desc = "Open Git Mergetool"
 keymap.set("n", "<leader>gr", ":Gread<CR>", { desc = "Reset file to index version" })
 
 -- Stage current file
-keymap.set("n", "<leader>gw", ":Gwrite<CR>", { desc = "Stage current file" })
+keymap.set("n", "<leader>gs", ":Gwrite<CR>", { desc = "Stage current file" })
 
 -- Git Add All
 keymap.set("n", "<leader>ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
 -- Git commit
-keymap.set("n", "<leader>gC", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
+keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
 -- Git Push Current Branch
 keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Push current branch to remote" })
 
@@ -357,9 +357,10 @@ keymap.set({ "n", "v" }, "<leader>Lf", function()
 	end
 end, { noremap = true, silent = true, desc = "Format buffer using LSP" })
 
--- Custom nohup Command Bindings
-keymap.set("n", "<leader>lz", ":noh<CR>", { noremap = true, silent = true, desc = "Disable search highlight (nohup)" })
-keymap.set("n", "<leader>gz", ":noh<CR>", { noremap = true, silent = true, desc = "Disable search highlight (nohup global)" })
+-- More LSP Commands on <leader>l...
+local d = "More LSP Commands on <leader>l... (Also disables search highlight)"
+keymap.set("n", "<leader>lz", ":noh<CR>", { noremap = true, silent = true, desc = d })
+keymap.set("n", "<leader>gz", ":noh<CR>", { noremap = true, silent = true, desc = d })
 
 ---------------------- ----------------------Telescope
 keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
