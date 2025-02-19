@@ -7,61 +7,63 @@ local function debug_log(func_name, ...)
 end
 
 -------------------------------- C/C++ ----------------------------------
-local function find_in_build(callback)
+local function find_in_build()
 	debug_log("find_in_build")
-	local build_dir = vim.fn.getcwd() .. "/build/"
-	local safe_build_dir = vim.fn.shellescape(build_dir) -- Escape path
 
-	vim.fn.jobstart("find " .. safe_build_dir .. " -maxdepth 1 -type f -executable", {
-		stdout_buffered = true,
-		on_stdout = function(_, data)
-			if data and data[1] and data[1] ~= "" then
-				print("[DAP] find_in_build() found executable: " .. data[1])
-				callback(data[1])
-			else
-				callback(nil)
-			end
-		end,
-	})
+	local build_dir = vim.fn.getcwd() .. "/build/"
+	local safe_build_dir = vim.fn.shellescape(build_dir) -- Escape the path properly
+
+	-- Check if the build directory exists
+	if vim.fn.isdirectory(build_dir) == 0 then
+		print("[DAP] find_in_build(): build/ directory does not exist")
+		return nil
+	end
+
+	-- Run find command safely
+	local executables = vim.fn.systemlist("find " .. safe_build_dir .. " -maxdepth 1 -type f -executable")
+
+	-- Ensure the result is valid
+	if #executables > 0 and vim.fn.filereadable(executables[1]) == 1 then
+		print("[DAP] find_in_build() found executable: " .. executables[1])
+		return executables[1]
+	end
+
+	return nil
 end
 
-local function find_elf_in_root(callback)
+local function find_elf_in_root()
 	debug_log("find_elf_in_root")
 	local cwd = vim.fn.getcwd()
+	local elf_executables =
+		vim.fn.systemlist("find '" .. cwd .. "' -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'")
 
-	vim.fn.jobstart("find " .. cwd .. " -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'", {
-		stdout_buffered = true,
-		on_stdout = function(_, data)
-			if data and data[1] and data[1] ~= "" then
-				print("[DAP] find_elf_in_root() found ELF executable: " .. data[1])
-				callback(data[1])
-			else
-				callback(nil)
-			end
-		end,
-	})
+	if #elf_executables > 0 then
+		print("[DAP] find_elf_in_root() found executable: " .. elf_executables[1])
+		return elf_executables[1]
+	end
+	return nil
 end
 
-local function parse_automake(callback)
+local function parse_automake()
 	debug_log("parse_automake")
 	local cwd = vim.fn.getcwd()
 	local automake_file = cwd .. "/AutoMake"
 
+	-- Check if the file exists
 	if vim.fn.filereadable(automake_file) == 0 then
-		callback(nil)
-		return
+		return nil
 	end
 
+	-- Read the file line by line
 	for _, line in ipairs(vim.fn.readfile(automake_file)) do
 		local target = line:match('TARGET="(.-)"')
 		if target then
 			print("[DAP] parse_automake() found executable: " .. cwd .. "/" .. target)
-			callback(cwd .. "/" .. target)
-			return
+			return cwd .. "/" .. target
 		end
 	end
 
-	callback(nil) -- No TARGET found
+	return nil -- Return nil if no TARGET line was found
 end
 
 local function parse_makefile()
