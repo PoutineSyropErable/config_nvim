@@ -12,6 +12,6 @@ vim.cmd([[
 vim.g.fugitive_mergetool = 1
 vim.g.fugitive_no_maps = 1
 
-vim.cmd([[
-  command! Gvdiffsplit Gvdiffsplit!
-]])
+-- vim.cmd([[
+--   command! Gvdiffsplit Gvdiffsplit!
+-- ]])
