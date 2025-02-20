@@ -59,6 +59,17 @@ require("lazy").setup({
 
 	"preservim/vimux",
 	"norcalli/nvim-colorizer.lua",
+	{
+		"powerman/vim-plugin-AnsiEsc",
+		config = function()
+			vim.cmd([[
+            let g:AnsiEsc_Enabled = 1
+        ]])
+		end,
+	},
+
+	"brenoprata10/nvim-highlight-colors",
+
 	"uga-rosa/ccc.nvim",
 	{
 		"windwp/nvim-autopairs",

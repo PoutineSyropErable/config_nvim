@@ -111,16 +111,26 @@ vim.api.nvim_set_keymap(
 )
 
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
-vim.api.nvim_set_keymap("n", "<leader>nr", ":source %<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
 keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
 keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
-vim.keymap.set("n", "<leader>.F", ":NvimTreeFindFile<CR>")
-keymap.set("n", "<leader>.s", "<C-t>", { desc = "toggle tag stack" })
-vim.keymap.set("n", "<leader>.t", ":TestNearest<CR>")
-vim.keymap.set("n", "<leader>.T", ":TestFile<CR>")
+
+keymap.set("n", "<leader>.F", ":NvimTreeFindFile<CR>", { desc = "Find current file in NvimTree" })
+keymap.set("n", "<leader>.s", "<C-t>", { desc = "Toggle tag stack" })
+
+keymap.set("n", "<leader>.t", ":TestNearest<CR>", { desc = "Run nearest test" })
+keymap.set("n", "<leader>.T", ":TestFile<CR>", { desc = "Run test file" })
+
+keymap.set("n", "<leader>.c", ":AnsiEsc<CR>", { noremap = true, silent = true, desc = "Toggle ANSI escape highlighting" })
+keymap.set(
+	"n",
+	"<leader>.h",
+	":lua require('nvim-highlight-colors').toggle()<CR>",
+	{ noremap = true, silent = true, desc = "Toggle ANSI color parsing" }
+)
 
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
