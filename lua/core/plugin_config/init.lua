@@ -29,6 +29,7 @@ require("core.plugin_config.tressj")
 
 require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
+require("core.plugin_config.colors-highlight")
 ------ ##### DEACTIVATED ##### -------
 
 -- not needed vv (hologram) (and markdown_preview)

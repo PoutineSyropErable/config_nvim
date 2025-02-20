@@ -2,22 +2,32 @@
 require("mini.surround").setup({
 	-- Add custom surroundings to be used on top of builtin ones. For more
 	-- information with examples, see `:h MiniSurround.config`.
-	custom_surroundings = nil,
+	custom_surroundings = {
+		["r"] = {
+			output = { left = "\27[31m", right = "\27[0m" }, -- Red ANSI
+		},
+		["g"] = {
+			output = { left = "\27[32m", right = "\27[0m" }, -- Green ANSI
+		},
+		["b"] = {
+			output = { left = "\27[34m", right = "\27[0m" }, -- Blue ANSI
+		},
+	},
 
 	-- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
 	highlight_duration = 500,
 	-- Module mappings. Use `''` (empty string) to disable one.
 	mappings = {
-		add = "<leader>Sa",      -- Add surrounding in Normal and Visual modes
-		delete = "<leader>Sd",   -- Delete surrounding
-		find = "<leader>Sf",     -- Find surrounding (to the right)
+		add = "<leader>Sa", -- Add surrounding in Normal and Visual modes
+		delete = "<leader>Sd", -- Delete surrounding
+		find = "<leader>Sf", -- Find surrounding (to the right)
 		find_left = "<leader>SF", -- Find surrounding (to the left)
 		highlight = "<leader>Sh", -- Highlight surrounding
-		replace = "<leader>Sr",  -- Replace surrounding
+		replace = "<leader>Sr", -- Replace surrounding
 		update_n_lines = "<leader>Sn", -- Update `n_lines`
 
-		suffix_last = "l",       -- Suffix to search with "prev" method
-		suffix_next = "n",       -- Suffix to search with "next" method
+		suffix_last = "l", -- Suffix to search with "prev" method
+		suffix_next = "n", -- Suffix to search with "next" method
 	},
 
 	-- Number of lines within which surrounding is searched
