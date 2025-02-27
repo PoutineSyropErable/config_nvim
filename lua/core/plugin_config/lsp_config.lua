@@ -99,6 +99,22 @@ lspconfig.pyright.setup({
 	},
 })
 
+vim.api.nvim_create_user_command("PyrightDebug", function()
+	-- Show LSP info
+	vim.cmd("LspInfo")
+
+	-- Print the detected root directory
+	local clients = vim.lsp.get_active_clients()
+	for _, client in ipairs(clients) do
+		if client.name == "pyright" then
+			print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
+		end
+	end
+
+	-- Run Pyright manually
+	vim.cmd("!pyright --verbose")
+end, {})
+
 lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
