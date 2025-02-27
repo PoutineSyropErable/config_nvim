@@ -452,6 +452,7 @@ keymap.set("n", "<leader>kp", push_to_output, opts("Put current hunk into the fi
 keymap.set("n", "<leader>kn", "]c", opts("Jump to next conflict"))
 
 -- Jump to previous conflict
+keymap.set("n", "<leader>kN", "[c", opts("Jump to previous conflict"))
 keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
 
 -- Function to apply a selected version's hunk to all other buffers
