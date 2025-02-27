@@ -118,7 +118,7 @@ keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
 
-keymap.set("n", "<leader>.F", ":NvimTreeFindFile<CR>", { desc = "Find current file in NvimTree" })
+keymap.set("n", " leader>.F", ":NvimTreeFindFile<CR>", { desc = "Find current file in NvimTree" })
 keymap.set("n", "<leader>.s", "<C-t>", { desc = "Toggle tag stack" })
 
 keymap.set("n", "<leader>.t", ":TestNearest<CR>", { desc = "Run nearest test" })
@@ -131,6 +131,11 @@ keymap.set(
 	":lua require('nvim-highlight-colors').toggle()<CR>",
 	{ noremap = true, silent = true, desc = "Toggle ANSI color parsing" }
 )
+
+vim.keymap.set("n", "<leader>.l", function()
+	vim.opt.list = not vim.opt.list:get()
+	print("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
+end, { noremap = true, silent = true })
 
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
