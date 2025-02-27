@@ -4,13 +4,10 @@
 
 -- control+space for buffer completion on the other
 ------------------------------------- Setups for Split window management ----------------------------
+
+-- makes it easier to do opts shit
 local function opts(desc)
-	return {
-		desc = "nvim-tree: " .. desc,
-		noremap = true,
-		silent = true,
-		nowait = true,
-	}
+	return { noremap = true, silent = true, desc = desc }
 end
 
 -- Function to create key mapping options
@@ -147,8 +144,8 @@ keymap.set("n", "gx", ":!open <c-r><c-a><CR>") -- open URL under cursor
 
 ----------------Split window management, split, resize
 --there's a repeat of sh, it's fine. It's for inside nvim_tree, to open current file in a split
-keymap.set("n", "<leader>sh", tapi.node.open.vertical, opts("Open: Vertical Split"))
-keymap.set("n", "<leader>sv", tapi.node.open.horizontal, opts("Open: Horizontal Split"))
+keymap.set("n", "<leader>sh", tapi.node.open.vertical, opts("nvim-tree | Open: Vertical Split"))
+keymap.set("n", "<leader>sv", tapi.node.open.horizontal, opts("nvim tree |  Open: Horizontal Split"))
 -- I'm used to have it the other way arround. Horizontal split. = Side by side. Though its a vertical line.
 -- Too late, I'm used to it mixed up
 keymap.set("n", "<leader>se", "<C-w>=") -- make split windows equal width
@@ -214,6 +211,38 @@ keymap.set("", "<C-s>s", ":w<CR>", { noremap = true, silent = true })
 -- Keymap for write and save all
 keymap.set("", "<C-w>q", ":wa | qa!<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>Q", ":qa!<CR>", { noremap = true, silent = true })
+
+-- Function to get all windows in the current tab
+local function get_visible_windows()
+	return vim.api.nvim_tabpage_list_wins(0) -- Get all windows in the current tab
+end
+
+-- Function to move to a specific window by index (1-9)
+local function move_to_window(index)
+	local windows = get_visible_windows()
+	if windows[index] then
+		vim.api.nvim_set_current_win(windows[index]) -- Switch to the selected window
+	else
+		print("No window available for index " .. index)
+	end
+end
+
+-- Create keybindings for <leader>1-9 to switch between windows
+for i = 1, 9 do
+	keymap.set("n", "<leader>" .. i, function()
+		move_to_window(i)
+	end, opts("Move to window " .. i))
+end
+
+-- <leader>0 to go to the last window in the visible list
+keymap.set("n", "<leader>0", function()
+	local windows = get_visible_windows()
+	if #windows > 0 then
+		vim.api.nvim_set_current_win(windows[#windows]) -- Switch to last window
+	else
+		print("No visible windows to switch to")
+	end
+end, opts("Move to last visible window"))
 
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
@@ -298,12 +327,189 @@ keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" 
 -- Git blame (Avoids `<leader>gb` conflict)
 keymap.set("n", "<leader>gB", ":Git blame<CR>", { desc = "Git blame (Fugitive)" })
 
---------------------- Diff keymaps
-keymap.set("n", "<leader>cc", ":diffput<CR>", { desc = "Put diff from current to other" }) -- Apply current diff to other
-keymap.set("n", "<leader>cj", ":diffget 1<CR>", { desc = "Get diff from left (LOCAL)" }) -- Accept left (local) change
-keymap.set("n", "<leader>ck", ":diffget 3<CR>", { desc = "Get diff from right (REMOTE)" }) -- Accept right (remote) change
-keymap.set("n", "<leader>cn", "]c", { desc = "Jump to next diff hunk" }) -- Jump to next diff
-keymap.set("n", "<leader>cp", "[c", { desc = "Jump to previous diff hunk" }) -- Jump to previous diff
+---------------------------------------------- Diff keymaps
+function ApplyDiffGet(version)
+	-- This function is to apply the hunk of a buffer to output buffer
+	-- Save current window
+	local current_win = vim.api.nvim_get_current_win()
+	-- Find the output buffer (should be the one without LOCAL, BASE, REMOTE)
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+			vim.api.nvim_set_current_win(win) -- Switch to output buffer
+			vim.cmd("diffget " .. version) -- Apply diffget from LOCAL, BASE, or REMOTE
+			vim.api.nvim_set_current_win(current_win) -- Return to previous window
+			return
+		end
+	end
+	print("Output buffer not found!")
+end
+
+----- Meld like hunk movement
+local function get_adjacent_buf(direction)
+	local current_win = vim.api.nvim_get_current_win()
+	local wins = vim.api.nvim_list_wins()
+	local current_x = vim.api.nvim_win_get_position(current_win)[2]
+
+	local target_buf = nil
+	for _, win in ipairs(wins) do
+		if win ~= current_win then
+			local win_x = vim.api.nvim_win_get_position(win)[2]
+			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then
+				target_buf = vim.api.nvim_win_get_buf(win)
+			end
+		end
+	end
+	return target_buf
+end
+
+-- Function to pull a hunk from another buffer
+local function pull_hunk(direction)
+	local source_buf = get_adjacent_buf(direction)
+	if source_buf then
+		vim.cmd("diffget " .. source_buf) -- Explicitly pull from the correct buffer
+	else
+		print("No adjacent buffer found to the " .. direction)
+	end
+end
+
+-- Function to get the adjacent window ID (left or right)
+local function get_adjacent_win(direction)
+	local current_win = vim.api.nvim_get_current_win()
+	local wins = vim.api.nvim_list_wins()
+	local current_x = vim.api.nvim_win_get_position(current_win)[2]
+
+	local target_win = nil
+	for _, win in ipairs(wins) do
+		if win ~= current_win then
+			local win_x = vim.api.nvim_win_get_position(win)[2]
+			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then
+				target_win = win
+			end
+		end
+	end
+	return target_win
+end
+
+-- Function to push a hunk to another buffer
+local function push_hunk(direction)
+	local target_win = get_adjacent_win(direction) -- Get adjacent window ID
+	local current_win = vim.api.nvim_get_current_win() -- Store current window
+	local current_buf = vim.api.nvim_get_current_buf() -- Store current buffer
+
+	if target_win then
+		vim.api.nvim_set_current_win(target_win) -- Move to target buffer
+		vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer into this buffer
+		vim.api.nvim_set_current_win(current_win) -- Return to the original window
+	else
+		print("No adjacent window found to the " .. direction)
+	end
+end
+-- Move it to the **current buffer** (LOCAL, BASE, REMOTE)
+keymap.set("n", "<leader>kL", ":diffget LOCAL<CR>", opts("Take LOCAL version into current buffer"))
+keymap.set("n", "<leader>kB", ":diffget BASE<CR>", opts("Take BASE version into current buffer"))
+keymap.set("n", "<leader>kR", ":diffget REMOTE<CR>", opts("Take REMOTE version into current buffer"))
+
+-- Move it to the **output buffer** (final merged file)
+keymap.set("n", "<leader>kl", function()
+	ApplyDiffGet("LOCAL")
+end, opts("Apply LOCAL version to output buffer"))
+keymap.set("n", "<leader>kb", function()
+	ApplyDiffGet("BASE")
+end, opts("Apply BASE version to output buffer"))
+keymap.set("n", "<leader>kr", function()
+	ApplyDiffGet("REMOTE")
+end, opts("Apply REMOTE version to output buffer"))
+
+-- Push hunk to the left buffer
+keymap.set("n", "<leader>ka", function()
+	push_hunk("left")
+end, opts("Push hunk to the left buffer"))
+
+-- Push hunk to the right buffer
+keymap.set("n", "<leader>kd", function()
+	push_hunk("right")
+end, opts("Push hunk to the right buffer"))
+
+-- Pull hunk from the left buffer
+keymap.set("n", "<leader>kq", function()
+	pull_hunk("left")
+end, opts("Pull hunk from the left buffer"))
+
+-- Pull hunk from the right buffer
+keymap.set("n", "<leader>ke", function()
+	pull_hunk("right")
+end, opts("Pull hunk from the right buffer"))
+
+-- Function to push the current hunk into the final output buffer
+-- Function to push the current hunk into the final output buffer
+local function push_to_output()
+	local current_win = vim.api.nvim_get_current_win() -- Save current window
+	local current_buf = vim.api.nvim_get_current_buf() -- Save current buffer
+	local output_win = nil
+
+	-- Find the output buffer window (should be the one without _LOCAL_, _BASE_, _REMOTE_)
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+			output_win = win
+			break
+		end
+	end
+
+	if output_win then
+		vim.api.nvim_set_current_win(output_win) -- Switch to output buffer
+		vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
+		vim.api.nvim_set_current_win(current_win) -- Return to original buffer
+	else
+		print("Output buffer not found!")
+	end
+end
+
+keymap.set("n", "<leader>kp", push_to_output, opts("Put current hunk into the final output buffer"))
+
+-- Jump to next conflict
+keymap.set("n", "<leader>kn", "]c", opts("Jump to next conflict"))
+
+-- Jump to previous conflict
+keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
+
+-- Function to apply the current buffer's hunk to all other buffers
+local function apply_hunk_to_all()
+	local current_buf = vim.api.nvim_get_current_buf() -- Get the current buffer
+	local current_win = vim.api.nvim_get_current_win() -- Save the current window
+	local output_win = nil
+
+	-- Identify the output buffer
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+			output_win = win
+			break
+		end
+	end
+
+	-- Apply diffget to all buffers except the output buffer
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local target_buf = vim.api.nvim_win_get_buf(win)
+		if target_buf ~= current_buf and win ~= output_win then
+			vim.api.nvim_set_current_win(win) -- Move to target window
+			vim.cmd("diffget " .. current_buf) -- Apply hunk from the original buffer
+		end
+	end
+
+	-- Apply the current hunk to the output buffer without moving to the next hunk
+	if output_win then
+		vim.api.nvim_set_current_win(output_win) -- Move to output buffer
+		vim.cmd("diffget " .. current_buf) -- Apply hunk without changing cursor position
+	end
+
+	-- Return to the original buffer
+	vim.api.nvim_set_current_win(current_win)
+end
+
+-- Keybinding to apply the current buffer's hunk to all other buffers
+keymap.set("n", "<leader>kC", apply_hunk_to_all, opts("Apply current buffer's hunk to all other buffers"))
 
 ---------------------------------------------LSP
 -- Helper function to check if LSP is available
