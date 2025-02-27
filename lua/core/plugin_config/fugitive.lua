@@ -6,6 +6,12 @@ vim.cmd([[
     autocmd!
     autocmd QuitPre * if &diff | diffoff! | endif
   augroup END
+
+  " Print merge conflict keybindings when entering a diff
+  augroup fugitive_merge_message
+    autocmd!
+    autocmd BufWinEnter * if &diff | echohl WarningMsg | echo "Merge Conflicts: Use <leader>k for keybindings" | echohl None | endif
+  augroup END
 ]])
 
 -- Set Fugitive as the Git mergetool
