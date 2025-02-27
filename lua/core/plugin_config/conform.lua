@@ -30,7 +30,16 @@ require("conform").setup({
 			prepend_args = { "--line-length", "140" }, -- Set the line length for black
 		},
 		stylua = {
-			prepend_args = { "--column-width", "151" }, -- Set the column width for stylua
+			prepend_args = {
+				"--column-width",
+				"151", -- Max width before breaking lines
+				"--indent-type",
+				"Tabs", -- Use tabs instead of spaces
+				"--indent-width",
+				"4", -- Set indentation width to 4 spaces (tab width)
+				"--collapse-simple-statement",
+				"Always", -- Avoid breaking simple single-line statements
+			},
 		},
 		prettier = {
 			prepend_args = { "--tab-width", "4", "--use-tabs", "false" },

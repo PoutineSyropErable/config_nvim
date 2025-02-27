@@ -6,9 +6,7 @@
 ------------------------------------- Setups for Split window management ----------------------------
 
 -- makes it easier to do opts shit
-local function opts(desc)
-	return { noremap = true, silent = true, desc = desc }
-end
+local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 -- Function to create key mapping options
 local tapi = require("nvim-tree.api")
@@ -229,9 +227,7 @@ end
 
 -- Create keybindings for <leader>1-9 to switch between windows
 for i = 1, 9 do
-	keymap.set("n", "<leader>" .. i, function()
-		move_to_window(i)
-	end, opts("Move to window " .. i))
+	keymap.set("n", "<leader>" .. i, function() move_to_window(i) end, opts("Move to window " .. i))
 end
 
 -- <leader>0 to go to the last window in the visible list
@@ -383,9 +379,7 @@ local function get_adjacent_win(direction)
 	for _, win in ipairs(wins) do
 		if win ~= current_win then
 			local win_x = vim.api.nvim_win_get_position(win)[2]
-			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then
-				target_win = win
-			end
+			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then target_win = win end
 		end
 	end
 	return target_win
@@ -411,35 +405,21 @@ keymap.set("n", "<leader>kB", ":diffget BASE<CR>", opts("Take BASE version into 
 keymap.set("n", "<leader>kR", ":diffget REMOTE<CR>", opts("Take REMOTE version into current buffer"))
 
 -- Move it to the **output buffer** (final merged file)
-keymap.set("n", "<leader>kl", function()
-	ApplyDiffGet("LOCAL")
-end, opts("Apply LOCAL version to output buffer"))
-keymap.set("n", "<leader>kb", function()
-	ApplyDiffGet("BASE")
-end, opts("Apply BASE version to output buffer"))
-keymap.set("n", "<leader>kr", function()
-	ApplyDiffGet("REMOTE")
-end, opts("Apply REMOTE version to output buffer"))
+keymap.set("n", "<leader>kl", function() ApplyDiffGet("LOCAL") end, opts("Apply LOCAL version to output buffer"))
+keymap.set("n", "<leader>kb", function() ApplyDiffGet("BASE") end, opts("Apply BASE version to output buffer"))
+keymap.set("n", "<leader>kr", function() ApplyDiffGet("REMOTE") end, opts("Apply REMOTE version to output buffer"))
 
 -- Push hunk to the left buffer
-keymap.set("n", "<leader>ka", function()
-	push_hunk("left")
-end, opts("Push hunk to the left buffer"))
+keymap.set("n", "<leader>ka", function() push_hunk("left") end, opts("Push hunk to the left buffer"))
 
 -- Push hunk to the right buffer
-keymap.set("n", "<leader>kd", function()
-	push_hunk("right")
-end, opts("Push hunk to the right buffer"))
+keymap.set("n", "<leader>kd", function() push_hunk("right") end, opts("Push hunk to the right buffer"))
 
 -- Pull hunk from the left buffer
-keymap.set("n", "<leader>kq", function()
-	pull_hunk("left")
-end, opts("Pull hunk from the left buffer"))
+keymap.set("n", "<leader>kq", function() pull_hunk("left") end, opts("Pull hunk from the left buffer"))
 
 -- Pull hunk from the right buffer
-keymap.set("n", "<leader>ke", function()
-	pull_hunk("right")
-end, opts("Pull hunk from the right buffer"))
+keymap.set("n", "<leader>ke", function() pull_hunk("right") end, opts("Pull hunk from the right buffer"))
 
 -- Function to push the current hunk into the final output buffer
 -- Function to push the current hunk into the final output buffer
@@ -474,9 +454,8 @@ keymap.set("n", "<leader>kn", "]c", opts("Jump to next conflict"))
 -- Jump to previous conflict
 keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
 
--- Function to apply the current buffer's hunk to all other buffers
-local function apply_hunk_to_all()
-	local current_buf = vim.api.nvim_get_current_buf() -- Get the current buffer
+-- Function to apply a selected version's hunk to all other buffers
+local function apply_hunk_to_all(version)
 	local current_win = vim.api.nvim_get_current_win() -- Save the current window
 	local output_win = nil
 
@@ -489,27 +468,55 @@ local function apply_hunk_to_all()
 		end
 	end
 
-	-- Apply diffget to all buffers except the output buffer
+	-- Apply diffget from the chosen version to all buffers except the output buffer
 	for _, win in ipairs(vim.api.nvim_list_wins()) do
 		local target_buf = vim.api.nvim_win_get_buf(win)
-		if target_buf ~= current_buf and win ~= output_win then
-			vim.api.nvim_set_current_win(win) -- Move to target window
-			vim.cmd("diffget " .. current_buf) -- Apply hunk from the original buffer
+		if win ~= output_win then
+			vim.api.nvim_set_current_win(win) -- Move to target buffer
+			vim.cmd("diffget " .. version) -- Apply hunk from the selected version
 		end
 	end
 
-	-- Apply the current hunk to the output buffer without moving to the next hunk
+	-- Apply the selected hunk to the output buffer without moving to the next hunk
 	if output_win then
 		vim.api.nvim_set_current_win(output_win) -- Move to output buffer
-		vim.cmd("diffget " .. current_buf) -- Apply hunk without changing cursor position
+		vim.cmd("diffget " .. version) -- Apply hunk without changing cursor position
 	end
 
-	-- Return to the original buffer
+	-- Return to the original window
 	vim.api.nvim_set_current_win(current_win)
 end
 
--- Keybinding to apply the current buffer's hunk to all other buffers
-keymap.set("n", "<leader>kC", apply_hunk_to_all, opts("Apply current buffer's hunk to all other buffers"))
+-- Function to detect the current buffer type and apply it to all buffers
+local function apply_current_hunk_to_all()
+	local bufname = vim.api.nvim_buf_get_name(0)
+
+	if bufname:match("_LOCAL_") then
+		apply_hunk_to_all("LOCAL")
+	elseif bufname:match("_BASE_") then
+		apply_hunk_to_all("BASE")
+	elseif bufname:match("_REMOTE_") then
+		apply_hunk_to_all("REMOTE")
+	else
+		print("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
+	end
+end
+
+-- Apply LOCAL hunk to all buffers
+keymap.set("n", "<leader>kcl", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
+-- Apply BASE hunk to all buffers
+keymap.set("n", "<leader>kcb", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
+-- Apply REMOTE hunk to all buffers
+keymap.set("n", "<leader>kcr", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
+-- Apply CURRENT buffer's hunk to all buffers
+keymap.set("n", "<leader>kC", apply_current_hunk_to_all, opts("Apply current buffer's hunk to all buffers"))
+
+-- Apply LOCAL hunk to all buffers
+keymap.set("n", "<leader>kf", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
+-- Apply BASE hunk to all buffers
+keymap.set("n", "<leader>kg", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
+-- Apply REMOTE hunk to all buffers
+keymap.set("n", "<leader>kh", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
 
 ---------------------------------------------LSP
 -- Helper function to check if LSP is available
@@ -598,9 +605,7 @@ keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
 keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
 keymap.set("n", "<leader>fH", ":nohlsearch<CR>")
 keymap.set("n", "<leader>fi", builtin.lsp_incoming_calls, {})
-keymap.set("n", "<leader>fm", function()
-	builtin.treesitter({ default_text = ":method:" })
-end)
+keymap.set("n", "<leader>fm", function() builtin.treesitter({ default_text = ":method:" }) end)
 keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", { desc = "Telescope Neoclip" })
 
 keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
@@ -622,9 +627,7 @@ keymap.set("n", "<leader>hh", harpoon_ui.toggle_quick_menu, { desc = "Open Harpo
 
 -- Navigate to Harpoon file slots (1-9)
 for i = 1, 9 do
-	keymap.set("n", "<leader>h" .. i, function()
-		harpoon_ui.nav_file(i)
-	end, { desc = "Go to Harpoon file " .. i })
+	keymap.set("n", "<leader>h" .. i, function() harpoon_ui.nav_file(i) end, { desc = "Go to Harpoon file " .. i })
 end
 
 -- Cycle through Harpoon files
@@ -639,39 +642,32 @@ vim.keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
 vim.keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
 
 -- Open/Close Fold Under Cursor
-vim.keymap.set("n", "<leader>zr", function()
-	ufo.openFoldsExceptKinds({})
-end, { desc = "Open fold under cursor" })
+vim.keymap.set("n", "<leader>zr", function() ufo.openFoldsExceptKinds({}) end, { desc = "Open fold under cursor" })
 
-vim.keymap.set("n", "<leader>zm", function()
-	ufo.closeFoldsWith(1)
-end, { desc = "Close fold under cursor" })
+vim.keymap.set("n", "<leader>zm", function() ufo.closeFoldsWith(1) end, { desc = "Close fold under cursor" })
 
 -- Peek Folded Lines
 vim.keymap.set("n", "<leader>zK", function()
 	local winid = ufo.peekFoldedLinesUnderCursor()
-	if not winid then
-		vim.lsp.buf.hover()
-	end
+	if not winid then vim.lsp.buf.hover() end
 end, { desc = "Peek Fold" })
 
 -- Jump to Next/Previous Closed Fold
-vim.keymap.set("n", "<leader>zn", function()
-	vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W")
-end, { desc = "Jump to next closed fold" })
+vim.keymap.set("n", "<leader>zn", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W") end, { desc = "Jump to next closed fold" })
 
-vim.keymap.set("n", "<leader>zp", function()
-	vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW")
-end, { desc = "Jump to previous closed fold" })
+vim.keymap.set(
+	"n",
+	"<leader>zp",
+	function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW") end,
+	{ desc = "Jump to previous closed fold" }
+)
 
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
 -- hence check ftplugin directory in that github thing
 
 keymap.set("n", "<leader>go", function()
-	if vim.bo.filetype == "python" then
-		vim.api.nvim_command("PyrightOrganizeImports")
-	end
+	if vim.bo.filetype == "python" then vim.api.nvim_command("PyrightOrganizeImports") end
 end, { noremap = true, silent = true, desc = "Organize Python imports (Pyright)" })
 
 --------------------------------------------- Debugging (nvim-dap)
@@ -699,15 +695,11 @@ keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>", { desc = 
 keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>", { desc = "Step out of current function" })
 
 keymap.set("n", "<leader>dTc", function()
-	if vim.bo.filetype == "python" then
-		require("dap-python").test_class()
-	end
+	if vim.bo.filetype == "python" then require("dap-python").test_class() end
 end)
 
 keymap.set("n", "<leader>dTm", function()
-	if vim.bo.filetype == "python" then
-		require("dap-python").test_method()
-	end
+	if vim.bo.filetype == "python" then require("dap-python").test_method() end
 end)
 
 -- Debugging Stop/Disconnect
@@ -724,9 +716,7 @@ end, { desc = "Terminate debugging session (kill process)" })
 -- Debugging Tools
 keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", { desc = "Toggle debugger REPL" })
 keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.run_last()<cr>", { desc = "Re-run last debugging session" })
-keymap.set("n", "<leader>di", function()
-	require("dap.ui.widgets").hover()
-end, { desc = "Hover to inspect variable under cursor" })
+keymap.set("n", "<leader>di", function() require("dap.ui.widgets").hover() end, { desc = "Hover to inspect variable under cursor" })
 
 keymap.set("n", "<leader>d?", function()
 	local widgets = require("dap.ui.widgets")
@@ -736,9 +726,12 @@ end, { desc = "Show debugging scopes (floating window)" })
 -- Telescope DAP Integrations
 keymap.set("n", "<leader>df", "<cmd>Telescope dap frames<cr>", { desc = "Show stack frames (Telescope UI)" })
 keymap.set("n", "<leader>dh", "<cmd>Telescope dap commands<cr>", { desc = "List DAP commands (Telescope UI)" })
-keymap.set("n", "<leader>de", function()
-	require("telescope.builtin").diagnostics({ default_text = ":E:" })
-end, { desc = "Show errors and diagnostics (Telescope UI)" })
+keymap.set(
+	"n",
+	"<leader>de",
+	function() require("telescope.builtin").diagnostics({ default_text = ":E:" }) end,
+	{ desc = "Show errors and diagnostics (Telescope UI)" }
+)
 
 ----------------------------------------------------- Terminal (PICK ONE) ---------------------------
 -------- Float Term: --------
@@ -831,9 +824,7 @@ else
 end
 
 ------------------------------ NOTES --------------------------
-local function ro(description)
-	return { noremap = true, silent = true, desc = description }
-end
+local function ro(description) return { noremap = true, silent = true, desc = description } end
 
 ---------------  ✍️ Markdown Preview Toggle
 keymap.set("n", "<leader>mt", ":MarkView Toggle<CR>", ro("Toggle Markdown Preview"))
@@ -1004,9 +995,7 @@ vim.api.nvim_set_keymap("v", "Q", "gE", { noremap = true, silent = true })
 function Replace_with_input()
 	local old_char = vim.fn.input("Replace character: ")
 	local new_char = vim.fn.input("Replace with: ")
-	if old_char ~= "" and new_char ~= "" then
-		vim.cmd(string.format("%%s/%s/%s/g", old_char, new_char))
-	end
+	if old_char ~= "" and new_char ~= "" then vim.cmd(string.format("%%s/%s/%s/g", old_char, new_char)) end
 end
 
 function Replace_with_confirmation()
@@ -1317,13 +1306,9 @@ function _G.general_utils_franck.search_word(direction)
 end
 
 -- Bind to functions for next and previous search
-function _G.general_utils_franck.SearchNextWord()
-	_G.general_utils_franck.search_word("next")
-end
+function _G.general_utils_franck.SearchNextWord() _G.general_utils_franck.search_word("next") end
 
-function _G.general_utils_franck.SearchPrevWord()
-	_G.general_utils_franck.search_word("prev")
-end
+function _G.general_utils_franck.SearchPrevWord() _G.general_utils_franck.search_word("prev") end
 
 -- Function to copy the full file path
 function _G.general_utils_franck.CopyFilePath()
@@ -1345,9 +1330,12 @@ vim.keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = 
 vim.keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
 
-vim.keymap.set("n", "<leader>rd", function()
-	print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected"))
-end, { desc = "Print LSP Root Directory" })
+vim.keymap.set(
+	"n",
+	"<leader>rd",
+	function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end,
+	{ desc = "Print LSP Root Directory" }
+)
 ----------------------------------------------- END OF CONFIG FILE
 
 -- print("Vim configuration reloaded")
