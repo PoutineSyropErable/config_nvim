@@ -233,11 +233,11 @@ lspconfig.texlab.setup({
 					"-pdf",
 					"-interaction=nonstopmode",
 					"-synctex=1",
-					"-aux-directory=" .. '"' .. tex_output .. '"',
-					"-output-directory=" .. '"' .. pdf_output_dir .. '"',
+					"-aux-directory=" .. tex_output,
+					"-output-directory=" .. pdf_output_dir,
 					tex_file,
 				},
-				onSave = true, -- Compile on save
+				onSave = false, -- Compile on save
 				forwardSearchAfter = true,
 			},
 			forwardSearch = {
@@ -277,11 +277,11 @@ vim.g.vimtex_view_general_viewer = "zathura"
 vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
 
 vim.g.vimtex_compiler_latexmk = {
-	aux_dir = '"' .. tex_output .. '"', -- Auxiliary files directory
-	out_dir = '"' .. pdf_output_dir .. '"', -- Output directory
-	callback = true,
-	continuous = true, -- Enable continuous compilation
-	background = true,
+	aux_dir = tex_output, -- Auxiliary files directory
+	out_dir = pdf_output_dir, -- Output directory
+	callback = false,
+	continuous = false, -- Enable continuous compilation
+	background = false,
 }
 
 -- Hyprlang LSP
