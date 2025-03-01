@@ -106,9 +106,7 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	-- Print the detected root directory
 	local clients = vim.lsp.get_active_clients()
 	for _, client in ipairs(clients) do
-		if client.name == "pyright" then
-			print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
-		end
+		if client.name == "pyright" then print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown")) end
 	end
 
 	-- Run Pyright manually
@@ -235,9 +233,8 @@ lspconfig.texlab.setup({
 					"-pdf",
 					"-interaction=nonstopmode",
 					"-synctex=1",
-					"-aux-directory=" .. tex_output, -- Store aux files in ~/.texfiles/
-					"-output-directory=" .. pdf_output_dir, -- PDF in the same directory as the LaTeX file
-					-- "-synctex-directory=" .. tex_output,
+					"-aux-directory=" .. '"' .. tex_output .. '"',
+					"-output-directory=" .. '"' .. pdf_output_dir .. '"',
 					tex_file,
 				},
 				onSave = true, -- Compile on save
@@ -280,10 +277,10 @@ vim.g.vimtex_view_general_viewer = "zathura"
 vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
 
 vim.g.vimtex_compiler_latexmk = {
-	aux_dir = tex_output, -- Move auxiliary files to ~/.texfiles/
-	out_dir = pdf_output_dir, -- Store build artifacts in ~/.texfiles/
+	aux_dir = '"' .. tex_output .. '"', -- Auxiliary files directory
+	out_dir = '"' .. pdf_output_dir .. '"', -- Output directory
 	callback = true,
-	continuous = true, -- Disable VimTeX auto-compilation
+	continuous = true, -- Enable continuous compilation
 	background = true,
 }
 
