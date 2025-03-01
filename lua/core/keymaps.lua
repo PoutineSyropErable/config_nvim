@@ -16,35 +16,35 @@ local tapi = require("nvim-tree.api")
 vim.g.mapleader = " " -- Assuming the leader key is set to space
 local keymap = vim.keymap
 ----------------------------------------- Clipboard
--- vim.api.nvim_set_keymap("n", "<leader>y", '"+y', { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("v", "<leader>y", '"+y', { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>C", '"+yy', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<leader>C", '"+yy', { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("n", "<leader>p", '"+p', { noremap = true, silent = true })
--- vim.api.nvim_set_keymap("v", "<leader>p", '"+p', { noremap = true, silent = true })
+-- keymap.set("n", "<leader>y", '"+y', { noremap = true, silent = true })
+-- keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
+-- keymap.set("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
+keymap.set("n", "<leader>C", '"+yy', { noremap = true, silent = true })
+keymap.set("v", "<leader>C", '"+yy', { noremap = true, silent = true })
+-- keymap.set("n", "<leader>p", '"+p', { noremap = true, silent = true })
+-- keymap.set("v", "<leader>p", '"+p', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("n", "<C-c>", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-x>", '"+d', { noremap = true, silent = true })
+keymap.set("n", "<C-c>", '"+y', { noremap = true, silent = true })
+keymap.set("n", "<C-x>", '"+d', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("v", "<C-c>", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-x>", '"+d', { noremap = true, silent = true })
+keymap.set("v", "<C-c>", '"+y', { noremap = true, silent = true })
+keymap.set("v", "<C-x>", '"+d', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("", "<C-C>", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
+keymap.set("", "<C-C>", '"+y', { noremap = true, silent = true })
+keymap.set("", "<C-V>", '"+p', { noremap = true, silent = true })
 -- Select all text (Help when vscode loads this)
 keymap.set("", "<C-a>", "ggVG<CR>", { noremap = true, silent = true })
 keymap.set("", "<C-w>a", "ggVG<CR>", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("", "<C-c>", '"+y', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("", "<C-x>", '"+d', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("", "<C-V>", '"+p', { noremap = true, silent = true })
+keymap.set("", "<C-c>", '"+y', { noremap = true, silent = true })
+keymap.set("", "<C-x>", '"+d', { noremap = true, silent = true })
+keymap.set("", "<C-V>", '"+p', { noremap = true, silent = true })
 -- Bind Backspace to '_d' in visual mode (so it cut to the empty register = delete )
-vim.api.nvim_set_keymap("v", "<BS>", '"_d', { noremap = true, silent = true })
+keymap.set("v", "<BS>", '"_d', { noremap = true, silent = true })
 
 ---------------------- Fixes
 -- To have access to a way to increase an number
-vim.api.nvim_set_keymap("n", "<leader>u", "<C-a>", { noremap = true, silent = true })
+keymap.set("n", "<leader>u", "<C-a>", { noremap = true, silent = true })
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
 
@@ -57,20 +57,20 @@ function copy_current_file_path()
 end
 
 -- Bind F1 to the function
-vim.api.nvim_set_keymap("n", "<F1>", ":lua copy_current_file_path()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<F1>", ":lua copy_current_file_path()<CR>", { noremap = true, silent = true })
 
 vim.api.nvim_buf_get_name(0)
 -- Run my build command (The basic (F5), and currently selected buffer one (F6))
--- vim.api.nvim_set_keymap("n", "<F6>", ':!bash ./build.sh "%:t"<CR>', { noremap = true, silent = true })
+-- keymap.set("n", "<F6>", ':!bash ./build.sh "%:t"<CR>', { noremap = true, silent = true })
 
--- vim.api.nvim_set_keymap(
+-- keymap.set(
 -- 	"n",
 -- 	"<F4>",
 -- 	':lua vim.cmd("! " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>',
 -- 	{ noremap = true, silent = true }
 -- )
 
-vim.api.nvim_set_keymap("n", "<F4>", ":lua RunCurrentFile()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<F4>", ":lua RunCurrentFile()<CR>", { noremap = true, silent = true })
 
 function RunCurrentFile()
 	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
@@ -91,14 +91,9 @@ function RunCurrentFile()
 	end
 end
 
-vim.api.nvim_set_keymap("n", "<F5>", ":!bash ./build.sh<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-	"n",
-	"<F6>",
-	':lua vim.cmd("!bash ./build.sh " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>',
-	{ noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
+keymap.set("n", "<F5>", ":!bash ./build.sh<CR>", { noremap = true, silent = true })
+keymap.set("n", "<F6>", ':lua vim.cmd("!bash ./build.sh " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>', { noremap = true, silent = true })
+keymap.set(
 	"n",
 	"<F7>",
 	':lua vim.cmd("!bash ./build_test.sh " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>',
@@ -106,8 +101,8 @@ vim.api.nvim_set_keymap(
 )
 
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
-vim.api.nvim_set_keymap("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>", { noremap = true, silent = true })
 keymap.set("n", "-", require("oil").open, { desc = "Open parent directory" })
 keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
@@ -127,7 +122,7 @@ keymap.set(
 	{ noremap = true, silent = true, desc = "Toggle ANSI color parsing" }
 )
 
-vim.keymap.set("n", "<leader>.l", function()
+keymap.set("n", "<leader>.l", function()
 	vim.opt.list = not vim.opt.list:get()
 	print("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
 end, { noremap = true, silent = true })
@@ -152,46 +147,46 @@ keymap.set("n", "<leader>sk", "<C-w>-") -- make split window height shorter
 keymap.set("n", "<leader>si", "<C-w>+") -- make split windows height taller
 keymap.set("n", "<leader>sl", "<C-w>>5") -- make split windows width bigger
 keymap.set("n", "<leader>sj", "<C-w><5") -- make split windows width smaller
-vim.keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>sf", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>sf", ":MaximizerToggle<CR>", { noremap = true, silent = true })
 
 ---- Resize splits with Ctrl + arrow keys
-vim.api.nvim_set_keymap("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-Left>", ":vertical resize -5<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-Right>", ":vertical resize +5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Left>", ":vertical resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Right>", ":vertical resize +5<CR>", { noremap = true, silent = true })
 
 ---- Resized splits with Alt + ijkl
-vim.api.nvim_set_keymap("n", "<M-j>", ":vertical resize -5<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<M-l>", ":vertical resize +5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<M-j>", ":vertical resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<M-l>", ":vertical resize +5<CR>", { noremap = true, silent = true })
 -- these two bellow might not work idk
-vim.api.nvim_set_keymap("n", "<M-i>", ":resize 5<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<M-k>", ":resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<M-i>", ":resize 5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<M-k>", ":resize -5<CR>", { noremap = true, silent = true })
 
 --------------------------------------------------------------------------------------- Tab management
 -- I don't use tabs (but hey)
-vim.keymap.set("n", "<leader>Tc", ":tabnew<CR>", { noremap = true, silent = true }) -- New tab
-vim.keymap.set("n", "<leader>Tx", ":tabclose<CR>", { noremap = true, silent = true }) -- Close tab
-vim.keymap.set("n", "<leader>Tk", ":tabnext<CR>", { noremap = true, silent = true }) -- Next tab
-vim.keymap.set("n", "<leader>Tj", ":tabprevious<CR>", { noremap = true, silent = true }) -- Previous tab
+keymap.set("n", "<leader>Tc", ":tabnew<CR>", { noremap = true, silent = true }) -- New tab
+keymap.set("n", "<leader>Tx", ":tabclose<CR>", { noremap = true, silent = true }) -- Close tab
+keymap.set("n", "<leader>Tk", ":tabnext<CR>", { noremap = true, silent = true }) -- Next tab
+keymap.set("n", "<leader>Tj", ":tabprevious<CR>", { noremap = true, silent = true }) -- Previous tab
 
 keymap.set("n", "<C-w>c", ":tabnew<CR>", { noremap = true, silent = true })
 
 -- Move Tabs Around
-vim.keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", { noremap = true, silent = true }) -- Move tab left
-vim.keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", { noremap = true, silent = true }) -- Move tab right
+keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", { noremap = true, silent = true }) -- Move tab left
+keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", { noremap = true, silent = true }) -- Move tab right
 
 -- Navigate buffers (Next/Previous)
-vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
 
 -- Move buffers (Reorder in Barbar)
-vim.keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", { noremap = true, silent = true })
 
 --keymaps for splits (vertical and horizontal)
 keymap.set("n", "<C-w>h", ":vsplit<CR>", { noremap = true, silent = true })
@@ -260,19 +255,19 @@ flash.setup({
 	},
 })
 
--- Define key mappings using vim.keymap.set
+-- Define key mappings using keymap.set
 
-vim.keymap.set({ "n", "x", "o" }, "rj", flash.jump, { desc = "Flash jump" })
-vim.keymap.set("n", "rT", flash.toggle, { desc = "Toggle Flash Search" })
-vim.keymap.set({ "n", "x", "o" }, "rt", flash.treesitter, { desc = "Flash Treesitter" })
-vim.keymap.set("o", "ro", flash.remote, { desc = "Remote Flash" })
-vim.keymap.set({ "o", "x" }, "rs", flash.treesitter_search, { desc = "Treesitter Search" })
+keymap.set({ "n", "x", "o" }, "rj", flash.jump, { desc = "Flash jump" })
+keymap.set("n", "rT", flash.toggle, { desc = "Toggle Flash Search" })
+keymap.set({ "n", "x", "o" }, "rt", flash.treesitter, { desc = "Flash Treesitter" })
+keymap.set("o", "ro", flash.remote, { desc = "Remote Flash" })
+keymap.set({ "o", "x" }, "rs", flash.treesitter_search, { desc = "Treesitter Search" })
 
 --------------------------------------------TREESJ
 -- Key mappings for TreeSJ commands
-vim.api.nvim_set_keymap("n", "<leader>jm", ":TSJToggle<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>js", ":TSJSplit<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>jj", ":TSJJoin<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>jm", ":TSJToggle<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>js", ":TSJSplit<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>jj", ":TSJJoin<CR>", { noremap = true, silent = true })
 
 --------------------------------------------mini.surround
 local surrounds_mappings_see_mini_surround_lua = {
@@ -545,7 +540,18 @@ end
 local opts_lsp = { noremap = true, silent = true }
 
 -- LSP Hover
-vim.api.nvim_set_keymap("n", "$", "<cmd>lua vim.lsp.buf.hover()<CR>", opts_lsp)
+keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
+keymap.set("n", "<C-d>", function() vim.lsp.util.scroll(4) end, opts("Scroll down on hover"))
+keymap.set("n", "<C-e>", function() vim.lsp.util.scroll(-4) end, opts("Scroll up on however"))
+vim.keymap.set("n", "¢", function()
+	vim.lsp.buf.hover()
+
+	-- Defer switching focus to ensure the hover window is created
+	vim.defer_fn(function()
+		-- Force `wincmd w` to work properly
+		vim.cmd("wincmd w")
+	end, 500) -- Small delay to allow hover to open
+end, opts("hover and switch"))
 
 -- LSP Actions
 keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), { noremap = true, silent = true, desc = "Rename symbol in all occurrences" })
@@ -611,10 +617,10 @@ keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", { desc = "Telescope 
 
 keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
 
-vim.keymap.set("n", "<C-o>", "<C-o>", { desc = "Jump Backward in Jump List" })
-vim.keymap.set("n", "<C-p>", "<C-i>", { desc = "Jump Forward in Jump List" })
-vim.keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
-vim.keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
+keymap.set("n", "<C-o>", "<C-o>", { desc = "Jump Backward in Jump List" })
+keymap.set("n", "<C-p>", "<C-i>", { desc = "Jump Forward in Jump List" })
+keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
+keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
 
 ---------------------------------------------------------------- Harpoon
 local harpoon_ui = require("harpoon.ui") -- Isolate Harpoon UI
@@ -639,29 +645,24 @@ keymap.set("n", "<leader>hn", harpoon_ui.nav_next, { desc = "Go to next Harpoon 
 local ufo = require("ufo")
 
 -- Open/Close All Folds
-vim.keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
-vim.keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
+keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
+keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
 
 -- Open/Close Fold Under Cursor
-vim.keymap.set("n", "<leader>zr", function() ufo.openFoldsExceptKinds({}) end, { desc = "Open fold under cursor" })
+keymap.set("n", "<leader>zr", function() ufo.openFoldsExceptKinds({}) end, { desc = "Open fold under cursor" })
 
-vim.keymap.set("n", "<leader>zm", function() ufo.closeFoldsWith(1) end, { desc = "Close fold under cursor" })
+keymap.set("n", "<leader>zm", function() ufo.closeFoldsWith(1) end, { desc = "Close fold under cursor" })
 
 -- Peek Folded Lines
-vim.keymap.set("n", "<leader>zK", function()
+keymap.set("n", "<leader>zK", function()
 	local winid = ufo.peekFoldedLinesUnderCursor()
 	if not winid then vim.lsp.buf.hover() end
 end, { desc = "Peek Fold" })
 
 -- Jump to Next/Previous Closed Fold
-vim.keymap.set("n", "<leader>zn", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W") end, { desc = "Jump to next closed fold" })
+keymap.set("n", "<leader>zn", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W") end, { desc = "Jump to next closed fold" })
 
-vim.keymap.set(
-	"n",
-	"<leader>zp",
-	function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW") end,
-	{ desc = "Jump to previous closed fold" }
-)
+keymap.set("n", "<leader>zp", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW") end, { desc = "Jump to previous closed fold" })
 
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
@@ -736,7 +737,7 @@ keymap.set(
 
 ----------------------------------------------------- Terminal (PICK ONE) ---------------------------
 -------- Float Term: --------
-vim.keymap.set(
+keymap.set(
 	"n",
 	"<leader>tm",
 	"<cmd>:FloatermNew --height=0.8 --width=0.9 --wintype=float --name=floaterm1 --position=center --autoclose=2<CR>",
@@ -767,8 +768,8 @@ end
 
 vim.cmd("autocmd! TermOpen term://* lua _set_terminal_keymaps()")
 
-vim.api.nvim_set_keymap("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
+keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+keymap.set("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
 
 --------------------------------------Tmux
 
@@ -849,26 +850,26 @@ keymap.set("n", "<leader>mts", ":MarkView traceShow<CR>", ro("Show Trace Logs"))
 
 --------------- 📄 LaTeX (Vimtex)
 -- ✍️ VimTeX Keybindings (Explicit)
-vim.keymap.set("n", "<leader>la", ":VimtexContextMenu<CR>", ro("Open VimTeX Context Menu"))
-vim.keymap.set("n", "<leader>lc", ":VimtexClean<CR>", ro("Clean Auxiliary Files"))
-vim.keymap.set("n", "<leader>lC", ":VimtexClean!<CR>", ro("Full Clean (Includes PDF)"))
-vim.keymap.set("n", "<leader>le", ":VimtexErrors<CR>", ro("Show VimTeX Errors"))
-vim.keymap.set("n", "<leader>lG", ":VimtexStatusAll<CR>", ro("Show Status for All VimTeX Sessions"))
-vim.keymap.set("n", "<leader>li", ":VimtexInfo<CR>", ro("Show VimTeX Info"))
-vim.keymap.set("n", "<leader>lI", ":VimtexInfo!<CR>", ro("Show Full VimTeX Info"))
-vim.keymap.set("n", "<leader>lk", ":VimtexStop<CR>", ro("Stop Current Compilation"))
-vim.keymap.set("n", "<leader>lK", ":VimtexStopAll<CR>", ro("Stop All VimTeX Sessions"))
-vim.keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", ro("Start/Continue Compilation"))
-vim.keymap.set("n", "<leader>lL", ":VimtexCompileSelected<CR>", ro("Compile Selected Text"))
-vim.keymap.set("n", "<leader>lm", ":VimtexImapsList<CR>", ro("List VimTeX Input Mappings"))
-vim.keymap.set("n", "<leader>lo", ":VimtexCompileOutput<CR>", ro("Show Compilation Output"))
-vim.keymap.set("n", "<leader>lq", ":VimtexLog<CR>", ro("Show Log File"))
-vim.keymap.set("n", "<leader>ls", ":VimtexToggleMain<CR>", ro("Toggle Main File"))
-vim.keymap.set("n", "<leader>lt", ":VimtexTocOpen<CR>", ro("Open Table of Contents"))
-vim.keymap.set("n", "<leader>lT", ":VimtexTocToggle<CR>", ro("Toggle Table of Contents"))
-vim.keymap.set("n", "<leader>lv", ":VimtexView<CR>", ro("View PDF"))
-vim.keymap.set("n", "<leader>lx", ":VimtexReload<CR>", ro("Reload VimTeX Project"))
-vim.keymap.set("n", "<leader>lX", ":VimtexReloadState<CR>", ro("Reload VimTeX State"))
+keymap.set("n", "<leader>la", ":VimtexContextMenu<CR>", ro("Open VimTeX Context Menu"))
+keymap.set("n", "<leader>lc", ":VimtexClean<CR>", ro("Clean Auxiliary Files"))
+keymap.set("n", "<leader>lC", ":VimtexClean!<CR>", ro("Full Clean (Includes PDF)"))
+keymap.set("n", "<leader>le", ":VimtexErrors<CR>", ro("Show VimTeX Errors"))
+keymap.set("n", "<leader>lG", ":VimtexStatusAll<CR>", ro("Show Status for All VimTeX Sessions"))
+keymap.set("n", "<leader>li", ":VimtexInfo<CR>", ro("Show VimTeX Info"))
+keymap.set("n", "<leader>lI", ":VimtexInfo!<CR>", ro("Show Full VimTeX Info"))
+keymap.set("n", "<leader>lk", ":VimtexStop<CR>", ro("Stop Current Compilation"))
+keymap.set("n", "<leader>lK", ":VimtexStopAll<CR>", ro("Stop All VimTeX Sessions"))
+keymap.set("n", "<leader>ll", ":VimtexCompile<CR>", ro("Start/Continue Compilation"))
+keymap.set("n", "<leader>lL", ":VimtexCompileSelected<CR>", ro("Compile Selected Text"))
+keymap.set("n", "<leader>lm", ":VimtexImapsList<CR>", ro("List VimTeX Input Mappings"))
+keymap.set("n", "<leader>lo", ":VimtexCompileOutput<CR>", ro("Show Compilation Output"))
+keymap.set("n", "<leader>lq", ":VimtexLog<CR>", ro("Show Log File"))
+keymap.set("n", "<leader>ls", ":VimtexToggleMain<CR>", ro("Toggle Main File"))
+keymap.set("n", "<leader>lt", ":VimtexTocOpen<CR>", ro("Open Table of Contents"))
+keymap.set("n", "<leader>lT", ":VimtexTocToggle<CR>", ro("Toggle Table of Contents"))
+keymap.set("n", "<leader>lv", ":VimtexView<CR>", ro("View PDF"))
+keymap.set("n", "<leader>lx", ":VimtexReload<CR>", ro("Reload VimTeX Project"))
+keymap.set("n", "<leader>lX", ":VimtexReloadState<CR>", ro("Reload VimTeX State"))
 
 ------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
@@ -881,117 +882,117 @@ vim.keymap.set("n", "<leader>lX", ":VimtexReloadState<CR>", ro("Reload VimTeX St
 ------------------------------------------------------------------------------------------------------------
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
-vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("v", "jk", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("i", "JK", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("v", "JK", "<Esc>", { noremap = true })
+keymap.set("i", "jk", "<Esc>", { noremap = true })
+keymap.set("v", "jk", "<Esc>", { noremap = true })
+keymap.set("i", "JK", "<Esc>", { noremap = true })
+keymap.set("v", "JK", "<Esc>", { noremap = true })
 
-vim.api.nvim_set_keymap("i", "jl", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("v", "jl", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("i", "JL", "<Esc>", { noremap = true })
-vim.api.nvim_set_keymap("v", "JK", "<Esc>", { noremap = true })
+keymap.set("i", "jl", "<Esc>", { noremap = true })
+keymap.set("v", "jl", "<Esc>", { noremap = true })
+keymap.set("i", "JL", "<Esc>", { noremap = true })
+keymap.set("v", "JK", "<Esc>", { noremap = true })
 
 -- Map Enter in normal mode to add a new line
-vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
+keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 ---------------------------------------------------------REGULAR NAVIGATION
 ---------------------- remap of movement keys and insert, add start/end of line support
 -------- USE    i
 ------------  j k l
 -- rather then hjkl for movement, h is insert ---------------------------
-vim.api.nvim_set_keymap("n", "j", "h", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "l", "l", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "i", "k", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "k", "j", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
+keymap.set("n", "j", "h", { noremap = true, silent = true })
+keymap.set("n", "l", "l", { noremap = true, silent = true })
+keymap.set("n", "i", "k", { noremap = true, silent = true })
+keymap.set("n", "k", "j", { noremap = true, silent = true })
+keymap.set("n", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
 
-vim.api.nvim_set_keymap("x", "j", "h", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("x", "l", "l", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("x", "i", "k", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("x", "k", "j", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("x", "h", "i", { noremap = true, silent = true }) -- Keep Insert mode
+keymap.set("x", "j", "h", { noremap = true, silent = true })
+keymap.set("x", "l", "l", { noremap = true, silent = true })
+keymap.set("x", "i", "k", { noremap = true, silent = true })
+keymap.set("x", "k", "j", { noremap = true, silent = true })
+keymap.set("x", "h", "i", { noremap = true, silent = true }) -- Keep Insert mode
 
-vim.api.nvim_set_keymap("v", "J", "_", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "L", "$", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "I", "H", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "K", "L", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "H", "I", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "h", "I", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "a", "A", { noremap = true, silent = true })
+keymap.set("v", "J", "_", { noremap = true, silent = true })
+keymap.set("v", "L", "$", { noremap = true, silent = true })
+keymap.set("v", "I", "H", { noremap = true, silent = true })
+keymap.set("v", "K", "L", { noremap = true, silent = true })
+keymap.set("v", "H", "I", { noremap = true, silent = true })
+keymap.set("v", "h", "I", { noremap = true, silent = true })
+keymap.set("v", "a", "A", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("n", "J", "_", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "L", "$", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "I", "H", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "K", "L", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "H", "I", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>hd", "K", { noremap = true, silent = true })
+keymap.set("n", "J", "_", { noremap = true, silent = true })
+keymap.set("n", "L", "$", { noremap = true, silent = true })
+keymap.set("n", "I", "H", { noremap = true, silent = true })
+keymap.set("n", "K", "L", { noremap = true, silent = true })
+keymap.set("n", "H", "I", { noremap = true, silent = true })
+keymap.set("n", "<leader>hd", "K", { noremap = true, silent = true })
 -- K was help on cursor
 
 ------------------------------------------------------PAGE NAVIGATION
 -- Map Enter in normal mode to add a new line
-vim.api.nvim_set_keymap("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
+keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
 
 -- map Ctrl+d to scroll down 1/2 screen
-vim.api.nvim_set_keymap("n", "<C-d>", "<C-d>", { noremap = true, silent = true })
+keymap.set("n", "<C-d>", "<C-d>", { noremap = true, silent = true })
 -- map Ctrl+f to scroll up 1/2 screen
-vim.api.nvim_set_keymap("n", "<C-e>", "<C-u>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-e>", "<C-u>", { noremap = true, silent = true })
+keymap.set("n", "<C-e>", "<C-u>", { noremap = true, silent = true })
+keymap.set("v", "<C-e>", "<C-u>", { noremap = true, silent = true })
 
 --scroll down/up one line (change the viewport)
-vim.api.nvim_set_keymap("n", "<C-f>", "<C-e>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-r>", "<C-y>", { noremap = true, silent = true })
+keymap.set("n", "<C-f>", "<C-e>", { noremap = true, silent = true })
+keymap.set("n", "<C-r>", "<C-y>", { noremap = true, silent = true })
 
 --repair redo:
-vim.api.nvim_set_keymap("n", "<C-y>", "<C-r>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "R", "<C-r>", { noremap = true, silent = true })
+keymap.set("n", "<C-y>", "<C-r>", { noremap = true, silent = true })
+keymap.set("n", "R", "<C-r>", { noremap = true, silent = true })
 
 --repair "enter replace mode"
-vim.api.nvim_set_keymap("n", "<leader>R", "R", { noremap = true, silent = true })
+keymap.set("n", "<leader>R", "R", { noremap = true, silent = true })
 
 -------------------------------------------------Tabs and indent
 -- Map Tab to indent line forward
-vim.api.nvim_set_keymap("n", "<Tab>", ">>", { noremap = true, silent = true })
+keymap.set("n", "<Tab>", ">>", { noremap = true, silent = true })
 -- Map Shift+Tab to indent line backward
-vim.api.nvim_set_keymap("n", "<S-Tab>", "<<", { noremap = true, silent = true })
+keymap.set("n", "<S-Tab>", "<<", { noremap = true, silent = true })
 -- Map Tab to indent line forward
-vim.api.nvim_set_keymap("v", "<Tab>", ">>", { noremap = true, silent = true })
+keymap.set("v", "<Tab>", ">>", { noremap = true, silent = true })
 -- Map Shift+Tab to indent line backward
-vim.api.nvim_set_keymap("v", "<S-Tab>", "<<", { noremap = true, silent = true })
+keymap.set("v", "<S-Tab>", "<<", { noremap = true, silent = true })
 
 -------------------------------MACROS
 -- Map `b` start a macro
-vim.api.nvim_set_keymap("n", "b", "q", { noremap = true, silent = true })
+keymap.set("n", "b", "q", { noremap = true, silent = true })
 -- Use  that symbol if on keyboard for better maccro playing (on ca fr laptop keyboards)
-vim.api.nvim_set_keymap("n", "«", "@", { noremap = true, silent = true })
+keymap.set("n", "«", "@", { noremap = true, silent = true })
 
 ---------------------------WORD NAVIGATION:
 ------------------------------------------- REMAP of  e,q for end of word.
 ------------------------------------------- REMAP of w,s for start of word
 -- Map `w` to move to the start of the next word
-vim.api.nvim_set_keymap("n", "w", "w", { noremap = true, silent = true })
+keymap.set("n", "w", "w", { noremap = true, silent = true })
 -- Map `s` to move to the start of the previous word
-vim.api.nvim_set_keymap("n", "s", "b", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "S", "B", { noremap = true, silent = true })
+keymap.set("n", "s", "b", { noremap = true, silent = true })
+keymap.set("n", "S", "B", { noremap = true, silent = true })
 
 -- Map `s` to move to the end of the next word
-vim.api.nvim_set_keymap("n", "e", "e", { noremap = true, silent = true })
+keymap.set("n", "e", "e", { noremap = true, silent = true })
 -- Map `q` to move to the end of the previous word
-vim.api.nvim_set_keymap("n", "q", "ge", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "Q", "gE", { noremap = true, silent = true })
+keymap.set("n", "q", "ge", { noremap = true, silent = true })
+keymap.set("n", "Q", "gE", { noremap = true, silent = true })
 
 -- aaa-bbb-ccc eee-fff-ggg xxx-yyy-zzz  111.222.333 cvb.zxc-asd_jkl
 
 -- Map `w` to move to the start of the next word
-vim.api.nvim_set_keymap("v", "w", "w", { noremap = true, silent = true })
+keymap.set("v", "w", "w", { noremap = true, silent = true })
 -- Map `s` to move to the start of the previous word
-vim.api.nvim_set_keymap("v", "s", "b", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "S", "B", { noremap = true, silent = true })
+keymap.set("v", "s", "b", { noremap = true, silent = true })
+keymap.set("v", "S", "B", { noremap = true, silent = true })
 
 -- Map `s` to move to the end of the next word
-vim.api.nvim_set_keymap("v", "e", "e", { noremap = true, silent = true })
+keymap.set("v", "e", "e", { noremap = true, silent = true })
 -- Map `q` to move to the end of the previous word
-vim.api.nvim_set_keymap("v", "q", "ge", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "Q", "gE", { noremap = true, silent = true })
+keymap.set("v", "q", "ge", { noremap = true, silent = true })
+keymap.set("v", "Q", "gE", { noremap = true, silent = true })
 
 function Replace_with_input()
 	local old_char = vim.fn.input("Replace character: ")
@@ -1009,15 +1010,10 @@ function Replace_with_confirmation()
 end
 
 -- Bind the function to <C-H>
-vim.api.nvim_set_keymap("n", "<C-g>", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>rc",
-	"<Cmd>lua Replace_with_confirmation()<CR>",
-	{ noremap = true, silent = true, desc = "Replace with confirmation" }
-)
-vim.api.nvim_set_keymap("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
+keymap.set("n", "<C-g>", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true, desc = "Replace with confirmation" })
+keymap.set("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
 
 -- Lua function for interactive replacement
 function ReplaceFrancois()
@@ -1036,9 +1032,9 @@ vim.api.nvim_create_user_command("ReplaceFrancois", ReplaceFrancois, {})
 
 -- top/bottom/center - Center the screen on the current line, aligning it to the bottom of the window
 -- no remaps, just a remainder for myself
-vim.api.nvim_set_keymap("n", "zt", "zt", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "zz", "zz", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "zb", "zb", { noremap = true, silent = true })
+keymap.set("n", "zt", "zt", { noremap = true, silent = true })
+keymap.set("n", "zz", "zz", { noremap = true, silent = true })
+keymap.set("n", "zb", "zb", { noremap = true, silent = true })
 ------------------------------------------ SYMBOL SEARCH FUNCTION FOR MACROS ---------------
 local telescope = require("telescope.builtin")
 local finders = require("telescope.finders")
@@ -1257,11 +1253,11 @@ function _G.debug_utils.write_function_debug()
 end
 
 ---- Bind the functions to keymaps -----
-vim.keymap.set("n", "<leader>wfs", _G.debug_utils.write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
-vim.keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, { noremap = true, silent = true, desc = "Write Function Numpy" })
-vim.keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, { noremap = true, silent = true, desc = "Write Function Numpy NewLine" })
-vim.keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
-vim.keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
+keymap.set("n", "<leader>wfs", _G.debug_utils.write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
+keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, { noremap = true, silent = true, desc = "Write Function Numpy" })
+keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, { noremap = true, silent = true, desc = "Write Function Numpy NewLine" })
+keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
+keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
 --------------------------------- GENERAL UTILS MACRO --------------------------------------
 _G.general_utils_franck = {}
 function _G.general_utils_franck.not_invert()
@@ -1325,18 +1321,13 @@ function _G.general_utils_franck.CopyDirPath()
 	print("Copied directory path: " .. dir)
 end
 
-vim.keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
-vim.keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, { desc = "Copy file path to clipboard" })
-vim.keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = "Copy directory path to clipboard" })
-vim.keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
-vim.keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
+keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
+keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, { desc = "Copy file path to clipboard" })
+keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = "Copy directory path to clipboard" })
+keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
+keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
 
-vim.keymap.set(
-	"n",
-	"<leader>rd",
-	function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end,
-	{ desc = "Print LSP Root Directory" }
-)
+keymap.set("n", "<leader>rd", function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end, { desc = "Print LSP Root Directory" })
 ----------------------------------------------- END OF CONFIG FILE
 
 -- print("Vim configuration reloaded")
