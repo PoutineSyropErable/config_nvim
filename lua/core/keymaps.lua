@@ -125,7 +125,7 @@ keymap.set(
 keymap.set("n", "<leader>.l", function()
 	vim.opt.list = not vim.opt.list:get()
 	print("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
-end, { noremap = true, silent = true })
+end, opts("Toggle invisible characters"))
 
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
@@ -165,45 +165,47 @@ keymap.set("n", "<M-k>", ":resize -5<CR>", { noremap = true, silent = true })
 
 --------------------------------------------------------------------------------------- Tab management
 -- I don't use tabs (but hey)
-keymap.set("n", "<leader>Tc", ":tabnew<CR>", { noremap = true, silent = true }) -- New tab
-keymap.set("n", "<leader>Tx", ":tabclose<CR>", { noremap = true, silent = true }) -- Close tab
-keymap.set("n", "<leader>Tk", ":tabnext<CR>", { noremap = true, silent = true }) -- Next tab
-keymap.set("n", "<leader>Tj", ":tabprevious<CR>", { noremap = true, silent = true }) -- Previous tab
+keymap.set("n", "<leader>Tc", ":tabnew<CR>", opts("New tab"))
+keymap.set("n", "<leader>Tx", ":tabclose<CR>", opts("Close tab"))
+keymap.set("n", "<leader>Tk", ":tabnext<CR>", opts("Next tab"))
+keymap.set("n", "<leader>Tj", ":tabprevious<CR>", opts("Previous tab"))
 
-keymap.set("n", "<C-w>c", ":tabnew<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>c", ":tabnew<CR>", opts("New tab"))
 
 -- Move Tabs Around
-keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", { noremap = true, silent = true }) -- Move tab left
-keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", { noremap = true, silent = true }) -- Move tab right
+keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", opts("Move tab left"))
+keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", opts("Move tab right"))
 
 -- Navigate buffers (Next/Previous)
-keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
-keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
-keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", { noremap = true, silent = true })
-keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer"))
+keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", opts("Next buffer"))
+keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", opts("Next buffer"))
 
 -- Move buffers (Reorder in Barbar)
-keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", { noremap = true, silent = true })
-keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left"))
+keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", opts("Move buffer right"))
+keymap.set("n", "<C-w>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left"))
+keymap.set("n", "<C-w>N", "<Cmd>BufferMoveNext<CR>", opts("Move buffer right"))
 
---keymaps for splits (vertical and horizontal)
-keymap.set("n", "<C-w>h", ":vsplit<CR>", { noremap = true, silent = true })
-keymap.set("n", "<C-w>v", ":split<CR>", { noremap = true, silent = true })
+-- Keymaps for splits (vertical and horizontal)
+keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
+keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
 
 -- Keymap for closing the current tab using Ctrl+w X
-keymap.set("n", "<C-w>x", ": w | bd!<CR>", { noremap = true, silent = true })
-keymap.set("n", "<C-w>d", ":close<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>x", ":w | bd!<CR>", opts("Close buffer and save"))
+keymap.set("n", "<C-w>d", ":close<CR>", opts("Close window"))
 
 -- Keymap for saving all
-keymap.set("n", "<C-w>s", ":wa<CR>", { noremap = true, silent = true })
-keymap.set("", "<C-S>", ":w<CR>", { noremap = true, silent = true })
-keymap.set("", "<C-s>s", ":w<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-w>s", ":wa<CR>", opts("Save all files"))
+keymap.set("", "<C-S>", ":w<CR>", opts("Save file"))
+keymap.set("", "<C-s>s", ":w<CR>", opts("Save file"))
 
 -- Keymap for write and save all
-keymap.set("", "<C-w>q", ":wa | qa!<CR>", { noremap = true, silent = true })
-keymap.set("", "<C-w>Q", ":qa!<CR>", { noremap = true, silent = true })
+keymap.set("", "<C-w>q", ":wa | qa!<CR>", opts("Save all and quit"))
+keymap.set("", "<C-w>Q", ":qa!<CR>", opts("Quit without saving"))
 
 -- Function to get all windows in the current tab
 local function get_visible_windows()
@@ -374,7 +376,9 @@ local function get_adjacent_win(direction)
 	for _, win in ipairs(wins) do
 		if win ~= current_win then
 			local win_x = vim.api.nvim_win_get_position(win)[2]
-			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then target_win = win end
+			if (direction == "left" and win_x < current_x) or (direction == "right" and win_x > current_x) then
+				target_win = win
+			end
 		end
 	end
 	return target_win
@@ -537,7 +541,57 @@ local function safe_telescope_call(fn)
 	end
 end
 
-local opts_lsp = { noremap = true, silent = true }
+-- Go to current function
+local ts_utils = require("nvim-treesitter.ts_utils")
+local function goto_current_function()
+	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+
+	-- Send an LSP request for document symbols
+	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
+		if not result then
+			print("No LSP symbols found.")
+			return
+		end
+
+		local row, _ = unpack(vim.api.nvim_win_get_cursor(0)) -- Get current cursor position
+		local function_node = nil
+
+		-- Helper function to traverse nested symbols (handles Clangd inconsistencies)
+		local function find_function(symbols)
+			for _, symbol in ipairs(symbols) do
+				local kind = symbol.kind
+				local range = symbol.range
+
+				-- Function-like symbols: Function (12) and Method (6)
+				if kind == 12 or kind == 6 then
+					local start_line = range.start.line + 1
+					local end_line = range["end"].line + 1
+
+					-- If cursor is inside function range
+					if start_line <= row and row <= end_line then
+						function_node = symbol
+					end
+				end
+
+				-- Recursively check for children (e.g., nested functions)
+				if symbol.children then
+					find_function(symbol.children)
+				end
+			end
+		end
+
+		-- Start search in document symbols
+		find_function(result)
+
+		-- Jump to the function if found
+		if function_node then
+			local target_line = function_node.range.start.line
+			vim.api.nvim_win_set_cursor(0, { target_line + 1, 0 })
+		else
+			print("No function found.")
+		end
+	end)
+end
 
 -- LSP Hover
 keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
@@ -554,34 +608,38 @@ vim.keymap.set("n", "¢", function()
 end, opts("hover and switch"))
 
 -- LSP Actions
-keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), { noremap = true, silent = true, desc = "Rename symbol in all occurrences" })
-keymap.set("n", "<leader>La", safe_lsp_call("code_action"), { noremap = true, silent = true, desc = "Show available code actions" })
+keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
+keymap.set("n", "<leader>fr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences (<leader>Lr)"))
+keymap.set("n", "<leader>La", safe_lsp_call("code_action"), opts("Show available code actions"))
 
 -- LSP Definitions & References
-keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), { noremap = true, silent = true, desc = "Go to definition" })
-keymap.set("n", "gD", safe_lsp_call("declaration"), { noremap = true, silent = true, desc = "Go to declaration" })
-keymap.set("n", "gi", safe_telescope_call("lsp_implementations"), { noremap = true, silent = true, desc = "Find implementations" })
-keymap.set("n", "gr", safe_telescope_call("lsp_references"), { noremap = true, silent = true, desc = "Find references" })
+keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
+keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
+keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
+keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
+keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
+keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
 
 -- LSP Information
-keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), { noremap = true, silent = true, desc = "Show LSP hover info" })
-keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), { noremap = true, silent = true, desc = "Show function signature help" })
+keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), opts("Show LSP hover info"))
+keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), opts("Show function signature help"))
 
 -- Workspace Folder Management
-keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), { noremap = true, silent = true, desc = "Add workspace folder" }) -- Changed from `<leader>La`
-keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), { noremap = true, silent = true, desc = "Remove workspace folder" }) -- Changed from `<leader>Lr`
+keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), opts("Add workspace folder"))
+keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
 keymap.set("n", "<leader>Ll", function()
 	if vim.lsp.buf.list_workspace_folders then
 		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	else
 		print("LSP function 'list_workspace_folders' not available")
 	end
-end, { noremap = true, silent = true, desc = "List workspace folders" })
+end, opts("List workspace folders"))
 
 -- Diagnostics
-keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), { noremap = true, silent = true, desc = "Show diagnostic in floating window" }) -- Changed from `<leader>Ll`
-keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), { noremap = true, silent = true, desc = "Go to previous diagnostic" })
-keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), { noremap = true, silent = true, desc = "Go to next diagnostic" })
+keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
+keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), opts("Go to next diagnostic"))
 
 -- Auto Formatting
 keymap.set({ "n", "v" }, "<leader>Lf", function()
@@ -590,37 +648,84 @@ keymap.set({ "n", "v" }, "<leader>Lf", function()
 	else
 		print("LSP function 'format' not available")
 	end
-end, { noremap = true, silent = true, desc = "Format buffer using LSP" })
+end, opts("Format buffer using LSP"))
 
 -- More LSP Commands on <leader>l...
-local d = "More LSP Commands on <leader>l... (Also disables search highlight)"
-keymap.set("n", "<leader>lz", ":noh<CR>", { noremap = true, silent = true, desc = d })
-keymap.set("n", "<leader>gz", ":noh<CR>", { noremap = true, silent = true, desc = d })
+local d = "More LSP Commands on <leader>L... (Also disables search highlight)"
+keymap.set("n", "<leader>lz", ":noh<CR>", opts(d))
+keymap.set("n", "<leader>gz", ":noh<CR>", opts(d))
 
----------------------- ----------------------Telescope
-keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Variable/Symbols Information" })
-keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find Keymaps" })
+----------------------------------------------Telescope
+-- Function for all symbols in the current file
+local all_symbols = {
+	"File",
+	"Module",
+	"Namespace",
+	"Package",
+	"Class",
+	"Method",
+	"Property",
+	"Field",
+	"Constructor",
+	"Enum",
+	"Interface",
+	"Function",
+	"Variable",
+	"Constant",
+	"String",
+	"Number",
+	"Boolean",
+	"Array",
+	"Object",
+	"Key",
+	"Null",
+	"EnumMember",
+	"Struct",
+	"Event",
+	"Operator",
+	"TypeParameter",
+}
 
-keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
-keymap.set("n", "<leader>fS", builtin.grep_string, { desc = "grep string" })
-keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, { desc = "Current buffer fuzzy find" })
+local function all_document_symbols()
+	builtin.lsp_document_symbols({
+		symbols = all_symbols,
+	})
+end
+
+-- Function for all symbols across the workspace
+local function all_workspace_symbols()
+	builtin.lsp_workspace_symbols({
+		symbols = all_symbols,
+	})
+end
+
+-- Telescope Keymaps
+keymap.set("n", "<leader>fs", all_document_symbols, opts("All Variable/Symbols Information (Document)"))
+keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols Information (Workspace)"))
+
+keymap.set("n", "<leader>fk", builtin.keymaps, opts("Find Keymaps"))
+
+keymap.set("n", "<leader>fg", builtin.live_grep, opts("Live Grep"))
+keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
+keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
 
 keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
-keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
+keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
 
-keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
-keymap.set("n", "<leader>fH", ":nohlsearch<CR>")
-keymap.set("n", "<leader>fi", builtin.lsp_incoming_calls, {})
-keymap.set("n", "<leader>fm", function() builtin.treesitter({ default_text = ":method:" }) end)
-keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", { desc = "Telescope Neoclip" })
+keymap.set("n", "<leader>fh", builtin.help_tags, opts("Help Tags"))
+keymap.set("n", "<leader>fH", ":nohlsearch<CR>") -- No description needed for raw command
+keymap.set("n", "<leader>fi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "<leader>fm", function() builtin.treesitter({ default_text = ":method:" }) end, opts("Find Methods with Treesitter"))
+keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", opts("Telescope Neoclip"))
 
-keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Change Colors Scheme" })
+keymap.set("n", "<leader>fc", builtin.colorscheme, opts("Change Color Scheme"))
 
-keymap.set("n", "<C-o>", "<C-o>", { desc = "Jump Backward in Jump List" })
-keymap.set("n", "<C-p>", "<C-i>", { desc = "Jump Forward in Jump List" })
-keymap.set("n", "<leader>jb", "<C-o>", { desc = "Jump Backward in Jump List" })
-keymap.set("n", "<leader>jf", "<C-i>", { desc = "Jump Forward in Jump List" })
+-- Jump List Navigation
+keymap.set("n", "<C-o>", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<C-p>", "<C-i>", opts("Jump Forward in Jump List"))
+keymap.set("n", "<leader>jb", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<leader>jf", "<C-i>", opts("Jump Forward in Jump List"))
 
 ---------------------------------------------------------------- Harpoon
 local harpoon_ui = require("harpoon.ui") -- Isolate Harpoon UI
@@ -656,7 +761,9 @@ keymap.set("n", "<leader>zm", function() ufo.closeFoldsWith(1) end, { desc = "Cl
 -- Peek Folded Lines
 keymap.set("n", "<leader>zK", function()
 	local winid = ufo.peekFoldedLinesUnderCursor()
-	if not winid then vim.lsp.buf.hover() end
+	if not winid then
+		vim.lsp.buf.hover()
+	end
 end, { desc = "Peek Fold" })
 
 -- Jump to Next/Previous Closed Fold
@@ -669,7 +776,9 @@ keymap.set("n", "<leader>zp", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\
 -- hence check ftplugin directory in that github thing
 
 keymap.set("n", "<leader>go", function()
-	if vim.bo.filetype == "python" then vim.api.nvim_command("PyrightOrganizeImports") end
+	if vim.bo.filetype == "python" then
+		vim.api.nvim_command("PyrightOrganizeImports")
+	end
 end, { noremap = true, silent = true, desc = "Organize Python imports (Pyright)" })
 
 --------------------------------------------- Debugging (nvim-dap)
@@ -697,11 +806,15 @@ keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>", { desc = 
 keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>", { desc = "Step out of current function" })
 
 keymap.set("n", "<leader>dTc", function()
-	if vim.bo.filetype == "python" then require("dap-python").test_class() end
+	if vim.bo.filetype == "python" then
+		require("dap-python").test_class()
+	end
 end)
 
 keymap.set("n", "<leader>dTm", function()
-	if vim.bo.filetype == "python" then require("dap-python").test_method() end
+	if vim.bo.filetype == "python" then
+		require("dap-python").test_method()
+	end
 end)
 
 -- Debugging Stop/Disconnect
@@ -997,7 +1110,9 @@ keymap.set("v", "Q", "gE", { noremap = true, silent = true })
 function Replace_with_input()
 	local old_char = vim.fn.input("Replace character: ")
 	local new_char = vim.fn.input("Replace with: ")
-	if old_char ~= "" and new_char ~= "" then vim.cmd(string.format("%%s/%s/%s/g", old_char, new_char)) end
+	if old_char ~= "" and new_char ~= "" then
+		vim.cmd(string.format("%%s/%s/%s/g", old_char, new_char))
+	end
 end
 
 function Replace_with_confirmation()

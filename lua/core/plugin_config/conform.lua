@@ -24,6 +24,12 @@ local function tab_formatter_go()
 	}
 end
 
+uncrustify_args = {
+	command = "uncrustify",
+	stdin = false, -- Uncrustify does NOT support stdin
+	args = { "-c", os.getenv("HOME") .. "/uncrustify.cfg", "--replace", "--no-backup", "$FILENAME" },
+}
+
 require("conform").setup({
 	formatters = {
 		black = {
@@ -36,14 +42,15 @@ require("conform").setup({
 				"--indent-type",
 				"Tabs", -- Use tabs instead of spaces
 				"--indent-width",
-				"4", -- Set indentation width to 4 spaces (tab width)
+				"4", -- Set indentation width (tab width)
 				"--collapse-simple-statement",
-				"Always", -- Avoid breaking simple single-line statements
+				"FunctionOnly", -- Collapse simple one-line statements
 			},
 		},
 		prettier = {
 			prepend_args = { "--tab-width", "4", "--use-tabs", "false" },
 		},
+		uncrustify = uncrustify_args,
 	},
 	formatters_by_ft = {
 		lua = { "stylua" },
@@ -55,7 +62,8 @@ require("conform").setup({
 		typescriptreact = { "prettier", stop_after_first = true },
 		go = { "gofumpt", "golines", "goimports-reviser" },
 		x = { "clang-format" },
-		c = { "clang-format" }, -- ~/.clang-format contains the style
+		-- c = { "clang-format" }, -- ~/.clang-format contains the style
+		c = { "uncrustify" },
 		cpp = { "clang-format" },
 		css = { "prettier" },
 		haskell = { "ormolu" },
@@ -92,7 +100,5 @@ require("conform").setup({
 -- Auto format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
 	pattern = "*",
-	callback = function(args)
-		require("conform").format({ bufnr = args.buf })
-	end,
+	callback = function(args) require("conform").format({ bufnr = args.buf }) end,
 })

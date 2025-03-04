@@ -30,6 +30,7 @@ require("core.plugin_config.tressj")
 require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
+require("core.plugin_config.nvim-session-manager")
 ------ ##### DEACTIVATED ##### -------
 
 -- not needed vv (hologram) (and markdown_preview)
@@ -40,7 +41,6 @@ require("core.plugin_config.colors-highlight")
 -- require("core.plugin_config.nvim-cmp")
 
 -- require("core.plugin_config.EXTRA_DEBUG")
--- require("core.plugin_config.nvim-session-manager")
 
 -- require("core.plugin_config.tabout")
 -- require("core.plugin_config.noice")

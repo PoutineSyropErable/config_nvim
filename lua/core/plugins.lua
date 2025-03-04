@@ -245,13 +245,13 @@ require("lazy").setup({
 		-- dependencies = { 'nvim-tree/nvim-web-devicons' },
 	},
 
-	-- {
-	-- 	"Shatur/neovim-session-manager",
-	-- 	dependencies = { "nvim-lua/plenary.nvim", "akinsho/bufferline.nvim" },
-	-- 	config = function()
-	-- 		require("neoclip").setup()
-	-- 	end,
-	-- },
+	 {
+	 	"Shatur/neovim-session-manager",
+	 	dependencies = { "nvim-lua/plenary.nvim", "akinsho/bufferline.nvim" },
+	 	config = function()
+	 		require("neoclip").setup()
+	 	end,
+	 },
 
 	-- Need to configure
 	"folke/flash.nvim",

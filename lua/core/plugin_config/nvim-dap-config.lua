@@ -50,9 +50,7 @@ local function parse_automake()
 	local automake_file = cwd .. "/AutoMake"
 
 	-- Check if the file exists
-	if vim.fn.filereadable(automake_file) == 0 then
-		return nil
-	end
+	if vim.fn.filereadable(automake_file) == 0 then return nil end
 
 	-- Read the file line by line
 	for _, line in ipairs(vim.fn.readfile(automake_file)) do
@@ -85,6 +83,7 @@ end
 local function compile_project()
 	debug_log("compile_project")
 	local cwd = vim.fn.getcwd()
+	local show_build_output = false
 	print("\n\n")
 	print("[DEBUG] Current working directory: " .. cwd)
 
@@ -95,11 +94,9 @@ local function compile_project()
 
 	-- Function to print live output from build process
 	local function print_output(_, data, _)
-		if data then
+		if data and show_build_output then
 			for _, line in ipairs(data) do
-				if line ~= "" then
-					print("[BUILD OUTPUT] " .. line)
-				end
+				if line ~= "" then print("[BUILD OUTPUT] " .. line) end
 			end
 		end
 	end
@@ -267,6 +264,26 @@ local setupCommands = {
 	{ text = "set debug-file-directory " .. vim.fn.getcwd() .. "/build", description = "Set debug symbols directory", ignoreFailures = false },
 }
 
+local other_c_dap = {
+	name = "Attach to GDB Server",
+	type = "cppdbg",
+	request = "launch",
+	MIMode = "gdb",
+	miDebuggerServerAddress = "localhost:1234",
+	miDebuggerPath = "/usr/bin/gdb",
+	cwd = "${workspaceFolder}",
+	program = function()
+		return find_executable()
+		-- return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+	end,
+}
+
+local redir_args = function()
+	local user_input = vim.fn.input("[DAP] Enter arguments (space-separated, support redirection): ")
+	if user_input == "" then return {} end
+	return { "-c", user_input } -- Pass entire command string
+end
+
 dap.configurations.c = {
 	{
 		name = "C++ Debugger by itself",
@@ -278,27 +295,14 @@ dap.configurations.c = {
 		end,
 		console = "integratedTerminal", -- Output goes here
 		justMyCode = true, -- Optional: set to true for just your code
-		args = function()
-			return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ")
-		end,
+		args = function() return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ") end,
+		-- args = redir_args,
 		-- cwd = vim.fn.getcwd(),
 		cwd = "${workspaceFolder}",
-		stopAtEntry = true,
+		stopAtEntry = false,
 		setupCommands = setupCommands,
 	},
-	-- {
-	-- 	name = "Attach to GDB Server",
-	-- 	type = "cppdbg",
-	-- 	request = "launch",
-	-- 	MIMode = "gdb",
-	-- 	miDebuggerServerAddress = "localhost:1234",
-	-- 	miDebuggerPath = "/usr/bin/gdb",
-	-- 	cwd = "${workspaceFolder}",
-	-- 	program = function()
-	-- 		return find_executable()
-	-- 		-- return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-	-- 	end,
-	-- },
+	-- other_c_dap,
 }
 
 dap.configurations.cpp = dap.configurations.c -- Apply same config for C++
