@@ -546,49 +546,64 @@ local ts_utils = require("nvim-treesitter.ts_utils")
 local function goto_current_function()
 	local params = { textDocument = vim.lsp.util.make_text_document_params() }
 
-	-- Send an LSP request for document symbols
 	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
 		if not result then
 			print("No LSP symbols found.")
 			return
 		end
 
-		local row, _ = unpack(vim.api.nvim_win_get_cursor(0)) -- Get current cursor position
+		local row = vim.api.nvim_win_get_cursor(0)[1] -- Get cursor line
 		local function_node = nil
 
-		-- Helper function to traverse nested symbols (handles Clangd inconsistencies)
+		-- Recursive search for the function under the cursor
 		local function find_function(symbols)
 			for _, symbol in ipairs(symbols) do
 				local kind = symbol.kind
 				local range = symbol.range
 
-				-- Function-like symbols: Function (12) and Method (6)
+				-- Function or Method symbols
 				if kind == 12 or kind == 6 then
 					local start_line = range.start.line + 1
 					local end_line = range["end"].line + 1
 
-					-- If cursor is inside function range
+					-- Check if cursor is within function bounds
 					if start_line <= row and row <= end_line then
 						function_node = symbol
 					end
 				end
 
-				-- Recursively check for children (e.g., nested functions)
+				-- Recursively check children (for nested functions)
 				if symbol.children then
 					find_function(symbol.children)
 				end
 			end
 		end
 
-		-- Start search in document symbols
 		find_function(result)
 
-		-- Jump to the function if found
 		if function_node then
-			local target_line = function_node.range.start.line
-			vim.api.nvim_win_set_cursor(0, { target_line + 1, 0 })
+			local target_line = function_node.range.start.line + 1
+			local target_col = function_node.range.start.character
+			local line_content = vim.api.nvim_buf_get_lines(0, target_line - 1, target_line, false)[1]
+
+			-- **🔹 Debugging output**
+			print("---- DEBUG INFO ----")
+			print("🔹 Full Line:", line_content)
+			print("🔹 LSP Start Character:", target_col)
+
+			-- Attempt to extract function name from the line
+			local function_name = string.match(line_content, "([_%w]+)%s*%(")
+
+			if function_name then
+				local col = string.find(line_content, function_name) - 1
+				print("🔹 Detected Function Name:", function_name, "at column:", col)
+				vim.api.nvim_win_set_cursor(0, { target_line, col })
+			else
+				print("❌ Function name not found using regex. Using fallback LSP position.")
+				vim.api.nvim_win_set_cursor(0, { target_line, target_col })
+			end
 		else
-			print("No function found.")
+			print("❌ No function found.")
 		end
 	end)
 end
@@ -617,9 +632,13 @@ keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to defini
 keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
 keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
 keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
+
 keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
+keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
 keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
 keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
+keymap.set("n", "gw", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
 
 -- LSP Information
 keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), opts("Show LSP hover info"))

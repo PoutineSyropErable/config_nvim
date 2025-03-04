@@ -62,8 +62,8 @@ require("conform").setup({
 		typescriptreact = { "prettier", stop_after_first = true },
 		go = { "gofumpt", "golines", "goimports-reviser" },
 		x = { "clang-format" },
-		-- c = { "clang-format" }, -- ~/.clang-format contains the style
-		c = { "uncrustify" },
+		c = { "clang-format" }, -- ~/.clang-format contains the style
+		-- c = { "uncrustify" },
 		cpp = { "clang-format" },
 		css = { "prettier" },
 		haskell = { "ormolu" },
