@@ -21,18 +21,18 @@ require("lazy").setup({
 	-- 	dependencies = { "nvim-lua/plenary.nvim" },
 	-- },
 
-	-- {
-	-- 	"gennaro-tedesco/nvim-possession",
-	-- 	dependencies = {
-	-- 		"ibhagwan/fzf-lua",
-	-- 		{
-	-- 			"tiagovla/scope.nvim",
-	-- 			lazy = false,
-	-- 			config = true,
-	-- 		},
-	-- 	},
-	-- 	config = true,
-	-- },
+	{
+		"gennaro-tedesco/nvim-possession",
+		dependencies = {
+			"ibhagwan/fzf-lua",
+			{
+				"tiagovla/scope.nvim",
+				lazy = false,
+				config = true,
+			},
+		},
+		config = true,
+	},
 	"nvim-lualine/lualine.nvim",
 	-- "vim-airline/vim-airline",
 	-- "vim-airline/vim-airline-themes",

@@ -70,7 +70,7 @@ function RunCurrentFile()
 		vim.cmd("!gcc " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
 	elseif file_ext == "cpp" then
 		-- Compile and run C file
-		local executable = vim.fn.shellescape(filepath:gsub("%.c$", ""))
+		local executable = vim.fn.shellescape(filepath:gsub("%.cpp$", ""))
 		vim.cmd("!g++ " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
 	elseif file_ext == "py" then
 		-- Run Python script

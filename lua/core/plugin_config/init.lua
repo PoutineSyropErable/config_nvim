@@ -35,10 +35,7 @@ require("core.plugin_config.barbar")
 
 require("core.plugin_config.lualine")
 
--- local has_nvp = pcall(require, "nvim-possession")
--- if has_nvp then
--- 	require("core.plugin_config.nvim-possession")
--- end
+require("core.plugin_config.nvim-possession")
 
 ------ ##### DEACTIVATED ##### -------
 

@@ -1,68 +1,23 @@
 -- Function to determine the session directory based on project root
 
-local function get_project_root()
-	-- Root markers for various project types
-	local root_markers = {
-		-- 📌 General
-		".git",
-		".hg",
-		".svn",
-		"Makefile",
-		"CMakeLists.txt",
+local function get_session_dir()
+	-- Get the absolute path of the current buffer
+	local buffer_path = vim.fn.expand("%:p")
 
-		-- 📌 Python
-		"pyproject.toml",
-		"Pipfile",
-		"requirements.txt",
-		"setup.py",
-		"setup.cfg",
-
-		-- 📌 C/C++
-		"compile_commands.json",
-		"meson.build",
-		"configure.ac",
-		"autogen.sh",
-
-		-- 📌 Java
-		"pom.xml",
-		"build.gradle",
-		"settings.gradle",
-		".classpath",
-		".project",
-
-		-- 📌 Rust
-		"Cargo.toml",
-	}
-
-	-- Start from the current working directory
-	local dir = vim.fn.getcwd()
-
-	while dir == "/" do
-		-- Check for project root markers in the current directory
-		for _, marker in ipairs(root_markers) do
-			local marker_path = vim.fn.findfile(marker, dir)
-			if marker_path and marker_path ~= "" then
-				print("📂 Found project root:", dir, "(via marker:", marker .. ")")
-				return dir
-			end
-		end
-
-		-- Move up one level (`cd ..`)
-		dir = vim.fn.fnamemodify(dir, ":h")
+	-- Fallback if the buffer is empty
+	if buffer_path == "" then
+		buffer_path = vim.fn.getcwd()
 	end
 
-	-- No project root found, fallback to current directory
-	local cwd = vim.fn.getcwd()
-	print("⚠ No project root found. Using current directory:", cwd)
-	return cwd
-end
+	-- Call the external script and capture the output
+	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
+	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_path))
 
-local function get_session_dir()
-	-- local project_root_or_cwd = get_project_root()
-	local cwd = vim.fn.getcwd()
+	-- Trim whitespace/newlines
+	project_root = project_root:gsub("%s+$", "")
 
-	-- If a project root is found, use it; otherwise, default to the current directory
-	local session_dir = cwd .. "/.nvim-session/"
+	-- Use the detected project root or fallback to CWD
+	local session_dir = project_root .. "/.nvim-session/"
 	print("💾 Using session directory:", session_dir) -- Debugging message
 
 	return session_dir

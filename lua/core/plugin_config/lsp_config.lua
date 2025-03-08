@@ -73,6 +73,7 @@ lspconfig.bashls.setup({
 lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
+			telemetry = { enable = false }, -- Disable telemetry
 			diagnostics = {
 				globals = { "vim" },
 			},
