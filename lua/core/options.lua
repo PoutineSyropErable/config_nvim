@@ -17,6 +17,8 @@ vim.opt.expandtab = false
 vim.o.autoindent = true -- Maintain indentation from the previous line
 vim.o.smartindent = true -- More intelligent auto-indentation
 
+vim.opt.mousemoveevent = true -- activate mouse
+
 vim.cmd([[ set noswapfile ]])
 vim.cmd([[ set termguicolors ]])
 --vim.opt.clipboard = 'unnamedplus'

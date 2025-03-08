@@ -950,10 +950,10 @@ local bottom_right_float = Terminal:new({
 	direction = "float",
 	float_opts = {
 		border = "rounded", -- Rounded border for aesthetics
-		width = math.floor(vim.o.columns * 0.5), -- 40% of screen width
-		height = math.floor(vim.o.lines * 0.5), -- 40% of screen height
-		row = math.floor(vim.o.lines * 0.5), -- Start at 60% down (bottom)
-		col = math.floor(vim.o.columns * 0.5), -- Start at 60% across (right)
+		width = math.floor(vim.o.columns * 0.45), -- 40% of screen width
+		height = math.floor(vim.o.lines * 0.45), -- 40% of screen height
+		row = math.floor(vim.o.lines * 0.55), -- Start at 60% down (bottom)
+		col = math.floor(vim.o.columns * 0.55), -- Start at 60% across (right)
 	},
 	hidden = true,
 })

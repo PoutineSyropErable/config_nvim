@@ -5,6 +5,13 @@ local bufferline = require("bufferline")
 bufferline.setup({
 	options = {
 		mode = "buffers", -- "tabs" to show only tabs
+		hover = {
+			enabled = true,
+			delay = 200,
+			reveal = { "close" },
+		},
+		show_buffer_close_icons = false, -- Hide close icons by defaul
+
 		numbers = "ordinal", -- Show buffer numbers
 		close_command = "bdelete! %d", -- Command to close buffers
 		right_mouse_command = "bdelete! %d", -- Close on right-click
@@ -18,6 +25,14 @@ bufferline.setup({
 		right_trunc_marker = "", -- Indicator for right truncation
 		separator_style = "thin", -- Options: "slant", "thick", "thin"
 		diagnostics = "nvim_lsp", -- Show LSP errors/warnings in buffers
+		diagnostics_indicator = function(count, level, diagnostics_dict, context)
+			local s = " "
+			for e, n in pairs(diagnostics_dict) do
+				local sym = e == "error" and " " or (e == "warning" and " " or " ")
+				s = s .. n .. sym
+			end
+			return s
+		end,
 		custom_filter = function(buf_number, _)
 			-- Hide terminal buffers from appearing in bufferline
 			if vim.bo[buf_number].buftype ~= "terminal" then
@@ -25,7 +40,7 @@ bufferline.setup({
 			end
 		end,
 		always_show_bufferline = true, -- Always show even with 1 buffer
-		sort_by = "insert_after_current", -- Buffer sorting method
+		sort_by = "insert_at_end", -- Buffer sorting method
 		offsets = {
 			{
 				filetype = "NvimTree",
