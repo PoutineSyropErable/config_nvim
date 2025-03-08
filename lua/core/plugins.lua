@@ -30,15 +30,9 @@ require("lazy").setup({
 			dapui.setup()
 
 			-- DAP UI listeners to open/close UI automatically
-			dap.listeners.before.event_initialized["dapui_config"] = function()
-				dapui.open()
-			end
-			dap.listeners.before.event_terminated["dapui_config"] = function()
-				dapui.close()
-			end
-			dap.listeners.before.event_exited["dapui_config"] = function()
-				dapui.close()
-			end
+			dap.listeners.before.event_initialized["dapui_config"] = function() dapui.open() end
+			dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
+			dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
 		end,
 		lazy = true,
 		event = { "BufReadPost", "BufNewFile" }, -- Load when reading/creating files
@@ -96,9 +90,7 @@ require("lazy").setup({
 	-------------------------------- 	END OF TERMINAL ----------------------------
 	{
 		"numToStr/Comment.nvim",
-		config = function()
-			require("Comment").setup()
-		end,
+		config = function() require("Comment").setup() end,
 	},
 
 	{
@@ -145,9 +137,7 @@ require("lazy").setup({
 			"lewis6991/gitsigns.nvim", -- OPTIONAL: for git status
 			"nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
 		},
-		init = function()
-			vim.g.barbar_auto_setup = false
-		end,
+		init = function() vim.g.barbar_auto_setup = false end,
 		opts = {
 			-- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
 			-- animation = true,
@@ -232,6 +222,11 @@ require("lazy").setup({
 		after = "telescope.nvim", -- Load after telescope.nvim
 	},
 
+	{
+		"nvim-telescope/telescope-file-browser.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+	},
+
 	-- fzf-native extension (requires building with 'make')
 	{
 		"nvim-telescope/telescope-fzf-native.nvim",
@@ -245,13 +240,11 @@ require("lazy").setup({
 		-- dependencies = { 'nvim-tree/nvim-web-devicons' },
 	},
 
-	 {
-	 	"Shatur/neovim-session-manager",
-	 	dependencies = { "nvim-lua/plenary.nvim", "akinsho/bufferline.nvim" },
-	 	config = function()
-	 		require("neoclip").setup()
-	 	end,
-	 },
+	{
+		"Shatur/neovim-session-manager",
+		dependencies = { "nvim-lua/plenary.nvim", "akinsho/bufferline.nvim" },
+		config = function() require("neoclip").setup() end,
+	},
 
 	-- Need to configure
 	"folke/flash.nvim",

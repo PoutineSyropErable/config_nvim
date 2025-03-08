@@ -3,18 +3,14 @@
 --inside nvimtree, do g? to get information
 
 -- control+space for buffer completion on the other
-------------------------------------- Setups for Split window management ----------------------------
 
--- makes it easier to do opts shit
+-- Set the leader key if not already set
+vim.g.mapleader = " "
+local keymap = vim.keymap
+-- makes keymap seting easier
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
--- Function to create key mapping options
-local tapi = require("nvim-tree.api")
-
 -----------------------------------------------ACTUAL START-------------------------------------------
--- Set the leader key if not already set
-vim.g.mapleader = " " -- Assuming the leader key is set to space
-local keymap = vim.keymap
 ----------------------------------------- Clipboard
 -- keymap.set("n", "<leader>y", '"+y', { noremap = true, silent = true })
 -- keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
@@ -56,21 +52,10 @@ function copy_current_file_path()
 	vim.api.nvim_echo({ { "File path copied: " .. file_path, "Normal" } }, false, {})
 end
 
--- Bind F1 to the function
-keymap.set("n", "<F1>", ":lua copy_current_file_path()<CR>", { noremap = true, silent = true })
-
-vim.api.nvim_buf_get_name(0)
--- Run my build command (The basic (F5), and currently selected buffer one (F6))
--- keymap.set("n", "<F6>", ':!bash ./build.sh "%:t"<CR>', { noremap = true, silent = true })
-
--- keymap.set(
--- 	"n",
--- 	"<F4>",
--- 	':lua vim.cmd("! " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>',
--- 	{ noremap = true, silent = true }
--- )
-
-keymap.set("n", "<F4>", ":lua RunCurrentFile()<CR>", { noremap = true, silent = true })
+local function execute_current_file()
+	local file_path = vim.api.nvim_buf_get_name(0) -- Get the full file path
+	vim.cmd("! " .. vim.fn.shellescape(file_path)) -- Run it in the shell
+end
 
 function RunCurrentFile()
 	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
@@ -86,19 +71,34 @@ function RunCurrentFile()
 	elseif file_ext == "py" then
 		-- Run Python script
 		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
+	elseif file_ext == "java" then
+		local autoMakeScript = "/home/francois/Documents/University (Real)/Semester 10/Comp 310/AutomakeJava/mysrc/find_dependancy_tree.py"
+		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
 		print("File type not supported for running with F4")
 	end
 end
 
-keymap.set("n", "<F5>", ":!bash ./build.sh<CR>", { noremap = true, silent = true })
-keymap.set("n", "<F6>", ':lua vim.cmd("!bash ./build.sh " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>', { noremap = true, silent = true })
-keymap.set(
-	"n",
-	"<F7>",
-	':lua vim.cmd("!bash ./build_test.sh " .. vim.fn.shellescape(vim.api.nvim_buf_get_name(0)))<CR>',
-	{ noremap = true, silent = true }
-)
+-- Function to run the build script with the current file
+local function run_build_script_with_file()
+	local file_path = vim.api.nvim_buf_get_name(0) -- Get the full file path
+	vim.cmd("!bash ./build.sh " .. vim.fn.shellescape(file_path))
+end
+
+-- Function to run the build test script with the current file
+local function run_build_test_script()
+	local file_path = vim.api.nvim_buf_get_name(0) -- Get the full file path
+	vim.cmd("!bash ./build_test.sh " .. vim.fn.shellescape(file_path))
+end
+
+local function run_build_script() vim.cmd("!bash ./build.sh") end
+
+keymap.set("n", "<F1>", copy_current_file_path, opts("Copy current file path"))
+keymap.set("n", "<F2>", execute_current_file, opts("Stupidly execute current file"))
+keymap.set("n", "<F4>", RunCurrentFile, opts("Run current file"))
+keymap.set("n", "<F5>", run_build_script, opts("Run build script (No argument) - (build.sh)"))
+keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with this file as argument) - (build.sh $thisFile)"))
+keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this file as argument) - (build_test.sh $thisFile)"))
 
 -- Key mapping to source the current file (Only works for reloading nvim configuration)
 keymap.set("n", "<leader>sr", ":source %<CR>", { noremap = true, silent = true })
@@ -136,6 +136,8 @@ keymap.set("n", "<leader>wa", ":wa<CR>") -- save all buffers
 keymap.set("n", "gx", ":!open <c-r><c-a><CR>") -- open URL under cursor
 
 ----------------Split window management, split, resize
+local tapi = require("nvim-tree.api")
+
 --there's a repeat of sh, it's fine. It's for inside nvim_tree, to open current file in a split
 keymap.set("n", "<leader>sh", tapi.node.open.vertical, opts("nvim-tree | Open: Vertical Split"))
 keymap.set("n", "<leader>sv", tapi.node.open.horizontal, opts("nvim tree |  Open: Horizontal Split"))
@@ -285,9 +287,263 @@ local surrounds_mappings_see_mini_surround_lua = {
 	suffix_next = "n", -- Suffix to search with "next" method
 }
 
----------------------------------------------------------- Git
-local builtin = require("telescope.builtin")
+---------------------------------------------------------------- Harpoon
+local harpoon_ui = require("harpoon.ui") -- Isolate Harpoon UI
+local harpoon_mark = require("harpoon.mark") -- Isolate Harpoon Mark
 
+-- Add current file to Harpoon
+keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "Add file to Harpoon" })
+
+-- Toggle Harpoon quick menu
+keymap.set("n", "<leader>hh", harpoon_ui.toggle_quick_menu, { desc = "Open Harpoon quick menu" })
+
+-- Navigate to Harpoon file slots (1-9)
+for i = 1, 9 do
+	keymap.set("n", "<leader>h" .. i, function() harpoon_ui.nav_file(i) end, { desc = "Go to Harpoon file " .. i })
+end
+
+-- Cycle through Harpoon files
+keymap.set("n", "<leader>hb", harpoon_ui.nav_prev, { desc = "Go to previous Harpoon file" })
+keymap.set("n", "<leader>hn", harpoon_ui.nav_next, { desc = "Go to next Harpoon file" })
+
+----------------------------------------------Telescope
+local telescope = require("telescope")
+local builtin = require("telescope.builtin")
+local finders = require("telescope.finders")
+local pickers = require("telescope.pickers")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+
+local all_symbols = {
+	"File",
+	"Module",
+	"Namespace",
+	"Package",
+	"Class",
+	"Method",
+	"Property",
+	"Field",
+	"Constructor",
+	"Enum",
+	"Interface",
+	"Function",
+	"Variable",
+	"Constant",
+	"String",
+	"Number",
+	"Boolean",
+	"Array",
+	"Object",
+	"Key",
+	"Null",
+	"EnumMember",
+	"Struct",
+	"Event",
+	"Operator",
+	"TypeParameter",
+}
+
+local function all_document_symbols()
+	builtin.lsp_document_symbols({
+		symbols = all_symbols,
+	})
+end
+
+-- Function for all symbols across the workspace
+local function all_workspace_symbols()
+	builtin.lsp_workspace_symbols({
+		symbols = all_symbols,
+	})
+end
+
+keymap.set("n", "<leader>fs", all_document_symbols, opts("All Variable/Symbols Information (Document)"))
+keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols Information (Workspace)"))
+
+keymap.set("n", "<leader>fk", builtin.keymaps, opts("Find Keymaps"))
+
+keymap.set("n", "<leader>fg", builtin.live_grep, opts("Live Grep"))
+keymap.set("n", "<leader>fw", function() builtin.live_grep({ default_text = vim.fn.expand("<cword>") }) end, opts("Live grep current word"))
+
+keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
+keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
+
+keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
+keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
+keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
+keymap.set("n", "<leader>fB", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
+keymap.set("n", "<leader>f<Space>", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
+
+keymap.set("n", "<leader>fh", builtin.help_tags, opts("Help Tags"))
+keymap.set("n", "<leader>fH", ":nohlsearch<CR>") -- No description needed for raw command
+keymap.set("n", "<leader>fi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "<leader>fm", function() builtin.treesitter({ default_text = ":method:" }) end, opts("Find Methods with Treesitter"))
+keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", opts("Telescope Neoclip"))
+
+keymap.set("n", "<leader>fc", builtin.colorscheme, opts("Change Color Scheme"))
+
+-- Jump List Navigation
+keymap.set("n", "<C-o>", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<C-p>", "<C-i>", opts("Jump Forward in Jump List"))
+keymap.set("n", "<leader>jb", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<leader>jf", "<C-i>", opts("Jump Forward in Jump List"))
+
+----------------------------------------------------------------------------------------- LSP
+-- Helper function to check if LSP is available
+local function safe_lsp_call(fn)
+	return function()
+		if vim.lsp.buf[fn] then
+			vim.lsp.buf[fn]()
+		else
+			print("LSP function '" .. fn .. "' not available")
+		end
+	end
+end
+
+local function safe_telescope_call(fn)
+	return function()
+		local ok, telescope_builtin = pcall(require, "telescope.builtin")
+		if ok and telescope_builtin[fn] then
+			telescope_builtin[fn]()
+		else
+			print("Telescope function '" .. fn .. "' not available")
+		end
+	end
+end
+
+-- Go to current function
+local ts_utils = require("nvim-treesitter.ts_utils")
+local function goto_current_function()
+	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+
+	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
+		if not result then
+			print("No LSP symbols found.")
+			return
+		end
+
+		local row = vim.api.nvim_win_get_cursor(0)[1] -- Get cursor line
+		local function_node = nil
+
+		-- Recursive search for the function under the cursor
+		local function find_function(symbols)
+			for _, symbol in ipairs(symbols) do
+				local kind = symbol.kind
+				local range = symbol.range
+
+				-- Function or Method symbols
+				if kind == 12 or kind == 6 then
+					local start_line = range.start.line + 1
+					local end_line = range["end"].line + 1
+
+					-- Check if cursor is within function bounds
+					if start_line <= row and row <= end_line then
+						function_node = symbol
+					end
+				end
+
+				-- Recursively check children (for nested functions)
+				if symbol.children then
+					find_function(symbol.children)
+				end
+			end
+		end
+
+		find_function(result)
+
+		if function_node then
+			local target_line = function_node.range.start.line + 1
+			local target_col = function_node.range.start.character
+			local line_content = vim.api.nvim_buf_get_lines(0, target_line - 1, target_line, false)[1]
+
+			-- **🔹 Debugging output**
+			print("---- DEBUG INFO ----")
+			print("🔹 Full Line:", line_content)
+			print("🔹 LSP Start Character:", target_col)
+
+			-- Attempt to extract function name from the line
+			local function_name = string.match(line_content, "([_%w]+)%s*%(")
+
+			if function_name then
+				local col = string.find(line_content, function_name) - 1
+				print("🔹 Detected Function Name:", function_name, "at column:", col)
+				vim.api.nvim_win_set_cursor(0, { target_line, col })
+			else
+				print("❌ Function name not found using regex. Using fallback LSP position.")
+				vim.api.nvim_win_set_cursor(0, { target_line, target_col })
+			end
+		else
+			print("❌ No function found.")
+		end
+	end)
+end
+
+-- LSP Hover
+keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
+keymap.set("n", "<C-d>", function() vim.lsp.util.scroll(4) end, opts("Scroll down on hover"))
+keymap.set("n", "<C-e>", function() vim.lsp.util.scroll(-4) end, opts("Scroll up on however"))
+vim.keymap.set("n", "¢", function()
+	vim.lsp.buf.hover()
+
+	-- Defer switching focus to ensure the hover window is created
+	vim.defer_fn(function()
+		-- Force `wincmd w` to work properly
+		vim.cmd("wincmd w")
+	end, 500) -- Small delay to allow hover to open
+end, opts("hover and switch"))
+
+-- LSP Actions
+keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
+keymap.set("n", "<leader>La", safe_lsp_call("code_action"), opts("Show available code actions"))
+
+-- LSP Definitions & References
+keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
+keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
+keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
+keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
+
+keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
+keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
+keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
+keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
+keymap.set("n", "gw", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
+
+-- LSP Information
+keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), opts("Show LSP hover info"))
+keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), opts("Show function signature help"))
+
+-- Workspace Folder Management
+keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), opts("Add workspace folder"))
+keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
+keymap.set("n", "<leader>Ll", function()
+	if vim.lsp.buf.list_workspace_folders then
+		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+	else
+		print("LSP function 'list_workspace_folders' not available")
+	end
+end, opts("List workspace folders"))
+
+-- Diagnostics
+keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
+keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), opts("Go to next diagnostic"))
+
+-- Auto Formatting
+keymap.set({ "n", "v" }, "<leader>Lf", function()
+	if vim.lsp.buf.format then
+		vim.lsp.buf.format({ async = true })
+	else
+		print("LSP function 'format' not available")
+	end
+end, opts("Format buffer using LSP"))
+
+-- More LSP Commands on <leader>l...
+local d = "More LSP Commands on <leader>L... (Also disables search highlight)"
+keymap.set("n", "<leader>lz", ":noh<CR>", opts(d))
+keymap.set("n", "<leader>gz", ":noh<CR>", opts(d))
+
+---------------------------------------------------------- Git
 -- Lazygit
 keymap.set("n", "<leader>lg", ":LazyGit<CR>", { desc = "Open LazyGit" })
 
@@ -517,253 +773,6 @@ keymap.set("n", "<leader>kf", function() apply_hunk_to_all("LOCAL") end, opts("A
 keymap.set("n", "<leader>kg", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
 -- Apply REMOTE hunk to all buffers
 keymap.set("n", "<leader>kh", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
-
----------------------------------------------LSP
--- Helper function to check if LSP is available
-local function safe_lsp_call(fn)
-	return function()
-		if vim.lsp.buf[fn] then
-			vim.lsp.buf[fn]()
-		else
-			print("LSP function '" .. fn .. "' not available")
-		end
-	end
-end
-
-local function safe_telescope_call(fn)
-	return function()
-		local ok, telescope_builtin = pcall(require, "telescope.builtin")
-		if ok and telescope_builtin[fn] then
-			telescope_builtin[fn]()
-		else
-			print("Telescope function '" .. fn .. "' not available")
-		end
-	end
-end
-
--- Go to current function
-local ts_utils = require("nvim-treesitter.ts_utils")
-local function goto_current_function()
-	local params = { textDocument = vim.lsp.util.make_text_document_params() }
-
-	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
-		if not result then
-			print("No LSP symbols found.")
-			return
-		end
-
-		local row = vim.api.nvim_win_get_cursor(0)[1] -- Get cursor line
-		local function_node = nil
-
-		-- Recursive search for the function under the cursor
-		local function find_function(symbols)
-			for _, symbol in ipairs(symbols) do
-				local kind = symbol.kind
-				local range = symbol.range
-
-				-- Function or Method symbols
-				if kind == 12 or kind == 6 then
-					local start_line = range.start.line + 1
-					local end_line = range["end"].line + 1
-
-					-- Check if cursor is within function bounds
-					if start_line <= row and row <= end_line then
-						function_node = symbol
-					end
-				end
-
-				-- Recursively check children (for nested functions)
-				if symbol.children then
-					find_function(symbol.children)
-				end
-			end
-		end
-
-		find_function(result)
-
-		if function_node then
-			local target_line = function_node.range.start.line + 1
-			local target_col = function_node.range.start.character
-			local line_content = vim.api.nvim_buf_get_lines(0, target_line - 1, target_line, false)[1]
-
-			-- **🔹 Debugging output**
-			print("---- DEBUG INFO ----")
-			print("🔹 Full Line:", line_content)
-			print("🔹 LSP Start Character:", target_col)
-
-			-- Attempt to extract function name from the line
-			local function_name = string.match(line_content, "([_%w]+)%s*%(")
-
-			if function_name then
-				local col = string.find(line_content, function_name) - 1
-				print("🔹 Detected Function Name:", function_name, "at column:", col)
-				vim.api.nvim_win_set_cursor(0, { target_line, col })
-			else
-				print("❌ Function name not found using regex. Using fallback LSP position.")
-				vim.api.nvim_win_set_cursor(0, { target_line, target_col })
-			end
-		else
-			print("❌ No function found.")
-		end
-	end)
-end
-
--- LSP Hover
-keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
-keymap.set("n", "<C-d>", function() vim.lsp.util.scroll(4) end, opts("Scroll down on hover"))
-keymap.set("n", "<C-e>", function() vim.lsp.util.scroll(-4) end, opts("Scroll up on however"))
-vim.keymap.set("n", "¢", function()
-	vim.lsp.buf.hover()
-
-	-- Defer switching focus to ensure the hover window is created
-	vim.defer_fn(function()
-		-- Force `wincmd w` to work properly
-		vim.cmd("wincmd w")
-	end, 500) -- Small delay to allow hover to open
-end, opts("hover and switch"))
-
--- LSP Actions
-keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
-keymap.set("n", "<leader>fr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences (<leader>Lr)"))
-keymap.set("n", "<leader>La", safe_lsp_call("code_action"), opts("Show available code actions"))
-
--- LSP Definitions & References
-keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
-keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
-keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
-keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
-
-keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
-keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
-keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
-keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
-keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
-keymap.set("n", "gw", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
-
--- LSP Information
-keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), opts("Show LSP hover info"))
-keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), opts("Show function signature help"))
-
--- Workspace Folder Management
-keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), opts("Add workspace folder"))
-keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
-keymap.set("n", "<leader>Ll", function()
-	if vim.lsp.buf.list_workspace_folders then
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	else
-		print("LSP function 'list_workspace_folders' not available")
-	end
-end, opts("List workspace folders"))
-
--- Diagnostics
-keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
-keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), opts("Go to previous diagnostic"))
-keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), opts("Go to next diagnostic"))
-
--- Auto Formatting
-keymap.set({ "n", "v" }, "<leader>Lf", function()
-	if vim.lsp.buf.format then
-		vim.lsp.buf.format({ async = true })
-	else
-		print("LSP function 'format' not available")
-	end
-end, opts("Format buffer using LSP"))
-
--- More LSP Commands on <leader>l...
-local d = "More LSP Commands on <leader>L... (Also disables search highlight)"
-keymap.set("n", "<leader>lz", ":noh<CR>", opts(d))
-keymap.set("n", "<leader>gz", ":noh<CR>", opts(d))
-
-----------------------------------------------Telescope
--- Function for all symbols in the current file
-local all_symbols = {
-	"File",
-	"Module",
-	"Namespace",
-	"Package",
-	"Class",
-	"Method",
-	"Property",
-	"Field",
-	"Constructor",
-	"Enum",
-	"Interface",
-	"Function",
-	"Variable",
-	"Constant",
-	"String",
-	"Number",
-	"Boolean",
-	"Array",
-	"Object",
-	"Key",
-	"Null",
-	"EnumMember",
-	"Struct",
-	"Event",
-	"Operator",
-	"TypeParameter",
-}
-
-local function all_document_symbols()
-	builtin.lsp_document_symbols({
-		symbols = all_symbols,
-	})
-end
-
--- Function for all symbols across the workspace
-local function all_workspace_symbols()
-	builtin.lsp_workspace_symbols({
-		symbols = all_symbols,
-	})
-end
-
--- Telescope Keymaps
-keymap.set("n", "<leader>fs", all_document_symbols, opts("All Variable/Symbols Information (Document)"))
-keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols Information (Workspace)"))
-
-keymap.set("n", "<leader>fk", builtin.keymaps, opts("Find Keymaps"))
-
-keymap.set("n", "<leader>fg", builtin.live_grep, opts("Live Grep"))
-keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
-keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
-
-keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
-keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
-keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
-
-keymap.set("n", "<leader>fh", builtin.help_tags, opts("Help Tags"))
-keymap.set("n", "<leader>fH", ":nohlsearch<CR>") -- No description needed for raw command
-keymap.set("n", "<leader>fi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
-keymap.set("n", "<leader>fm", function() builtin.treesitter({ default_text = ":method:" }) end, opts("Find Methods with Treesitter"))
-keymap.set("n", "<leader>fn", "<cmd>Telescope neoclip<CR>", opts("Telescope Neoclip"))
-
-keymap.set("n", "<leader>fc", builtin.colorscheme, opts("Change Color Scheme"))
-
--- Jump List Navigation
-keymap.set("n", "<C-o>", "<C-o>", opts("Jump Backward in Jump List"))
-keymap.set("n", "<C-p>", "<C-i>", opts("Jump Forward in Jump List"))
-keymap.set("n", "<leader>jb", "<C-o>", opts("Jump Backward in Jump List"))
-keymap.set("n", "<leader>jf", "<C-i>", opts("Jump Forward in Jump List"))
-
----------------------------------------------------------------- Harpoon
-local harpoon_ui = require("harpoon.ui") -- Isolate Harpoon UI
-local harpoon_mark = require("harpoon.mark") -- Isolate Harpoon Mark
-
--- Add current file to Harpoon
-keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "Add file to Harpoon" })
-
--- Toggle Harpoon quick menu
-keymap.set("n", "<leader>hh", harpoon_ui.toggle_quick_menu, { desc = "Open Harpoon quick menu" })
-
--- Navigate to Harpoon file slots (1-9)
-for i = 1, 9 do
-	keymap.set("n", "<leader>h" .. i, function() harpoon_ui.nav_file(i) end, { desc = "Go to Harpoon file " .. i })
-end
-
--- Cycle through Harpoon files
-keymap.set("n", "<leader>hb", harpoon_ui.nav_prev, { desc = "Go to previous Harpoon file" })
-keymap.set("n", "<leader>hn", harpoon_ui.nav_next, { desc = "Go to next Harpoon file" })
 
 -- ---------------------------------------------ufo
 local ufo = require("ufo")
@@ -1170,12 +1179,6 @@ keymap.set("n", "zt", "zt", { noremap = true, silent = true })
 keymap.set("n", "zz", "zz", { noremap = true, silent = true })
 keymap.set("n", "zb", "zb", { noremap = true, silent = true })
 ------------------------------------------ SYMBOL SEARCH FUNCTION FOR MACROS ---------------
-local telescope = require("telescope.builtin")
-local finders = require("telescope.finders")
-local pickers = require("telescope.pickers")
-local conf = require("telescope.config").values
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
 
 -- Function to fetch symbols (LSP + buffer fallback)
 local function get_symbols()
