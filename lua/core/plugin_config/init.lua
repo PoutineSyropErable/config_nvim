@@ -4,7 +4,9 @@ require("core.plugin_config.coloriser")
 
 require("core.plugin_config.nvimtree_config")
 require("core.plugin_config.oil")
-require("core.plugin_config.bufferline")
+if _G.PRE_CONFIG_FRANCK.usebufferline then
+	require("core.plugin_config.bufferline")
+end
 require("core.plugin_config.lualine")
 require("core.plugin_config.treesitter")
 require("core.plugin_config.telescope")

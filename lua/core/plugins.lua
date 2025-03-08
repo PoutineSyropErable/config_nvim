@@ -1,6 +1,9 @@
 -- Detect if the OS is Linux
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
+local get_buffer_plugins = require("buffer_manager")
+local buffer_plugins = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
+
 require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	"tpope/vim-commentary",
@@ -12,6 +15,7 @@ require("lazy").setup({
 	"nvim-lualine/lualine.nvim",
 	"nvim-treesitter/nvim-treesitter",
 	"vim-test/vim-test",
+	unpack(buffer_plugins),
 
 	-- DAP core and UI setup
 	{
@@ -139,7 +143,6 @@ require("lazy").setup({
 	"L3MON4D3/LuaSnip",
 	"rafamadriz/friendly-snippets",
 	"hrsh7th/cmp-buffer",
-	{ "akinsho/bufferline.nvim", version = "*", dependencies = "nvim-tree/nvim-web-devicons" },
 	{ "tiagovla/scope.nvim", config = true },
 	"hrsh7th/cmp-path",
 	"hrsh7th/cmp-cmdline",
@@ -224,12 +227,6 @@ require("lazy").setup({
 		"goolord/alpha-nvim",
 		dependencies = { "echasnovski/mini.icons" },
 		-- dependencies = { 'nvim-tree/nvim-web-devicons' },
-	},
-
-	{
-		"Shatur/neovim-session-manager",
-		dependencies = { "nvim-lua/plenary.nvim", "akinsho/bufferline.nvim" },
-		config = function() require("neoclip").setup() end,
 	},
 
 	-- Need to configure
