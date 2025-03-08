@@ -146,14 +146,13 @@ require("lazy").setup({
 	"szw/vim-maximizer",
 
 	"lewis6991/gitsigns.nvim",
-	"github/copilot.vim",
 	"tpope/vim-fugitive",
 	-- New git plugins vv, needed? idk
 
 	-- "f-person/git-blame.nvim",
 	"tpope/vim-rhubarb",
 	"tpope/vim-surround",
-	"airblade/vim-gitgutter",
+	-- "airblade/vim-gitgutter",
 	"mhinz/vim-signify",
 	"kdheepak/lazygit.nvim",
 	"itchyny/vim-gitbranch",

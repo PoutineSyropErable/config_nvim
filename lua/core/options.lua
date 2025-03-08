@@ -80,6 +80,7 @@ vim.opt.sessionoptions = { -- required
 	"tabpages",
 	"globals",
 }
+-- let g:gitgutter_enabled = 0
 
 vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
 -- vim.cmd('set verbose=10')

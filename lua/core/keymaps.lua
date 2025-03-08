@@ -237,7 +237,6 @@ keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
 keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
 
 -- Keymap for closing the current tab using Ctrl+w X
-keymap.set("n", "<C-w>x", ":w | bd!<CR>", opts("Close buffer and save"))
 keymap.set("n", "<C-w>d", ":close<CR>", opts("Close window"))
 
 -- Keymap for saving all
