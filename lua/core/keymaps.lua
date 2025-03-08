@@ -178,6 +178,15 @@ keymap.set("n", "<C-w>c", ":tabnew<CR>", opts("New tab"))
 keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", opts("Move tab left"))
 keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", opts("Move tab right"))
 
+-- Function to switch to a specific buffer using Barbar
+local function goto_buffer(buf_num) vim.cmd("BufferGoto " .. buf_num) end
+
+-- Bind <leader>1 to <leader>0 for buffer switching
+for i = 1, 9 do
+	keymap.set("n", "<leader>" .. i, function() goto_buffer(i) end, opts("Go to buffer " .. i))
+end
+keymap.set("n", "<leader>0", function() goto_buffer(10) end, opts("Go to buffer 10"))
+
 -- Navigate buffers (Next/Previous)
 keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
 keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer"))
@@ -224,13 +233,13 @@ local function move_to_window(index)
 	end
 end
 
--- Create keybindings for <leader>1-9 to switch between windows
+-- Create keybindings for m1-9 to switch between windows
 for i = 1, 9 do
-	keymap.set("n", "<leader>" .. i, function() move_to_window(i) end, opts("Move to window " .. i))
+	keymap.set("n", "m" .. i, function() move_to_window(i) end, opts("Move to window " .. i))
 end
 
--- <leader>0 to go to the last window in the visible list
-keymap.set("n", "<leader>0", function()
+-- m0 to go to the last window in the visible list
+keymap.set("n", "m0", function()
 	local windows = get_visible_windows()
 	if #windows > 0 then
 		vim.api.nvim_set_current_win(windows[#windows]) -- Switch to last window
