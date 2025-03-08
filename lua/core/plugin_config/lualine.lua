@@ -2,6 +2,8 @@ require("lualine").setup({
 	options = {
 		icons_enabled = true,
 		theme = "nightfly",
+		component_separators = { left = "", right = "" }, -- Separators between components
+		section_separators = { left = "", right = "" }, -- Separators between sections
 	},
 	sections = {
 		lualine_a = {
