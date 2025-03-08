@@ -3,6 +3,7 @@ local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
 local get_buffer_plugins = require("buffer_manager")
 local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
+-- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
@@ -15,10 +16,23 @@ require("lazy").setup({
 	"nvim-treesitter/nvim-treesitter",
 	"vim-test/vim-test",
 	buffer_plugin,
-	{
-		"Shatur/neovim-session-manager",
-		dependencies = { "nvim-lua/plenary.nvim" },
-	},
+	-- {
+	-- 	"Shatur/neovim-session-manager",
+	-- 	dependencies = { "nvim-lua/plenary.nvim" },
+	-- },
+
+	-- {
+	-- 	"gennaro-tedesco/nvim-possession",
+	-- 	dependencies = {
+	-- 		"ibhagwan/fzf-lua",
+	-- 		{
+	-- 			"tiagovla/scope.nvim",
+	-- 			lazy = false,
+	-- 			config = true,
+	-- 		},
+	-- 	},
+	-- 	config = true,
+	-- },
 	"nvim-lualine/lualine.nvim",
 	-- "vim-airline/vim-airline",
 	-- "vim-airline/vim-airline-themes",

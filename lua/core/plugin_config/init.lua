@@ -29,9 +29,12 @@ require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
-if _G.PRE_CONFIG_FRANCK.use_bufferline then
+local has_bufferline = pcall(require, "bufferline")
+local has_barbar = pcall(require, "barbar")
+if has_bufferline then
 	require("core.plugin_config.bufferline")
-else
+end
+if has_barbar then
 	require("core.plugin_config.barbar")
 end
 
@@ -40,7 +43,16 @@ if has_lualine then
 	require("core.plugin_config.lualine")
 end
 
-require("core.plugin_config.nvim-session-manager")
+local has_nvsm = pcall(require, "session-manager")
+if has_nvsm then
+	require("core.plugin_config.nvim-session-manager")
+end
+
+-- local has_nvp = pcall(require, "nvim-possession")
+-- if has_nvp then
+-- 	require("core.plugin_config.nvim-possession")
+-- end
+
 ------ ##### DEACTIVATED ##### -------
 
 -- not needed vv (hologram) (and markdown_preview)

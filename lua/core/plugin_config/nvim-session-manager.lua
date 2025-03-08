@@ -50,6 +50,6 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 			end
 		end
 		session_manager.save_current_session()
-		vim.cmd([[ScopeSaveState]]) -- Ensure Scope state is saved with session
+		-- vim.cmd([[ScopeSaveState]]) -- Ensure Scope state is saved with session
 	end,
 })

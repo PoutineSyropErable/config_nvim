@@ -17,8 +17,8 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 -- keymap.set("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 keymap.set("n", "<leader>C", '"+yy', { noremap = true, silent = true })
 keymap.set("v", "<leader>C", '"+yy', { noremap = true, silent = true })
--- keymap.set("n", "<leader>p", '"+p', { noremap = true, silent = true })
--- keymap.set("v", "<leader>p", '"+p', { noremap = true, silent = true })
+keymap.set("n", "<leader>P", '"+p', { noremap = true, silent = true })
+keymap.set("v", "<leader>P", '"+p', { noremap = true, silent = true })
 
 keymap.set("n", "<C-c>", '"+y', { noremap = true, silent = true })
 keymap.set("n", "<C-x>", '"+d', { noremap = true, silent = true })
@@ -68,6 +68,10 @@ function RunCurrentFile()
 		-- Compile and run C file
 		local executable = vim.fn.shellescape(filepath:gsub("%.c$", ""))
 		vim.cmd("!gcc " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
+	elseif file_ext == "cpp" then
+		-- Compile and run C file
+		local executable = vim.fn.shellescape(filepath:gsub("%.c$", ""))
+		vim.cmd("!g++ " .. vim.fn.shellescape(filepath) .. " -o " .. executable .. " && " .. executable)
 	elseif file_ext == "py" then
 		-- Run Python script
 		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
@@ -114,7 +118,6 @@ local toggle_invisible_char = function()
 end
 
 local toggle_linting = function()
-	vim.g.linting_enabled = not vim.g.linting_enabled
 	if vim.g.linting_enabled then
 		vim.diagnostic.enable()
 		print("🔍 Linting Enabled")
@@ -122,6 +125,7 @@ local toggle_linting = function()
 		vim.diagnostic.enable(false)
 		print("🚫 Linting Disabled")
 	end
+	vim.g.linting_enabled = not vim.g.linting_enabled
 end
 
 keymap.set("n", " leader>.F", ":NvimTreeFindFile<CR>", opts("Find current file in NvimTree"))
@@ -201,7 +205,7 @@ local has_barbar, _ = pcall(require, "barbar")
 
 local function goto_buffer(_) end
 if has_bufferline then
-	print("Using Bufferline")
+	-- print("Using Bufferline")
 	-- Bufferline keymaps
 	vim.keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
 	vim.keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
@@ -210,7 +214,7 @@ if has_bufferline then
 
 	goto_buffer = function(buf_num) vim.cmd("BufferLineGoToBuffer " .. buf_num) end
 elseif has_barbar then
-	print("Using Barbar")
+	-- print("Using Barbar")
 	-- Barbar keymaps
 	vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
 	vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
@@ -274,6 +278,12 @@ keymap.set("n", "m0", function()
 		print("No visible windows to switch to")
 	end
 end, opts("Move to last visible window"))
+
+------------------------------------------------- Sessions keymaps
+keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
+keymap.set("n", "<leader>pn", function() require("nvim-possession").new() end, opts("📌create new session"))
+keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
+keymap.set("n", "<leader>pd", function() require("nvim-possession").delete() end, opts("📌delete selected session"))
 
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
