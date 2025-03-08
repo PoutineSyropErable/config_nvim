@@ -172,34 +172,54 @@ keymap.set("n", "<leader>Tx", ":tabclose<CR>", opts("Close tab"))
 keymap.set("n", "<leader>Tk", ":tabnext<CR>", opts("Next tab"))
 keymap.set("n", "<leader>Tj", ":tabprevious<CR>", opts("Previous tab"))
 
-keymap.set("n", "<C-w>c", ":tabnew<CR>", opts("New tab"))
+keymap.set("n", "<C-w>c", "<Cmd>tabnew<CR>", opts("New tab"))
+keymap.set("n", "<C-w>x", "<Cmd>tabclose<CR>", opts("Close tab"))
+keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next buffer"))
 
 -- Move Tabs Around
 keymap.set("n", "<leader>Tb", ":tabmove -1<CR>", opts("Move tab left"))
 keymap.set("n", "<leader>Tn", ":tabmove +1<CR>", opts("Move tab right"))
 
+-- Navigate buffers (Next/Previous)
+keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer"))
+keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", opts("Next buffer"))
+
+local has_bufferline, _ = pcall(require, "bufferline")
+local has_barbar, _ = pcall(require, "barbar")
+
+if has_bufferline then
+	-- Bufferline keymaps
+	vim.keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
+	vim.keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
+	vim.keymap.set("n", "<leader>B", "<Cmd>BufferLineMovePrev<CR>", opts("Move buffer left (Bufferline)"))
+	vim.keymap.set("n", "<leader>M", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
+elseif has_barbar then
+	-- Barbar keymaps
+	vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
+	vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
+	vim.keymap.set("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+	vim.keymap.set("n", "<leader>N", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+else
+	print("Neither Bufferline nor Barbar is installed!")
+end
+
 -- Function to switch to a specific buffer using Barbar
-local function goto_buffer(buf_num) vim.cmd("BufferGoto " .. buf_num) end
+local function goto_buffer(buf_num)
+	if has_barbar then
+		vim.cmd("BufferGoto " .. buf_num)
+	elseif has_bufferline then
+		vim.cmd("BufferLineGoToBuffer " .. buf_num)
+	end
+end
 
 -- Bind <leader>1 to <leader>0 for buffer switching
 for i = 1, 9 do
 	keymap.set("n", "<leader>" .. i, function() goto_buffer(i) end, opts("Go to buffer " .. i))
 end
 keymap.set("n", "<leader>0", function() goto_buffer(10) end, opts("Go to buffer 10"))
-
--- Navigate buffers (Next/Previous)
-keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
-keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer"))
-keymap.set("n", "<C-w>b", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
-keymap.set("n", "<C-w>n", "<Cmd>BufferNext<CR>", opts("Next buffer"))
-keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
-keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", opts("Next buffer"))
-
--- Move buffers (Reorder in Barbar)
-keymap.set("n", "<leader>bn", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left"))
-keymap.set("n", "<leader>bm", "<Cmd>BufferMoveNext<CR>", opts("Move buffer right"))
-keymap.set("n", "<C-w>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left"))
-keymap.set("n", "<C-w>N", "<Cmd>BufferMoveNext<CR>", opts("Move buffer right"))
 
 -- Keymaps for splits (vertical and horizontal)
 keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
@@ -380,7 +400,7 @@ keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current B
 keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
 keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
 keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
-keymap.set("n", "<leader>fB", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
+keymap.set("n", "<leader>fB", telescope.extensions.scope.buffers, opts("Telescope File Browser"))
 keymap.set("n", "<leader>f<Space>", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
 
 keymap.set("n", "<leader>fh", builtin.help_tags, opts("Help Tags"))
