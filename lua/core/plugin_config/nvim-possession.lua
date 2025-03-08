@@ -1,6 +1,7 @@
--- Function to determine the session directory based on project root
+-- Store session directory once when Neovim starts
+local session_dir
 
-local function get_session_dir()
+local function set_session_dir()
 	-- Get the absolute path of the current buffer
 	local buffer_path = vim.fn.expand("%:p")
 
@@ -17,15 +18,34 @@ local function get_session_dir()
 	project_root = project_root:gsub("%s+$", "")
 
 	-- Use the detected project root or fallback to CWD
-	local session_dir = project_root .. "/.nvim-session/"
-	print("💾 Using session directory:", session_dir) -- Debugging message
+	session_dir = project_root .. "/.nvim-session/"
 
-	return session_dir
+	-- Debug message
+	print("💾 Session directory set to:", session_dir)
 end
 
+local function ensure_session_exists()
+	local session_file = session_dir .. "/session.vim"
+
+	-- If no session exists, create one
+	if vim.fn.filereadable(session_file) == 0 then
+		require("nvim-possession").update() -- Save session **without asking for a name**
+		print("📂 Auto-created new session in:", session_file)
+	end
+end
+
+-- Call `set_session_dir` once when Neovim starts
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		set_session_dir()
+		ensure_session_exists()
+	end,
+})
+
+-- Ensure session_dir is available in `nvim-possession`
 require("nvim-possession").setup({
 	sessions = {
-		sessions_path = get_session_dir(),
+		sessions_path = function() return session_dir end, -- Use stored session_dir
 		sessions_variable = "current_session", -- Global variable to track active session
 		sessions_icon = "󰀚 ", -- Icon for session names in statusline/UI
 		sessions_prompt = "📌 Select Session >", -- Prompt when listing sessions
@@ -45,20 +65,10 @@ require("nvim-possession").setup({
 
 	-- ✅ Hook: Load Scope.nvim state after loading a session
 	post_hook = function()
-		local cwd = vim.fn.getcwd()
-		local session_dir = cwd .. "/.nvim-session/"
-
-		-- ✅ Ensure directory exists
-		if vim.fn.isdirectory(session_dir) == 0 then
-			vim.fn.mkdir(session_dir, "p") -- Create directory recursively
-			print("📁 Created session directory:", session_dir)
-		end
-
-		-- ✅ Only create a new session if none exist **AND** no session was loaded
 		local session_file = session_dir .. "/session.vim"
 		if vim.fn.filereadable(session_file) == 0 and not require("nvim-possession").status() then
 			require("nvim-possession").update() -- Save session **without asking for a name**
-			print("📂 Auto-created new session for:", cwd)
+			print("📂 Auto-created new session for:", session_dir)
 		else
 			print("📂 Loaded session from:", session_file)
 		end
@@ -68,15 +78,6 @@ require("nvim-possession").setup({
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session
 	save_hook = function()
-		local cwd = vim.fn.getcwd()
-		local session_dir = cwd .. "/.nvim-session"
-
-		-- ✅ Ensure directory exists before saving
-		if vim.fn.isdirectory(session_dir) == 0 then
-			vim.fn.mkdir(session_dir, "p") -- Create directory recursively
-			print("📁 Created session directory before saving:", session_dir)
-		end
-
 		print("💾 Auto-saved session in:", session_dir .. "/session.vim")
 		vim.cmd([[ScopeSaveState]]) -- Save Scope.nvim tab states
 	end,

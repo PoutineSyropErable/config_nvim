@@ -60,5 +60,11 @@ int main(int argc, char* argv[]) {
 
 	fs::path project_root = find_project_root(target_path);
 	std::cout << project_root.string() << std::endl;
+	// Create .nvim-session/ inside the project root if it doesn't exist
+	fs::path session_dir = project_root / ".nvim-session";
+	if (!fs::exists(session_dir)) {
+		fs::create_directories(session_dir);
+		/* std::cerr << "📂 Created session directory: " << session_dir.string() << std::endl; */
+	}
 	return 0;
 }
