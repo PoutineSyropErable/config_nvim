@@ -73,5 +73,11 @@ vim.cmd([[
 
 vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
 
+vim.opt.sessionoptions = { -- required
+	"buffers",
+	"tabpages",
+	"globals",
+}
+
 vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim.log")
 -- vim.cmd('set verbose=10')

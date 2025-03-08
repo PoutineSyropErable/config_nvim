@@ -1,7 +1,9 @@
 local telescope = require("telescope")
-local builtin = require("telescope.builtin")
+-- local builtin = require("telescope.builtin")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
+
+local tapi = require("nvim-tree.api")
 
 local function create_new_file(prompt_bufnr)
 	-- Get the current text from Telescope's prompt
@@ -38,6 +40,22 @@ telescope.setup({
 		},
 		file_browser = {
 			hijack_netrw = true,
+			mappings = {
+				["i"] = {
+					["<CR>"] = function(prompt_bufnr)
+						local entry = action_state.get_selected_entry()
+
+						if entry then
+							local file_dir = vim.fn.fnamemodify(entry.path, ":h") -- Get directory of selected file
+							vim.cmd("tcd " .. vim.fn.fnameescape(file_dir)) -- Change tab-local directory
+							tapi.tree.change_root(file_dir) -- Sync Nvim-Tree
+							print("Changed tab directory to: " .. file_dir)
+						end
+
+						actions.select_default(prompt_bufnr) -- Open file
+					end,
+				},
+			},
 		},
 		fzf = {
 			fuzzy = true, -- Enables fuzzy matching

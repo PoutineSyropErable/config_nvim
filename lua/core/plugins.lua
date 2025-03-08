@@ -2,7 +2,7 @@
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
 local get_buffer_plugins = require("buffer_manager")
-local buffer_plugins = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
+local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 
 require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
@@ -12,10 +12,17 @@ require("lazy").setup({
 	"nvim-tree/nvim-web-devicons",
 	"ellisonleao/gruvbox.nvim",
 	"dracula/vim",
-	"nvim-lualine/lualine.nvim",
 	"nvim-treesitter/nvim-treesitter",
 	"vim-test/vim-test",
-	unpack(buffer_plugins),
+	buffer_plugin,
+	{
+		"Shatur/neovim-session-manager",
+		dependencies = { "nvim-lua/plenary.nvim" },
+	},
+	"nvim-lualine/lualine.nvim",
+	-- "vim-airline/vim-airline",
+	-- "vim-airline/vim-airline-themes",
+	-- "itchyny/lightline.vim",
 
 	-- DAP core and UI setup
 	{

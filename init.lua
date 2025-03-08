@@ -14,8 +14,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+require("pre_config") -- The config before the plugins loading
 require("core.options")
-require("core.pre_config") -- The config before the plugins loading
 require("core.plugins")
 require("core.plugin_config")
 require("core.spellcheck")

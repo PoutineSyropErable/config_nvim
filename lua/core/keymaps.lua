@@ -190,29 +190,27 @@ keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", opts("Next buffer"))
 local has_bufferline, _ = pcall(require, "bufferline")
 local has_barbar, _ = pcall(require, "barbar")
 
+local function goto_buffer(_) end
 if has_bufferline then
+	print("Using Bufferline")
 	-- Bufferline keymaps
 	vim.keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
 	vim.keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
 	vim.keymap.set("n", "<leader>B", "<Cmd>BufferLineMovePrev<CR>", opts("Move buffer left (Bufferline)"))
 	vim.keymap.set("n", "<leader>M", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
+
+	goto_buffer = function(buf_num) vim.cmd("BufferLineGoToBuffer " .. buf_num) end
 elseif has_barbar then
+	print("Using Barbar")
 	-- Barbar keymaps
 	vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
 	vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
 	vim.keymap.set("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
 	vim.keymap.set("n", "<leader>N", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+
+	goto_buffer = function(buf_num) vim.cmd("BufferGoto " .. buf_num) end
 else
 	print("Neither Bufferline nor Barbar is installed!")
-end
-
--- Function to switch to a specific buffer using Barbar
-local function goto_buffer(buf_num)
-	if has_barbar then
-		vim.cmd("BufferGoto " .. buf_num)
-	elseif has_bufferline then
-		vim.cmd("BufferLineGoToBuffer " .. buf_num)
-	end
 end
 
 -- Bind <leader>1 to <leader>0 for buffer switching
@@ -1487,11 +1485,19 @@ function _G.general_utils_franck.CopyDirPath()
 	print("Copied directory path: " .. dir)
 end
 
-keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, { noremap = true, silent = true, desc = "Invert true/false under cursor" })
-keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, { desc = "Copy file path to clipboard" })
-keymap.set("n", "<Leader>cd", _G.general_utils_franck.CopyDirPath, { desc = "Copy directory path to clipboard" })
-keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, { noremap = true, silent = true })
-keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, { noremap = true, silent = true })
+function _G.general_utils_franck.cdHere()
+	local file_dir = vim.fn.expand("%:p:h") -- Get directory of current file
+	vim.cmd("tcd " .. file_dir)
+	print("Changed directory to: " .. file_dir)
+end
+
+vim.keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
+
+keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, opts("Invert true/false under cursor"))
+keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, opts("Copy file path to clipboard"))
+keymap.set("n", "<Leader>cp", _G.general_utils_franck.CopyDirPath, opts("Copy directory path to clipboard"))
+keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, opts("Search Previous occurance of this word"))
+keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, opts("Search next occurance of this word"))
 
 keymap.set("n", "<leader>rd", function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end, { desc = "Print LSP Root Directory" })
 ----------------------------------------------- END OF CONFIG FILE

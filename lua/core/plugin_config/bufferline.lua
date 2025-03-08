@@ -1,7 +1,6 @@
 vim.opt.termguicolors = true
 
 local bufferline = require("bufferline")
--- bufferline.setup({})
 
 bufferline.setup({
 	options = {
@@ -27,5 +26,15 @@ bufferline.setup({
 		end,
 		always_show_bufferline = true, -- Always show even with 1 buffer
 		sort_by = "insert_after_current", -- Buffer sorting method
+		offsets = {
+			{
+				filetype = "NvimTree",
+				text = "File Explorer",
+				highlight = "Directory",
+				text_align = "center",
+				separator = true, -- Show a separator between nvim-tree and buffers
+				padding = 1, -- Space between the file tree and bufferline
+			},
+		},
 	},
 })

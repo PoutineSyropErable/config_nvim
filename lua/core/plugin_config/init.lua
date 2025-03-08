@@ -4,10 +4,6 @@ require("core.plugin_config.coloriser")
 
 require("core.plugin_config.nvimtree_config")
 require("core.plugin_config.oil")
-if _G.PRE_CONFIG_FRANCK.usebufferline then
-	require("core.plugin_config.bufferline")
-end
-require("core.plugin_config.lualine")
 require("core.plugin_config.treesitter")
 require("core.plugin_config.telescope")
 require("core.plugin_config.neoclip")
@@ -32,6 +28,18 @@ require("core.plugin_config.tressj")
 require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
+
+if _G.PRE_CONFIG_FRANCK.use_bufferline then
+	require("core.plugin_config.bufferline")
+else
+	require("core.plugin_config.barbar")
+end
+
+local has_lualine = pcall(require, "lualine")
+if has_lualine then
+	require("core.plugin_config.lualine")
+end
+
 require("core.plugin_config.nvim-session-manager")
 ------ ##### DEACTIVATED ##### -------
 
@@ -46,3 +54,7 @@ require("core.plugin_config.nvim-session-manager")
 
 -- require("core.plugin_config.tabout")
 -- require("core.plugin_config.noice")
+
+-- End of file
+
+require("core.plugin_config.last")
