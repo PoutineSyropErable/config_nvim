@@ -299,11 +299,11 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 	end,
 })
 
-vim.api.nvim_create_autocmd("VimLeavePre", {
-	callback = function()
-		-- Properly shut down LSP servers when exiting Neovim
-		for _, client in pairs(vim.lsp.get_active_clients()) do
-			client.stop()
-		end
-	end,
-})
+-- vim.api.nvim_create_autocmd("VimLeavePre", {
+-- 	callback = function()
+-- 		-- Properly shut down LSP servers when exiting Neovim
+-- 		for _, client in pairs(vim.lsp.get_active_clients()) do
+-- 			client.stop()
+-- 		end
+-- 	end,
+-- })

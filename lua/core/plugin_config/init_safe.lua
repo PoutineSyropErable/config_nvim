@@ -29,11 +29,25 @@ require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
-require("core.plugin_config.bufferline")
+local has_bufferline = pcall(require, "bufferline")
+local has_barbar = pcall(require, "barbar")
+if has_bufferline then
+	require("core.plugin_config.bufferline")
+end
 
-require("core.plugin_config.barbar")
+if has_barbar then
+	require("core.plugin_config.barbar")
+end
 
-require("core.plugin_config.lualine")
+local has_lualine = pcall(require, "lualine")
+if has_lualine then
+	require("core.plugin_config.lualine")
+end
+
+local has_nvsm = pcall(require, "session-manager")
+if has_nvsm then
+	require("core.plugin_config.nvim-session-manager")
+end
 
 -- local has_nvp = pcall(require, "nvim-possession")
 -- if has_nvp then
