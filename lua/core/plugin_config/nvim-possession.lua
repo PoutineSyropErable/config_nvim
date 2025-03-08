@@ -58,7 +58,7 @@ nvim_possession.setup({
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		if vim.fn.filereadable(session_file) == 0 and not require("nvim-possession").status() then
 			require("nvim-possession").new(session_name) -- Save session with "default" name
-			print("📂 Auto-created new session:", session_file)
+			-- print("📂 Auto-created new session:", session_file)
 		else
 			print("📂 Loaded session:", session_file)
 		end
@@ -99,7 +99,7 @@ local function ensure_session_exists()
 	-- If no session exists, create "default" session
 	if vim.fn.filereadable(session_file) == 0 then
 		nvim_possession.create(session_name) -- Save session with name "default"
-		print("📂 Auto-created session:", session_file)
+		-- print("📂 Auto-created session:", session_file)
 	end
 end
 
