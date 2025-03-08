@@ -281,7 +281,7 @@ end, opts("Move to last visible window"))
 
 ------------------------------------------------- Sessions keymaps
 keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
-keymap.set("n", "<leader>pn", function() require("nvim-possession").new() end, opts("📌create new session"))
+keymap.set("n", "<leader>pc", function() require("nvim-possession").new() end, opts("📌create new session"))
 keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
 keymap.set("n", "<leader>pd", function() require("nvim-possession").delete() end, opts("📌delete selected session"))
 

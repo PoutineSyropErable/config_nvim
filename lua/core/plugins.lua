@@ -22,7 +22,9 @@ require("lazy").setup({
 	-- },
 
 	{
-		"gennaro-tedesco/nvim-possession",
+		-- "gennaro-tedesco/nvim-possession",
+		"PoutineSyropErable/nvim-possession",
+		branch = "main", -- Ensure you're using the correct branch
 		dependencies = {
 			"ibhagwan/fzf-lua",
 			{
@@ -33,6 +35,7 @@ require("lazy").setup({
 		},
 		config = true,
 	},
+
 	"nvim-lualine/lualine.nvim",
 	-- "vim-airline/vim-airline",
 	-- "vim-airline/vim-airline-themes",
