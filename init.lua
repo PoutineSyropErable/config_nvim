@@ -15,6 +15,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("core.options")
+require("core.pre_config") -- The config before the plugins loading
 require("core.plugins")
 require("core.plugin_config")
 require("core.spellcheck")
