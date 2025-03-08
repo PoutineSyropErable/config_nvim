@@ -27,7 +27,7 @@ local function set_session_dir()
 	vim.fn.mkdir(session_dir, "p")
 
 	-- Debug message
-	print("💾 Session directory set to:", session_dir)
+	-- print("💾 Session directory set to:", session_dir)
 	-- ^^this doesn't work
 	return session_dir
 end
