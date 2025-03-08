@@ -935,15 +935,30 @@ keymap.set("n", "<leader>tp", "<cmd>FloatermPrev<CR>")
 keymap.set("n", "<leader>tn", "<cmd>FloatermNext<CR>")
 
 -------- ToggleTerm: ---------
+local Terminal = require("toggleterm.terminal").Terminal
 
 -- Toggle floating terminal
-keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", { noremap = true, silent = true, desc = "Floating Terminal" })
+keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", opts("Floating Terminal"))
 
 -- Toggle horizontal split terminal
-keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", { noremap = true, silent = true, desc = "Horizontal Terminal" })
+keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", opts("Horizontal Terminal"))
 
 -- Toggle vertical split terminal
-keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=vertical<CR>", { noremap = true, silent = true, desc = "Vertical Terminal" })
+keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=vertical<CR>", opts("Vertical Terminal"))
+
+local bottom_right_float = Terminal:new({
+	direction = "float",
+	float_opts = {
+		border = "rounded", -- Rounded border for aesthetics
+		width = math.floor(vim.o.columns * 0.5), -- 40% of screen width
+		height = math.floor(vim.o.lines * 0.5), -- 40% of screen height
+		row = math.floor(vim.o.lines * 0.5), -- Start at 60% down (bottom)
+		col = math.floor(vim.o.columns * 0.5), -- Start at 60% across (right)
+	},
+	hidden = true,
+})
+
+keymap.set("n", "<leader>tb", function() bottom_right_float:toggle() end, opts("Floating Bottom-Left Terminal"))
 
 -- Terminal Mode Navigation
 function _set_terminal_keymaps()
