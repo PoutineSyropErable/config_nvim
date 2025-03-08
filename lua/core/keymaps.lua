@@ -108,29 +108,38 @@ keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 --- Weird stuff
 
-keymap.set("n", " leader>.F", ":NvimTreeFindFile<CR>", { desc = "Find current file in NvimTree" })
-keymap.set("n", "<leader>.s", "<C-t>", { desc = "Toggle tag stack" })
-
-keymap.set("n", "<leader>.t", ":TestNearest<CR>", { desc = "Run nearest test" })
-keymap.set("n", "<leader>.T", ":TestFile<CR>", { desc = "Run test file" })
-
-keymap.set("n", "<leader>.c", ":AnsiEsc<CR>", { noremap = true, silent = true, desc = "Toggle ANSI escape highlighting" })
-keymap.set(
-	"n",
-	"<leader>.h",
-	":lua require('nvim-highlight-colors').toggle()<CR>",
-	{ noremap = true, silent = true, desc = "Toggle ANSI color parsing" }
-)
-
-keymap.set("n", "<leader>.l", function()
+local toggle_invisible_char = function()
 	vim.opt.list = not vim.opt.list:get()
 	print("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
-end, opts("Toggle invisible characters"))
+end
+
+local toggle_linting = function()
+	vim.g.linting_enabled = not vim.g.linting_enabled
+	if vim.g.linting_enabled then
+		vim.diagnostic.enable()
+		print("🔍 Linting Enabled")
+	else
+		vim.diagnostic.enable(false)
+		print("🚫 Linting Disabled")
+	end
+end
+
+keymap.set("n", " leader>.F", ":NvimTreeFindFile<CR>", opts("Find current file in NvimTree"))
+keymap.set("n", "<leader>.s", "<C-t>", opts("Toggle tag stack"))
+
+keymap.set("n", "<leader>.t", ":TestNearest<CR>", opts("Run nearest test"))
+keymap.set("n", "<leader>.T", ":TestFile<CR>", opts("Run test file"))
+
+keymap.set("n", "<leader>.c", ":AnsiEsc<CR>", opts("Toggle ANSI escape highlighting"))
+keymap.set("n", "<leader>.h", ":lua require('nvim-highlight-colors').toggle()<CR>", opts("Toggle ANSI color parsing"))
+
+keymap.set("n", "<leader>.i", toggle_invisible_char, opts("Toggle invisible characters"))
+vim.keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
 
 --------------------- General keymaps
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
 keymap.set("n", "<leader>qq", ":q!<CR>") -- quit without saving
-keymap.set("n", "<leader>bd", ": bd!<CR>", { noremap = true, silent = true, desc = ":bd close buffer" })
+keymap.set("n", "<leader>bd", ": bd!<CR>", opts(":bd close buffer"))
 keymap.set("n", "<leader>ww", ":wa<CR>") -- save
 keymap.set("n", "<leader>wa", ":wa<CR>") -- save all buffers
 keymap.set("n", "gx", ":!open <c-r><c-a><CR>") -- open URL under cursor

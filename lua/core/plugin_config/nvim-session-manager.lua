@@ -1,6 +1,8 @@
 local Path = require("plenary.path")
 local config = require("session_manager.config")
-require("session_manager").setup({
+local session_manager = require("session_manager")
+
+session_manager.setup({
 	sessions_dir = Path:new(vim.fn.stdpath("data"), "sessions"), -- The directory where the session files will be saved.
 	session_filename_to_dir = session_filename_to_dir, -- Function that replaces symbols into separators and colons to transform filename into a session directory.
 	dir_to_session_filename = dir_to_session_filename, -- Function that replaces separators and colons into special symbols to transform session directory into a filename.
@@ -20,15 +22,25 @@ require("session_manager").setup({
 
 local config_group = vim.api.nvim_create_augroup("MyConfigGroup", {}) -- A global group for all your config autocommands
 
--- vim.api.nvim_create_autocmd({ 'User' }, {
--- 	pattern = "SessionLoadPost",
--- 	group = config_group,
--- 	callback = function()
--- 		require('nvim-tree.api').tree.toggle(false, true)
--- 	end,
--- })
+-- ✅ Auto-load Scope.nvim state when a session is loaded
+vim.api.nvim_create_autocmd({ "User" }, {
+	pattern = "SessionLoadPost",
+	group = config_group,
+	callback = function()
+		vim.cmd([[ScopeLoadState]]) -- Load Scope state with session
+	end,
+})
 
--- Auto save session
+-- ✅ Auto-save Scope.nvim state when a session is saved
+vim.api.nvim_create_autocmd("User", {
+	pattern = "SessionSavePost",
+	group = config_group,
+	callback = function()
+		vim.cmd([[ScopeSaveState]]) -- Save Scope state with session
+	end,
+})
+
+-- ✅ Auto-save session (including Scope state) on buffer write
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 	callback = function()
 		for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -38,5 +50,6 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 			end
 		end
 		session_manager.save_current_session()
+		vim.cmd([[ScopeSaveState]]) -- Ensure Scope state is saved with session
 	end,
 })

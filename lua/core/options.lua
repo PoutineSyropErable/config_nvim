@@ -79,5 +79,5 @@ vim.opt.sessionoptions = { -- required
 	"globals",
 }
 
-vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim.log")
+vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
 -- vim.cmd('set verbose=10')
