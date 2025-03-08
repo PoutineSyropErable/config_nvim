@@ -43,22 +43,6 @@ _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-local servers = {
-	"bashls",
-	"lua_ls",
-	"pyright",
-	"ts_ls",
-	"clangd",
-	"rust_analyzer",
-	"texlab",
-}
-
-for _, server in ipairs(servers) do
-	lspconfig[server].setup({
-		capabilities = lsp_defaults.capabilities, -- ✅ Use the merged capabilities
-	})
-end
-
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
 	filetypes = { "sh", "bash" },
@@ -308,3 +292,17 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 		end
 	end,
 })
+
+-- vim.api.nvim_create_user_command("CheckLSP", function()
+-- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+-- 	if #clients > 1 then
+-- 		print("🚀 More than one LSP server is attached to this buffer:")
+-- 		for _, client in ipairs(clients) do
+-- 			print(" - " .. client.name)
+-- 		end
+-- 	elseif #clients == 1 then
+-- 		print("✅ Only one LSP server is attached: " .. clients[1].name)
+-- 	else
+-- 		print("❌ No LSP servers attached to this buffer")
+-- 	end
+-- end, {})
