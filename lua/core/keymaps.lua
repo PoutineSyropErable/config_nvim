@@ -142,6 +142,19 @@ keymap.set("n", "<leader>.h", ":lua require('nvim-highlight-colors').toggle()<CR
 keymap.set("n", "<leader>.i", toggle_invisible_char, opts("Toggle invisible characters"))
 vim.keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
 
+local function get_tab_name(tabnr)
+	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
+	return ok and name or tabnr -- Fallback if name is missing
+end
+
+local function get_current_tab_name()
+	local tabnr = vim.api.nvim_get_current_tabpage()
+	local tab_name = get_tab_name(tabnr)
+	print("Current Tab Name: " .. tab_name)
+end
+
+vim.keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
+
 --------------------- General keymaps
 local bufremove = require("mini.bufremove") -- Load once
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
