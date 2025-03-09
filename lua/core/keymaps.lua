@@ -210,7 +210,7 @@ if has_bufferline then
 	vim.keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
 	vim.keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
 	vim.keymap.set("n", "<leader>B", "<Cmd>BufferLineMovePrev<CR>", opts("Move buffer left (Bufferline)"))
-	vim.keymap.set("n", "<leader>M", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
+	vim.keymap.set("n", "<leader>N", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
 
 	goto_buffer = function(buf_num) vim.cmd("BufferLineGoToBuffer " .. buf_num) end
 elseif has_barbar then

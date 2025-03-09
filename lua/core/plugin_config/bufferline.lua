@@ -5,12 +5,12 @@ local bufferline = require("bufferline")
 bufferline.setup({
 	options = {
 		mode = "buffers", -- "tabs" to show only tabs
-		hover = {
-			enabled = true,
-			delay = 200,
-			reveal = { "close" },
-		},
-		show_buffer_close_icons = false, -- Hide close icons by defaul
+		-- hover = {
+		-- 	enabled = true,
+		-- 	delay = 200,
+		-- 	reveal = { "close" },
+		-- },
+		show_buffer_close_icons = true, -- Hide close icons by defaul
 
 		numbers = "ordinal", -- Show buffer numbers
 		close_command = "bdelete! %d", -- Command to close buffers

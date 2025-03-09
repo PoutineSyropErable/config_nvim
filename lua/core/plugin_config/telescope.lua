@@ -76,7 +76,7 @@ telescope.load_extension("scope")
 -- Uncomment and load additional extensions if needed
 -- telescope.load_extension("undo")
 -- telescope.load_extension("advanced_git_search")
--- telescope.load_extension("live_grep_args")
+telescope.load_extension("live_grep_args")
 -- telescope.load_extension("colors")
 -- telescope.load_extension("noice")
 
