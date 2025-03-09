@@ -32,6 +32,28 @@ local function set_session_dir()
 	return session_dir
 end
 
+-- Function to get bufferline tab names
+local function get_tab_names()
+	local names = {}
+	for i, tab in ipairs(vim.api.nvim_list_tabpages()) do
+		local name = vim.api.nvim_tabpage_get_var(tab, "bufferline_name") or ""
+		names[i] = name
+	end
+	return names
+end
+
+-- Function to restore tab names
+local function restore_tab_names(session_data)
+	if session_data and session_data.extra and session_data.extra.bufferline_names then
+		for i, tab in ipairs(vim.api.nvim_list_tabpages()) do
+			local name = session_data.extra.bufferline_names[i]
+			if name then
+				vim.api.nvim_tabpage_set_var(tab, "bufferline_name", name)
+			end
+		end
+	end
+end
+
 -- Ensure session_dir is available in `nvim-possession`
 nvim_possession.setup({
 	sessions = {
