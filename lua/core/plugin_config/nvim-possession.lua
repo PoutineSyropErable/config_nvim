@@ -2,6 +2,60 @@
 local session_dir
 local session_name = "default" -- Default session name
 local nvim_possession = require("nvim-possession")
+local bufferline = require("bufferline")
+local tabpage = require("bufferline.tabpages") -- Ensure it exists
+
+local function get_tab_name(tabnr)
+	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
+	return ok and name or tabnr -- Fallback if name is missing
+end
+
+local function get_all_tab_names()
+	local tab_names = {}
+	for _, tabnr in ipairs(vim.api.nvim_list_tabpages()) do
+		table.insert(tab_names, get_tab_name(tabnr))
+	end
+	return tab_names
+end
+local function save_tab_names()
+	if not session_dir or not session_name then
+		print("❌ No valid session directory or name")
+		return
+	end
+
+	local tab_names_file = session_dir .. "/" .. "zzz_" .. session_name .. "-tab-names.json"
+	local tab_names = get_all_tab_names()
+	local json_data = vim.fn.json_encode(tab_names)
+
+	vim.fn.writefile({ json_data }, tab_names_file)
+	print("💾 Tab names saved to: " .. tab_names_file)
+end
+
+local function load_tab_names()
+	if not session_dir or not session_name then
+		print("❌ No valid session directory or name")
+		return
+	end
+
+	local tab_names_file = session_dir .. "/" .. "zzz_" .. session_name .. "-tab-names.json"
+
+	if vim.fn.filereadable(tab_names_file) == 0 then
+		print("❌ No saved tab names found.")
+		return
+	end
+
+	local json_data = vim.fn.readfile(tab_names_file)[1]
+	local tab_names = vim.fn.json_decode(json_data)
+
+	-- Apply the tab names
+	for i, tabnr in ipairs(vim.api.nvim_list_tabpages()) do
+		if tab_names[i] then
+			vim.api.nvim_tabpage_set_var(tabnr, "name", tab_names[i])
+		end
+	end
+
+	print("✅ Tab names loaded from: " .. tab_names_file)
+end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
@@ -32,28 +86,6 @@ local function set_session_dir()
 	return session_dir
 end
 
--- Function to get bufferline tab names
-local function get_tab_names()
-	local names = {}
-	for i, tab in ipairs(vim.api.nvim_list_tabpages()) do
-		local name = vim.api.nvim_tabpage_get_var(tab, "bufferline_name") or ""
-		names[i] = name
-	end
-	return names
-end
-
--- Function to restore tab names
-local function restore_tab_names(session_data)
-	if session_data and session_data.extra and session_data.extra.bufferline_names then
-		for i, tab in ipairs(vim.api.nvim_list_tabpages()) do
-			local name = session_data.extra.bufferline_names[i]
-			if name then
-				vim.api.nvim_tabpage_set_var(tab, "bufferline_name", name)
-			end
-		end
-	end
-end
-
 -- Ensure session_dir is available in `nvim-possession`
 nvim_possession.setup({
 	sessions = {
@@ -76,7 +108,7 @@ nvim_possession.setup({
 	},
 
 	-- ✅ Hook: Load Scope.nvim state after loading a session
-	post_hook = function()
+	post_hook = function(session_data)
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		if vim.fn.filereadable(session_file) == 0 and not require("nvim-possession").status() then
 			require("nvim-possession").new(session_name) -- Save session with "default" name
@@ -86,6 +118,7 @@ nvim_possession.setup({
 		end
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
+		load_tab_names()
 	end,
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session
@@ -93,6 +126,7 @@ nvim_possession.setup({
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		print("💾 Auto-saved session:", session_file)
 		vim.cmd([[ScopeSaveState]]) -- Save Scope.nvim tab states
+		save_tab_names()
 	end,
 
 	-- ✅ Highlighting for session list UI
@@ -126,3 +160,9 @@ local function ensure_session_exists()
 end
 
 ensure_session_exists()
+
+vim.keymap.set("n", "<leader>tN", function()
+	local tabnr = vim.api.nvim_get_current_tabpage()
+	local tab_name = get_tab_name(tabnr)
+	print("Current Tab Name: " .. tab_name)
+end, { noremap = true, silent = true, desc = "Show current tab name" })

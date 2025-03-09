@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd("TabEnter", {
 			require("nvim-tree.api").tree.change_root(file_dir) -- Sync Nvim-Tree
 			print("Changed tab directory to: " .. file_dir)
 		else
-			print("No active buffer, keeping previous tab directory.")
+			-- print("No active buffer, keeping previous tab directory.")
 		end
 	end,
 })
