@@ -76,7 +76,9 @@ function RunCurrentFile()
 		-- Run Python script
 		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
 	elseif file_ext == "java" then
-		local autoMakeScript = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava/mysrc/automake.py"
+		local home = vim.fn.expand("$HOME")
+		local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
+		local autoMakeScript = home .. AutoMakeJava_location .. "/mysrc/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
 		print("File type not supported for running with F4")
@@ -416,11 +418,11 @@ keymap.set("n", "<leader>fw", function() builtin.live_grep({ default_text = vim.
 keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
 keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
 
-keymap.set("n", "<Space><Space>", builtin.oldfiles, {})
+keymap.set("n", "<leader>f<leader>", builtin.oldfiles, {})
 keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
 keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
 keymap.set("n", "<leader>fB", telescope.extensions.scope.buffers, opts("Telescope File Browser"))
-keymap.set("n", "<leader>f<Space>", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
+keymap.set("n", "<leader><leader>", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
 
 keymap.set("n", "<leader>fh", builtin.help_tags, opts("Help Tags"))
 keymap.set("n", "<leader>fH", ":nohlsearch<CR>") -- No description needed for raw command
