@@ -418,7 +418,8 @@ keymap.set("n", "<leader>fw", function() builtin.live_grep({ default_text = vim.
 keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
 keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
 
-keymap.set("n", "<leader>f<leader>", builtin.oldfiles, {})
+keymap.set("n", "<leader>f<leader>", builtin.oldfiles, opts("Recently used files"))
+keymap.set("n", "<leader>fo", builtin.oldfiles, opts("Recently used files"))
 keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
 keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
 keymap.set("n", "<leader>fB", telescope.extensions.scope.buffers, opts("Telescope File Browser"))
