@@ -197,7 +197,7 @@ keymap.set("n", "<M-i>", ":resize 5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<M-k>", ":resize -5<CR>", { noremap = true, silent = true })
 
 --------------------------------------------------------------------------------------- Tab management
--- I don't use tabs (but hey)
+-- I don't use tabs (but hey) [I use them now]
 keymap.set("n", "<leader>Tc", ":tabnew<CR>", opts("New tab"))
 keymap.set("n", "<leader>Tx", ":tabclose<CR>", opts("Close tab"))
 keymap.set("n", "<leader>Tk", ":tabnext<CR>", opts("Next tab"))
