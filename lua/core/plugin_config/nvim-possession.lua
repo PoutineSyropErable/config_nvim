@@ -77,9 +77,11 @@ local function set_session_dir()
 		buffer_path = vim.fn.getcwd()
 	end
 
+	local buffer_dir = vim.fn.expand("%:p:h") -- `%:p:h` extracts the directory of the current file
 	-- Call the external script and capture the output
 	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
-	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_path))
+
+	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
 	-- Trim whitespace and newlines
 	project_root = project_root:gsub("%s+$", "")
 
@@ -91,6 +93,7 @@ local function set_session_dir()
 
 	if #project_root > 256 then
 		print("❌ Error: Project root path too long (> 256 chars)!")
+		print("\nproject root was: \n(" .. project_root .. ")\n\n")
 		return nil
 	end
 
