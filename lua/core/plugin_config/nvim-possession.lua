@@ -1,9 +1,11 @@
 --  Store session directory once when Neovim starts
 local session_dir
-local session_name = "default" -- Default session name
+local session_name = vim.g["current_session"] or "default"
 local nvim_possession = require("nvim-possession")
 local bufferline = require("bufferline")
 local tabpage = require("bufferline.tabpages") -- Ensure it exists
+
+local DEBUG = false -- Set to `true` to enable debug logs
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -28,19 +30,25 @@ local function save_tab_names()
 	local json_data = vim.fn.json_encode(tab_names)
 
 	vim.fn.writefile({ json_data }, tab_names_file)
-	print("💾 Tab names saved to: " .. tab_names_file)
+	if DEBUG then
+		print("💾 Tab names saved to: " .. tab_names_file)
+	end
 end
 
 local function load_tab_names()
 	if not session_dir or not session_name then
-		print("❌ No valid session directory or name")
+		if DEBUG then
+			print("❌ No valid session directory or name")
+		end
 		return
 	end
 
 	local tab_names_file = session_dir .. "/" .. "zzz_" .. session_name .. "-tab-names.json"
 
 	if vim.fn.filereadable(tab_names_file) == 0 then
-		print("❌ No saved tab names found.")
+		if DEBUG then
+			print("❌ No saved tab names found.")
+		end
 		return
 	end
 
@@ -54,7 +62,9 @@ local function load_tab_names()
 		end
 	end
 
-	print("✅ Tab names loaded from: " .. tab_names_file)
+	if DEBUG then
+		print("✅ Tab names loaded from: " .. tab_names_file)
+	end
 end
 
 -- This doesnt work cause we need one without user input
@@ -70,9 +80,29 @@ local function set_session_dir()
 	-- Call the external script and capture the output
 	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_path))
-
-	-- Trim whitespace/newlines
+	-- Trim whitespace and newlines
 	project_root = project_root:gsub("%s+$", "")
+
+	-- 🚨 **Validation Checks**
+	if project_root == "" then
+		print("❌ Error: `find_project_root` returned an empty string!")
+		return nil
+	end
+
+	if #project_root > 256 then
+		print("❌ Error: Project root path too long (> 256 chars)!")
+		return nil
+	end
+
+	if project_root:find("[\n\r]") then
+		print("❌ Error: Project root contains unexpected newlines!")
+		return nil
+	end
+
+	if not vim.fn.isdirectory(project_root) then
+		print("❌ Error: `find_project_root` did not return a valid directory!")
+		return nil
+	end
 
 	-- Use the detected project root or fallback to CWD
 	session_dir = project_root .. "/.nvim-session/"
@@ -114,7 +144,9 @@ nvim_possession.setup({
 			require("nvim-possession").new(session_name) -- Save session with "default" name
 			-- print("📂 Auto-created new session:", session_file)
 		else
-			print("📂 Loaded session:", session_file)
+			if DEBUG then
+				print("📂 Loaded session:", session_file)
+			end
 		end
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
@@ -124,7 +156,10 @@ nvim_possession.setup({
 	-- ✅ Hook: Save Scope.nvim state when saving a session
 	save_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
-		print("💾 Auto-saved session:", session_file)
+
+		if DEBUG then
+			print("💾 Auto-saved session:", session_file)
+		end
 		vim.cmd([[ScopeSaveState]]) -- Save Scope.nvim tab states
 		save_tab_names()
 	end,
@@ -160,9 +195,3 @@ local function ensure_session_exists()
 end
 
 ensure_session_exists()
-
-vim.keymap.set("n", "<leader>tN", function()
-	local tabnr = vim.api.nvim_get_current_tabpage()
-	local tab_name = get_tab_name(tabnr)
-	print("Current Tab Name: " .. tab_name)
-end, { noremap = true, silent = true, desc = "Show current tab name" })
