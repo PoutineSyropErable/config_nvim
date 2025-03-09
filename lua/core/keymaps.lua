@@ -141,8 +141,11 @@ keymap.set("n", "<leader>.i", toggle_invisible_char, opts("Toggle invisible char
 vim.keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
 
 --------------------- General keymaps
+local bufremove = require("mini.bufremove") -- Load once
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
-keymap.set("n", "<leader>qq", ":q!<CR>") -- quit without saving
+-- keymap.set("n", "<leader>qq", ":q!<CR>") -- quit without saving
+vim.keymap.set("n", "<leader>q", function() bufremove.delete(0, false) end, opts("Close current buffer"))
+vim.keymap.set("n", "<leader>X", function() bufremove.delete(0, false) end, opts("Close current buffer"))
 keymap.set("n", "<leader>bd", ": bd!<CR>", opts(":bd close buffer"))
 keymap.set("n", "<leader>ww", ":wa<CR>") -- save
 keymap.set("n", "<leader>wa", ":wa<CR>") -- save all buffers

@@ -1,4 +1,5 @@
 vim.opt.termguicolors = true
+local bufremove = require("mini.bufremove") -- Load once
 
 local bufferline = require("bufferline")
 
@@ -13,8 +14,8 @@ bufferline.setup({
 		show_buffer_close_icons = true, -- Hide close icons by defaul
 
 		numbers = "ordinal", -- Show buffer numbers
-		close_command = "bdelete! %d", -- Command to close buffers
-		right_mouse_command = "bdelete! %d", -- Close on right-click
+		close_command = function(bufnum) bufremove.delete(bufnum, false) end,
+		right_mouse_command = function(bufnum) bufremove.delete(bufnum, false) end,
 		left_mouse_command = "buffer %d", -- Switch buffer on click
 		middle_mouse_command = nil, -- No middle-click behavior
 		indicator = { style = "underline" }, -- Style for active buffer indicator

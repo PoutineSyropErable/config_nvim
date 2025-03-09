@@ -35,6 +35,11 @@ require("lazy").setup({
 		},
 		config = true,
 	},
+	{
+		"echasnovski/mini.bufremove",
+		version = false,
+		config = function() end, -- No extra config needed
+	},
 
 	"nvim-lualine/lualine.nvim",
 	-- "vim-airline/vim-airline",
