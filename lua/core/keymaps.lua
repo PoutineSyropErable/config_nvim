@@ -1524,6 +1524,7 @@ end
 function _G.general_utils_franck.cdHere()
 	local file_dir = vim.fn.expand("%:p:h") -- Get directory of current file
 	vim.cmd("tcd " .. file_dir)
+	tapi.tree.change_root(file_dir) -- Sync Nvim-Tree
 	print("Changed directory to: " .. file_dir)
 end
 
