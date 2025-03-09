@@ -572,6 +572,7 @@ keymap.set("n", "<leader>La", safe_lsp_call("code_action"), opts("Show available
 
 -- LSP Definitions & References
 keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
+keymap.set("n", "gj", vim.lsp.buf.definition, opts("Go to definition (No telescope)"))
 keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
 keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
 keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
@@ -582,6 +583,11 @@ keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those wh
 keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
 keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
 keymap.set("n", "gw", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "java",
+	callback = function() vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition (No telescope)")) end,
+})
 
 -- LSP Information
 keymap.set("n", "<leader>Lg", safe_lsp_call("hover"), opts("Show LSP hover info"))
