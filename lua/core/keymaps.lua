@@ -76,7 +76,7 @@ function RunCurrentFile()
 		-- Run Python script
 		vim.cmd("!python3 " .. vim.fn.shellescape(filepath))
 	elseif file_ext == "java" then
-		local autoMakeScript = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava/mysrc/find_dependancy_tree.py"
+		local autoMakeScript = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava/mysrc/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
 		print("File type not supported for running with F4")
