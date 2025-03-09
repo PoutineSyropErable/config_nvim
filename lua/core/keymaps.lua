@@ -140,7 +140,7 @@ keymap.set("n", "<leader>.c", ":AnsiEsc<CR>", opts("Toggle ANSI escape highlight
 keymap.set("n", "<leader>.h", ":lua require('nvim-highlight-colors').toggle()<CR>", opts("Toggle ANSI color parsing"))
 
 keymap.set("n", "<leader>.i", toggle_invisible_char, opts("Toggle invisible characters"))
-vim.keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
+keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -153,7 +153,7 @@ local function get_current_tab_name()
 	print("Current Tab Name: " .. tab_name)
 end
 
-vim.keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
+keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
 
 --------------------- General keymaps
 local bufremove = require("mini.bufremove") -- Load once
@@ -225,19 +225,29 @@ local function goto_buffer(_) end
 if has_bufferline then
 	-- print("Using Bufferline")
 	-- Bufferline keymaps
-	vim.keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
-	vim.keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
-	vim.keymap.set("n", "<leader>B", "<Cmd>BufferLineMovePrev<CR>", opts("Move buffer left (Bufferline)"))
-	vim.keymap.set("n", "<leader>N", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
+	keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
+	keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
+	keymap.set("n", "<leader>B", "<Cmd>BufferLineMovePrev<CR>", opts("Move buffer left (Bufferline)"))
+	keymap.set("n", "<leader>N", "<Cmd>BufferLineMoveNext<CR>", opts("Move buffer right (Bufferline)"))
+	local bufferline = require("bufferline")
+	local function rename_tab()
+		local new_buffer_name = vim.fn.input("Enter new tab name: ")
+		if new_buffer_name ~= "" then
+			bufferline.rename_tab({ new_buffer_name }) -- Pass as a table/array
+		else
+			print("❌ Tab rename canceled (empty input)")
+		end
+	end
+	keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
 
 	goto_buffer = function(buf_num) vim.cmd("BufferLineGoToBuffer " .. buf_num) end
 elseif has_barbar then
 	-- print("Using Barbar")
 	-- Barbar keymaps
-	vim.keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
-	vim.keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
-	vim.keymap.set("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
-	vim.keymap.set("n", "<leader>N", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+	keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
+	keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
+	keymap.set("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+	keymap.set("n", "<leader>N", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
 
 	goto_buffer = function(buf_num) vim.cmd("BufferGoto " .. buf_num) end
 else
