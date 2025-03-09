@@ -40,6 +40,9 @@ telescope.setup({
 		},
 		file_browser = {
 			hijack_netrw = true,
+			hidden = true, -- Show hidden files
+			respect_gitignore = false, -- Show Git-ignored files
+			grouped = true, -- Group folders first
 			mappings = {
 				["i"] = {
 					["<CR>"] = function(prompt_bufnr)
