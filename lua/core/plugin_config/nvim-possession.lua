@@ -1,6 +1,8 @@
 --  Store session directory once when Neovim starts
-local session_dir
+local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
+local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
+
 local nvim_possession = require("nvim-possession")
 local bufferline = require("bufferline")
 local tabpage = require("bufferline.tabpages") -- Ensure it exists
@@ -88,26 +90,26 @@ local function set_session_dir()
 	-- 🚨 **Validation Checks**
 	if project_root == "" then
 		print("❌ Error: `find_project_root` returned an empty string!")
-		return nil
+		return original_location
 	end
 
 	if #project_root > 256 then
 		print("❌ Error: Project root path too long (> 256 chars)!")
 		print("\nproject root was: \n(" .. project_root .. ")\n\n")
-		return nil
+		return original_location
 	end
 
 	if project_root:find("[\n\r]") then
 		print("❌ Error: Project root contains unexpected newlines!")
-		return nil
+		return original_location
 	end
 
 	if not vim.fn.isdirectory(project_root) then
 		print("❌ Error: `find_project_root` did not return a valid directory!")
-		return nil
+		return original_location
 	end
 
-	-- Use the detected project root or fallback to CWD
+	-- Use the detected
 	session_dir = project_root .. "/.nvim-session/"
 
 	-- Ensure session directory exists (The script takes care of it), hence redundant
@@ -188,6 +190,9 @@ nvim_possession.setup({
 })
 
 local function ensure_session_exists()
+	if session_dir == original_location then
+		return
+	end
 	local session_file = session_dir .. session_name .. ".vim"
 
 	-- If no session exists, create "default" session
