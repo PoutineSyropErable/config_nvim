@@ -78,7 +78,7 @@ function RunCurrentFile()
 	elseif file_ext == "java" then
 		local home = vim.fn.expand("$HOME")
 		local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
-		local autoMakeScript = home .. AutoMakeJava_location .. "/mysrc/automake.py"
+		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
 		print("File type not supported for running with F4")
