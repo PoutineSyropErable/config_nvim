@@ -993,19 +993,16 @@ local bottom_right_float = Terminal:new({
 })
 
 keymap.set("n", "<leader>tb", function() bottom_right_float:toggle() end, opts("Floating Bottom-Left Terminal"))
+keymap.set("n", "<leader>tr", function() bottom_right_float:toggle() end, opts("Floating Bottom-Left Terminal"))
 
--- Terminal Mode Navigation
-function _set_terminal_keymaps()
-	local opts = { buffer = 0 }
-	keymap.set("t", "<esc>", [[<C-\><C-n>]], opts) -- Exit terminal mode with ESC
-	keymap.set("t", "jk", [[<C-\><C-n>]], opts) -- Alternative ESC
-	keymap.set("t", "qq", [[<C-\><C-n>:q<CR>]], { noremap = true, silent = true })
-end
+keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
+keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
+keymap.set("t", "qq", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
 
-vim.cmd("autocmd! TermOpen term://* lua _set_terminal_keymaps()")
-
-keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
-keymap.set("t", "jk", "<C-\\><C-n>", { noremap = true, silent = true })
+vim.api.nvim_create_autocmd("TermOpen", {
+	pattern = "*",
+	callback = function() vim.keymap.set("n", "qq", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
+})
 
 --------------------------------------Tmux
 

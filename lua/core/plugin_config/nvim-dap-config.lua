@@ -1,12 +1,66 @@
 local dap = require("dap")
--- dap.set_log_level("TRACE")
+dap.set_log_level("TRACE")
 
 local function debug_log(func_name, ...)
 	local args = table.concat({ ... }, ", ")
 	print("[DEBUG] Called: " .. func_name .. " with args: " .. args)
 end
 
+-------------------------------- PYTHON ----------------------------------
+require("dap-python").setup(vim.fn.exepath("python")) -- Use system Python by default
+
+dap.configurations.python = {
+	{
+		type = "python",
+		request = "launch",
+		name = "Launch file",
+		console = "integratedTerminal", -- Output goes here
+		justMyCode = false, -- Optional: set to true for just your code
+		pythonPath = function()
+			-- Use the active virtual environment if available
+			if vim.env.VIRTUAL_ENV then
+				print("Using virtual environment: " .. vim.env.VIRTUAL_ENV)
+				return vim.env.VIRTUAL_ENV .. "/bin/python"
+			end
+			-- Otherwise, fallback to system Python
+			print("Using system Python: " .. vim.fn.exepath("python3"))
+			return vim.fn.exepath("python3") or "python"
+		end,
+
+		program = "${file}", -- Run the currently open file
+		args = function()
+			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
+			print("")
+			local ret = vim.split(args, " ")
+			return ret
+		end,
+	},
+}
+
+-------------------------------- BASH ----------------------------------
+
+-- DAP Adapter for Bash
+dap.adapters.bashdb = {
+	type = "executable",
+	command = "bash-debug-adapter",
+	name = "bashdb",
+}
+
+-- DAP Configurations for Bash
+dap.configurations.sh = {
+	{
+		name = "Run Bash Script",
+		type = "bashdb",
+		request = "launch",
+		program = "${file}", -- Current file
+		cwd = "${workspaceFolder}",
+		args = {}, -- Script arguments
+		env = {}, -- Environment variables
+		stopOnEntry = false,
+	},
+}
 -------------------------------- C/C++ ----------------------------------
+
 local function find_in_build()
 	debug_log("find_in_build")
 
@@ -15,7 +69,7 @@ local function find_in_build()
 
 	-- Check if the build directory exists
 	if vim.fn.isdirectory(build_dir) == 0 then
-		print("[DAP] find_in_build(): build/ directory does not exist")
+		print("[WARNING] find_in_build(): build/ directory does not exist")
 		return nil
 	end
 
@@ -24,23 +78,39 @@ local function find_in_build()
 
 	-- Ensure the result is valid
 	if #executables > 0 and vim.fn.filereadable(executables[1]) == 1 then
-		print("[DAP] find_in_build() found executable: " .. executables[1])
+		print("[DEBUG] find_in_build() found executable: " .. executables[1])
 		return executables[1]
 	end
 
 	return nil
 end
 
-local function find_elf_in_root()
+local function find_elf_in_cwd()
 	debug_log("find_elf_in_root")
 	local cwd = vim.fn.getcwd()
-	local elf_executables =
-		vim.fn.systemlist("find '" .. cwd .. "' -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'")
+	local bufname = vim.fn.expand("%:t:r") -- buffer name without extension
+
+	-- First, check if executable matching buffer name exists and is ELF
+	local candidate = cwd .. "/" .. bufname
+	if vim.fn.executable(candidate) == 1 then
+		local file_info = vim.fn.system("file " .. vim.fn.shellescape(candidate))
+		if file_info:find("ELF") then
+			print("[DEBUG] Found matching ELF executable: " .. candidate)
+			return candidate
+		end
+	end
+
+	-- Otherwise, find any ELF executable
+	local elf_executables = vim.fn.systemlist(
+		"find " .. vim.fn.shellescape(cwd) .. " -maxdepth 1 -type f -executable -exec file {} \\; | grep 'ELF' | awk -F: '{print $1}'"
+	)
 
 	if #elf_executables > 0 then
-		print("[DAP] find_elf_in_root() found executable: " .. elf_executables[1])
+		print("[DEBUG] Found ELF executable: " .. elf_executables[1])
 		return elf_executables[1]
 	end
+
+	print("[WARNING] No ELF executable found.")
 	return nil
 end
 
@@ -50,7 +120,9 @@ local function parse_automake()
 	local automake_file = cwd .. "/AutoMake"
 
 	-- Check if the file exists
-	if vim.fn.filereadable(automake_file) == 0 then return nil end
+	if vim.fn.filereadable(automake_file) == 0 then
+		return nil
+	end
 
 	-- Read the file line by line
 	for _, line in ipairs(vim.fn.readfile(automake_file)) do
@@ -72,11 +144,15 @@ local function parse_makefile()
 	local target = vim.trim(vim.fn.system(target_cmd))
 
 	if target == "" then
-		print("[DAP] parse_makefile() did not find a TARGET, defaulting to /build/main")
-		return cwd .. "/build/main"
+		print("[WARNING] parse_makefile() did not find a TARGET, defaulting to /build/main")
+		target = cwd .. "/build/main"
+		if vim.fn.filereadable(target) ~= 1 then
+			print("[ERROR] Target executable not found: " .. (target == "" and "(no target specified)" or target))
+			return nil
+		end
 	end
 
-	print("[DAP] parse_makefile() found executable: " .. cwd .. "/" .. target)
+	print("[DEBUG] parse_makefile() found executable: " .. cwd .. "/" .. target)
 	return cwd .. "/" .. target
 end
 
@@ -84,7 +160,7 @@ local function compile_project()
 	debug_log("compile_project")
 	local cwd = vim.fn.getcwd()
 	local show_build_output = false
-	print("\n\n")
+	print("\n")
 	print("[DEBUG] Current working directory: " .. cwd)
 
 	local build_script = cwd .. "/build.sh"
@@ -96,16 +172,18 @@ local function compile_project()
 	local function print_output(_, data, _)
 		if data and show_build_output then
 			for _, line in ipairs(data) do
-				if line ~= "" then print("[BUILD OUTPUT] " .. line) end
+				if line ~= "" then
+					print("[BUILD OUTPUT] " .. line)
+				end
 			end
 		end
 	end
 
 	-- Check if build.sh exists and is executable
 	if vim.fn.filereadable(build_script) == 1 then
-		print("\n\n")
+		print("\n")
 		print("[DAP] Running build.sh debug...")
-		print("\n\n")
+		print("\n")
 
 		-- Use `vim.fn.jobstart` for real-time output capturing
 		local job_id = vim.fn.jobstart({ "sh", build_script, "debug" }, {
@@ -119,28 +197,143 @@ local function compile_project()
 		local exit_code = vim.fn.jobwait({ job_id })[1]
 
 		if exit_code ~= 0 then
-			print("\n\n")
+			print("\n")
 			print("[ERROR] Build.sh failed! Debugging cannot start.")
-			print("\n\n")
+			print("\n")
 			return nil -- Exit function early
 		end
 
-		print("\n\n")
 		print("[DAP] Build.sh completed successfully.")
-		print("\n\n")
+		print("\n")
 	else
-		print("\n\n")
 		print("[WARNING] build.sh not found! Falling back to 'make debug'.")
-		print("\n\n")
+		print("\n")
 		use_make = true
 	end
 
+	local try_dumb_gcc = false
 	-- If build.sh doesn't exist, use `make` with debug flags
 	if use_make then
-		local make_cmd = "make clean && make CFLAGS='-g -O0 -Wall -Wextra' LDFLAGS='-g'"
-		print("\n\n")
+		if vim.fn.filereadable(cwd .. "/Makefile") ~= 1 then
+			print("[WARNING] Makefile not found, skipping make.")
+			print("\n")
+			try_dumb_gcc = true
+		else
+			local make_cmd = "make clean && make CFLAGS='-g -O0 -Wall -Wextra' LDFLAGS='-g'"
+			print("\n")
+			print("[DEBUG] Running: " .. make_cmd)
+			print("\n")
+
+			-- Run `make` with jobstart to capture its output
+			local job_id = vim.fn.jobstart(make_cmd, {
+				stdout_buffered = false,
+				stderr_buffered = false,
+				on_stdout = print_output,
+				on_stderr = print_output,
+			})
+
+			-- Wait for job to finish
+			local exit_code = vim.fn.jobwait({ job_id })[1]
+
+			if exit_code ~= 0 then
+				print("\n")
+				print("[ERROR] Make build failed! Debugging cannot start.")
+				print("\n")
+				try_dumb_gcc = true
+			end
+
+			print("\n")
+			print("[DAP] Make build completed successfully.")
+			print("\n")
+		end
+	end
+
+	if try_dumb_gcc then
+		local bufname = vim.api.nvim_buf_get_name(0)
+		local ext = bufname:match("%.([^.]+)$")
+		local output_name = bufname:gsub("%.%w+$", "")
+		local compiler_cmd
+
+		if ext == "c" then
+			compiler_cmd = { "gcc", bufname, "-o", output_name, "-g", "-O0", "-Wall", "-Wextra" }
+		elseif ext == "cpp" or ext == "cc" or ext == "cxx" then
+			compiler_cmd = { "g++", bufname, "-o", output_name, "-g", "-O0", "-Wall", "-Wextra", "-std=c++17" }
+		else
+			print("[ERROR] Unsupported file type: " .. (ext or "unknown"))
+			return nil
+		end
+
+		print("[DEBUG] Running single-file compilation: " .. table.concat(compiler_cmd, " "))
+
+		local job_id = vim.fn.jobstart(compiler_cmd, {
+			stdout_buffered = false,
+			stderr_buffered = false,
+			on_stdout = print_output,
+			on_stderr = print_output,
+		})
+
+		local exit_code = vim.fn.jobwait({ job_id })[1]
+
+		if exit_code ~= 0 then
+			print("\n")
+			print("[ERROR] Single-file compilation failed! Debugging cannot start.")
+			print("\n")
+			return nil
+		end
+
+		print("\n")
+		print("[DEBUG] Single-file compilation completed successfully.")
+		print("\n")
+	end
+end
+
+local function find_executable()
+	debug_log("find_executable")
+	compile_project()
+	local exe = parse_automake() or find_in_build() or find_elf_in_cwd() or parse_makefile()
+
+	print("\n")
+	if exe then
+		print("[DAP] Found executable: " .. exe)
+		print("")
+		return exe
+	else
+		error("[DAP] No executable found. Check AutoMake, build/, ELF binaries, or Makefile.")
+	end
+end
+
+local function custom_make()
+	local cwd = vim.fn.getcwd()
+	local show_build_output = false
+
+	-- Function to print live output from build process
+	local function print_output(_, data, _)
+		if data and show_build_output then
+			for _, line in ipairs(data) do
+				if line ~= "" then
+					print("[BUILD OUTPUT] " .. line)
+				end
+			end
+		end
+	end
+
+	if vim.fn.filereadable(cwd .. "/Makefile") ~= 1 then
+		print("[WARNING] Makefile not found, skipping make.")
+		print("\n")
+		return nil
+	else
+		local custom_debug_input = vim.fn.input("What is the custom debug flag you want added (No -, Lower case): ")
+		local debug_flags = ""
+
+		for flag in custom_debug_input:gmatch("%S+") do
+			debug_flags = debug_flags .. " -D" .. string.upper(flag)
+		end
+
+		local make_cmd = "make clean && make CFLAGS='-g -O0 -Wall -Wextra " .. debug_flags .. "' LDFLAGS='-g'"
+
+		print("\n")
 		print("[DEBUG] Running: " .. make_cmd)
-		print("\n\n")
+		print("\n")
 
 		-- Run `make` with jobstart to capture its output
 		local job_id = vim.fn.jobstart(make_cmd, {
@@ -154,35 +347,34 @@ local function compile_project()
 		local exit_code = vim.fn.jobwait({ job_id })[1]
 
 		if exit_code ~= 0 then
-			print("\n\n")
+			print("\n")
 			print("[ERROR] Make build failed! Debugging cannot start.")
-			print("\n\n")
-			return nil -- Exit function early
+			print("\n")
+			return nil
 		end
 
-		print("\n\n")
+		print("\n")
 		print("[DAP] Make build completed successfully.")
-		print("\n\n")
+		print("\n")
 	end
 end
 
-local function find_executable()
-	debug_log("find_executable")
-	compile_project()
-	local exe = parse_automake() or find_in_build() or find_elf_in_root() or parse_makefile()
+local function find_executable_custom_debug()
+	debug_log("find_executable_custom_debug_falg")
+	custom_make()
 
+	local exe = parse_automake() or find_in_build() or find_elf_in_cwd() or parse_makefile()
+
+	print("\n")
 	if exe then
-		print("[DEBUG] find_executable() raw path: " .. exe)
-
-		-- Remove fnameescape (test without escaping)
-		-- local safe_exe = vim.fn.fnameescape(exe) -- Might be breaking the path
-		local safe_exe = exe
-
-		print("[DAP] Final executable: " .. safe_exe)
-		return safe_exe
+		print("[DAP] Found executable: " .. exe)
+		print("")
+		return exe
 	else
 		error("[DAP] No executable found. Check AutoMake, build/, ELF binaries, or Makefile.")
 	end
+
+	vim.cmd("messages")
 end
 
 local function get_source_directories()
@@ -278,79 +470,44 @@ local other_c_dap = {
 	end,
 }
 
-local redir_args = function()
-	local user_input = vim.fn.input("[DAP] Enter arguments (space-separated, support redirection): ")
-	if user_input == "" then return {} end
-	return { "-c", user_input } -- Pass entire command string
-end
-
 dap.configurations.c = {
+	{
+		name = "C++ Debugger by itself, custom debug flags",
+		type = "cppdbg",
+		request = "launch",
+		console = "integratedTerminal", -- Output goes here
+		justMyCode = true, -- Optional: set to true for just your code
+		cwd = "${workspaceFolder}",
+		stopAtEntry = false,
+		setupCommands = setupCommands,
+
+		program = find_executable_custom_debug,
+		args = function()
+			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
+			print("\n")
+			local ret = vim.split(args, " ")
+			return ret
+		end,
+	},
 	{
 		name = "C++ Debugger by itself",
 		type = "cppdbg",
 		request = "launch",
-		program = function()
-			return find_executable()
-			-- return vim.fn.getcwd() .. "/build/mysh"
-		end,
 		console = "integratedTerminal", -- Output goes here
 		justMyCode = true, -- Optional: set to true for just your code
-		args = function() return vim.split(vim.fn.input("[DAP] Enter arguments (space-separated): "), " ") end,
-		-- args = redir_args,
-		-- cwd = vim.fn.getcwd(),
 		cwd = "${workspaceFolder}",
 		stopAtEntry = false,
 		setupCommands = setupCommands,
+
+		program = find_executable,
+		args = function()
+			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
+			print("\n")
+			local ret = vim.split(args, " ")
+			return ret
+		end,
 	},
 	-- other_c_dap,
 }
 
 dap.configurations.cpp = dap.configurations.c -- Apply same config for C++
-
--------------------------------- BASH ----------------------------------
-
--- DAP Adapter for Bash
-dap.adapters.bashdb = {
-	type = "executable",
-	command = "bash-debug-adapter",
-	name = "bashdb",
-}
-
--- DAP Configurations for Bash
-dap.configurations.sh = {
-	{
-		name = "Run Bash Script",
-		type = "bashdb",
-		request = "launch",
-		program = "${file}", -- Current file
-		cwd = "${workspaceFolder}",
-		args = {}, -- Script arguments
-		env = {}, -- Environment variables
-		stopOnEntry = false,
-	},
-}
-
--------------------------------- PYTHON ----------------------------------
-
-require("dap-python").setup(vim.fn.exepath("python")) -- Use system Python by default
-
-dap.configurations.python = {
-	{
-		type = "python",
-		request = "launch",
-		name = "Launch file",
-		program = "${file}", -- Run the currently open file
-		console = "integratedTerminal", -- Output goes here
-		justMyCode = false, -- Optional: set to true for just your code
-		pythonPath = function()
-			-- Use the active virtual environment if available
-			if vim.env.VIRTUAL_ENV then
-				print("Using virtual environment: " .. vim.env.VIRTUAL_ENV)
-				return vim.env.VIRTUAL_ENV .. "/bin/python"
-			end
-			-- Otherwise, fallback to system Python
-			print("Using system Python: " .. vim.fn.exepath("python3"))
-			return vim.fn.exepath("python3") or "python"
-		end,
-	},
-}
