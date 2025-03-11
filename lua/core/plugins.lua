@@ -55,18 +55,6 @@ require("lazy").setup({
 			"theHamsta/nvim-dap-virtual-text", -- Inline variable text while debugging
 			"nvim-neotest/nvim-nio", -- Required dependency for nvim-dap-ui
 		},
-		config = function()
-			local dap = require("dap")
-			local dapui = require("dapui")
-
-			-- DAP UI setup
-			dapui.setup()
-
-			-- DAP UI listeners to open/close UI automatically
-			dap.listeners.before.event_initialized["dapui_config"] = function() dapui.open() end
-			dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
-			dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
-		end,
 		lazy = true,
 		event = { "BufReadPost", "BufNewFile" }, -- Load when reading/creating files
 	},

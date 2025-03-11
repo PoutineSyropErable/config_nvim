@@ -552,6 +552,83 @@ local function goto_current_function()
 	end)
 end
 
+local function goto_next_function_or_call()
+	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+
+	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
+		if not result then
+			print("❌ No LSP symbols found.")
+			return
+		end
+
+		local row = vim.api.nvim_win_get_cursor(0)[1] -- Get cursor line
+		local next_match = nil
+		local matches = {}
+
+		-- Recursive function to extract all function definitions
+		local function find_functions(symbols)
+			for _, symbol in ipairs(symbols) do
+				local kind = symbol.kind
+				local range = symbol.range
+
+				-- Function (12) or Method (6)
+				if kind == 12 or kind == 6 then
+					table.insert(matches, {
+						name = symbol.name,
+						line = range.start.line + 1,
+						col = range.start.character,
+						type = "definition",
+					})
+				end
+
+				if symbol.children then
+					find_functions(symbol.children)
+				end
+			end
+		end
+
+		-- Find all function definitions
+		find_functions(result)
+
+		-- Use regex to search for function calls (e.g., `foo(...)`)
+		local current_line = row
+		while current_line < vim.api.nvim_buf_line_count(0) do
+			local line_content = vim.api.nvim_buf_get_lines(0, current_line, current_line + 1, false)[1]
+			if line_content then
+				local match_start, match_end = string.find(line_content, "([%w_]+)%s*%(")
+				if match_start then
+					table.insert(matches, {
+						name = string.sub(line_content, match_start, match_end),
+						line = current_line + 1,
+						col = match_start - 1,
+						type = "call",
+					})
+				end
+			end
+			current_line = current_line + 1
+		end
+
+		-- Sort matches by line number to ensure correct order
+		table.sort(matches, function(a, b) return a.line < b.line end)
+
+		-- Find the first function call/definition after the cursor position
+		for _, match in ipairs(matches) do
+			if match.line > row then
+				next_match = match
+				break
+			end
+		end
+
+		-- Move cursor to the next function call/definition
+		if next_match then
+			print("🔹 Jumping to:", next_match.name, "| Type:", next_match.type, "| Line:", next_match.line)
+			vim.api.nvim_win_set_cursor(0, { next_match.line, next_match.col })
+		else
+			print("❌ No next function call or definition found.")
+		end
+	end)
+end
+
 -- LSP Hover
 keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
 keymap.set("n", "<C-d>", function() vim.lsp.util.scroll(4) end, opts("Scroll down on hover"))
@@ -579,6 +656,7 @@ keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find referenc
 
 keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
 keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
+keymap.set("n", "gs", goto_next_function_or_call, opts("Go to next function"))
 keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
 keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
 keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
@@ -891,28 +969,93 @@ end, { noremap = true, silent = true, desc = "Organize Python imports (Pyright)"
 
 --------------------------------------------- Debugging (nvim-dap)
 -- Breakpoint Management
-keymap.set("n", "<leader>bb", "<cmd>lua require'dap'.toggle_breakpoint()<cr>", { desc = "Toggle breakpoint at current line" })
-keymap.set(
-	"n",
-	"<leader>bc",
-	"<cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<cr>",
-	{ desc = "Set conditional breakpoint" }
-)
+
+local dap = require("dap")
+local dapui = require("dapui")
+local widgets = require("dap.ui.widgets")
+
+-- Breakpoint Keybindings
+keymap.set("n", "<leader>bb", dap.toggle_breakpoint, opts("Toggle breakpoint at current line"))
+keymap.set("n", "<leader>bc", function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, opts("Set conditional breakpoint"))
 keymap.set(
 	"n",
 	"<leader>bl",
-	"<cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<cr>",
-	{ desc = "Set log point (executes a log message instead of stopping execution)" }
+	function() dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: ")) end,
+	opts("Set log point (executes a log message instead of stopping execution)")
 )
-keymap.set("n", "<leader>br", "<cmd>lua require'dap'.clear_breakpoints()<cr>", { desc = "Clear all breakpoints" })
-keymap.set("n", "<leader>ba", "<cmd>Telescope dap list_breakpoints<cr>", { desc = "List all breakpoints (Telescope UI)" })
+keymap.set("n", "<leader>br", dap.clear_breakpoints, opts("Clear all breakpoints"))
+keymap.set("n", "<leader>ba", function() telescope.extensions.dap.list_breakpoints() end, opts("List all breakpoints (Telescope UI)"))
 
--- Debugging Execution
-keymap.set("n", "<leader>dc", "<cmd>lua require'dap'.continue()<cr>", { desc = "Start/continue debugging session" })
-keymap.set("n", "<leader>dj", "<cmd>lua require'dap'.step_over()<cr>", { desc = "Step over (skip function calls)" })
-keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.step_into()<cr>", { desc = "Step into function calls" })
-keymap.set("n", "<leader>do", "<cmd>lua require'dap'.step_out()<cr>", { desc = "Step out of current function" })
+-- Debugging Execution Keybindings
+keymap.set("n", "<leader>dc", dap.continue, opts("--- Start/continue debugging session"))
+keymap.set("n", "<leader>dj", dap.step_over, opts("--- Step over (skip function calls)"))
+keymap.set("n", "<leader>dk", dap.step_into, opts("--- Step into function calls"))
+keymap.set("n", "<leader>do", dap.step_out, opts("--- Step out of current function"))
+keymap.set("n", "<leader>dp", dap.pause, opts("--- Pause program execution"))
+-- Reverse Continue (Run backwards until a breakpoint)
+keymap.set("n", "<leader>db", dap.reverse_continue, opts("-- Reverse continue (run backward, previous breakpoint)"))
+-- Reverse Step (Step back one line)
+keymap.set("n", "<leader>dBl", dap.step_back, opts("--Step backward (previous line)"))
+-- Reverse Step Instruction (Step back one assembly instruction)
 
+-- Debugging Stop/Disconnect
+keymap.set("n", "<leader>dd", function()
+	dap.disconnect()
+	dap.close()
+end, opts("Disconnect debugger (keep process running)"))
+
+keymap.set("n", "<leader>dt", function()
+	dap.terminate()
+	dapui.close()
+end, { desc = "Terminate debugging session (kill process)" })
+
+local dap_run = function()
+	-- Check if a DAP REPL buffer exists
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		local buf_name = vim.api.nvim_buf_get_name(buf):lower()
+		if buf_name:match("dap%-repl") then
+			vim.api.nvim_set_current_win(win) -- Focus the REPL if it's already open
+			goto evaluate
+		end
+	end
+
+	-- Open REPL if it's not open
+	dap.repl.open()
+
+	::evaluate::
+	local input_expr = vim.fn.input("Evaluate expression: ") -- Get input first
+	if input_expr and input_expr ~= "" then
+		local filetype = vim.bo.filetype
+		if filetype == "c" or filetype == "cpp" then
+			input_expr = "-exec " .. input_expr -- Prefix with "-exec" for GDB-based debuggers
+		end
+		dap.repl.execute(input_expr) -- Pass it to REPL
+	end
+end
+
+-- Debugging Tools
+keymap.set("n", "<leader>d.", function() dap.repl.toggle() end, opts("Toggle debugger REPL [Not Useful]"))
+keymap.set("n", "<leader>dr", dap_run, opts("Evaluate expression in REPL"))
+keymap.set("n", "<leader>dl", dap.run_last, opts("Re-run last debugging session"))
+keymap.set("n", "<leader>dR", dap.restart, opts("Restart debugging session"))
+
+keymap.set("n", "<leader>di", widgets.hover, opts("Hover to inspect variable under cursor"))
+keymap.set("n", "<leader>du", dapui.toggle, opts("Toggle DAP UI"))
+
+keymap.set("n", "<leader>dv", function() widgets.centered_float(widgets.scopes) end, opts("Show debugging scopes (floating window)"))
+keymap.set("n", "<leader>da", function() widgets.centered_float(widgets.variables) end, opts("Show all variables (floating window)"))
+keymap.set("n", "<leader>ds", function() widgets.centered_float(widgets.frames) end, opts("Show call stack (floating window)"))
+
+-- Telescope DAP Integrations
+keymap.set("n", "<leader>df", function() telescope.extensions.dap.frames() end, opts("Show stack frames (Telescope UI)"))
+keymap.set("n", "<leader>dh", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
+
+keymap.set("n", "<leader>de", function() builtin.diagnostics({ default_text = ":E:" }) end, opts("Show errors and diagnostics (Telescope UI)"))
+keymap.set("n", "<leader>dw", function() builtin.diagnostics({ default_text = ":W:" }) end, opts("Show Warning and diagnostics (Telescope UI)"))
+keymap.set("n", "<leader>dm", function() telescope.extensions.dap.threads() end, opts("Show running threads (Telescope UI)"))
+
+-- Tests
 keymap.set("n", "<leader>dTc", function()
 	if vim.bo.filetype == "python" then
 		require("dap-python").test_class()
@@ -924,37 +1067,6 @@ keymap.set("n", "<leader>dTm", function()
 		require("dap-python").test_method()
 	end
 end)
-
--- Debugging Stop/Disconnect
-keymap.set("n", "<leader>dd", function()
-	require("dap").disconnect()
-	require("dapui").close()
-end, { desc = "Disconnect debugger (keep process running)" })
-
-keymap.set("n", "<leader>dt", function()
-	require("dap").terminate()
-	require("dapui").close()
-end, { desc = "Terminate debugging session (kill process)" })
-
--- Debugging Tools
-keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.toggle()<cr>", { desc = "Toggle debugger REPL" })
-keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.run_last()<cr>", { desc = "Re-run last debugging session" })
-keymap.set("n", "<leader>di", function() require("dap.ui.widgets").hover() end, { desc = "Hover to inspect variable under cursor" })
-
-keymap.set("n", "<leader>d?", function()
-	local widgets = require("dap.ui.widgets")
-	widgets.centered_float(widgets.scopes)
-end, { desc = "Show debugging scopes (floating window)" })
-
--- Telescope DAP Integrations
-keymap.set("n", "<leader>df", "<cmd>Telescope dap frames<cr>", { desc = "Show stack frames (Telescope UI)" })
-keymap.set("n", "<leader>dh", "<cmd>Telescope dap commands<cr>", { desc = "List DAP commands (Telescope UI)" })
-keymap.set(
-	"n",
-	"<leader>de",
-	function() require("telescope.builtin").diagnostics({ default_text = ":E:" }) end,
-	{ desc = "Show errors and diagnostics (Telescope UI)" }
-)
 
 ----------------------------------------------------- Terminal (PICK ONE) ---------------------------
 -------- Float Term: --------
@@ -1057,6 +1169,26 @@ else
 	keymap.set("", "<C-w><Up>", nvim_tmux_nav.NvimTmuxNavigateUp)
 	keymap.set("", "<C-w><Right>", nvim_tmux_nav.NvimTmuxNavigateRight)
 end
+
+local function focus_floating_win()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		if vim.api.nvim_win_get_config(win).relative ~= "" then
+			vim.api.nvim_set_current_win(win)
+			return
+		end
+	end
+end
+
+local function focus_normal_win()
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		if vim.api.nvim_win_get_config(win).relative == "" then
+			vim.api.nvim_set_current_win(win)
+			return
+		end
+	end
+end
+vim.keymap.set("n", "<C-w>z", focus_floating_win, opts("Move to floating window"))
+vim.keymap.set("n", "<C-x>Z", focus_normal_win, opts("Move to normal split"))
 
 ------------------------------ NOTES --------------------------
 local function ro(description) return { noremap = true, silent = true, desc = description } end

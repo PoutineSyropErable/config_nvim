@@ -75,6 +75,7 @@ telescope.load_extension("fzf") -- Ensure fzf-native is compiled if used
 telescope.load_extension("ui-select")
 telescope.load_extension("file_browser")
 telescope.load_extension("scope")
+telescope.load_extension("dap")
 
 -- Uncomment and load additional extensions if needed
 -- telescope.load_extension("undo")

@@ -65,6 +65,10 @@ vim.fn.sign_define("DapBreakpoint", {
 	numhl = "", -- Optional: highlight the line number
 })
 
+vim.fn.sign_define("DapBreakpoint", { text = "🛑", texthl = "Error", linehl = "", numhl = "" })
+vim.fn.sign_define("DapStopped", { text = "✋", texthl = "Title", linehl = "", numhl = "" })
+vim.fn.sign_define("DapLogPoint", { text = "📝", texthl = "Question", linehl = "", numhl = "" })
+
 -- Define the custom highlight group for the breakpoint color
 vim.cmd([[
   highlight DapBreakpointHighlight guifg=#0000FF guibg=NONE ctermfg=blue ctermbg=NONE
