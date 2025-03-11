@@ -287,10 +287,21 @@ local function compile_project()
 	end
 end
 
+local function store_debug_file()
+	local bufname = vim.api.nvim_buf_get_name(0)
+	local ext = bufname:match("^.+(%..+)$") or ""
+
+	if ext == ".c" or ext == ".cpp" or ext == ".h" or ext == ".hpp" then
+		_G.last_debugged_file = ext -- Store the last known file extension
+		print("Stored last debugged file type: " .. ext)
+	end
+end
+
 local function find_executable()
 	debug_log("find_executable")
 	compile_project()
 	local exe = parse_automake() or find_in_build() or find_elf_in_cwd() or parse_makefile()
+	store_debug_file()
 
 	print("\n")
 	if exe then
@@ -364,6 +375,7 @@ local function find_executable_custom_debug()
 	custom_make()
 
 	local exe = parse_automake() or find_in_build() or find_elf_in_cwd() or parse_makefile()
+	store_debug_file()
 
 	print("\n")
 	if exe then

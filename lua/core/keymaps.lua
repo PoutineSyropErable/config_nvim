@@ -552,81 +552,66 @@ local function goto_current_function()
 	end)
 end
 
-local function goto_next_function_or_call()
-	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+local function get_function_calls()
+	local parser = vim.treesitter.get_parser(0, "c") -- Use Treesitter for C
+	local tree = parser:parse()[1]
+	local root = tree:root()
+	local calls = {}
 
-	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
-		if not result then
-			print("❌ No LSP symbols found.")
-			return
-		end
+	local function traverse(node)
+		if node:type() == "call_expression" then
+			local func_node = node:child(0) -- Function name
+			if func_node then
+				local func_name = vim.treesitter.get_node_text(func_node, 0)
+				local line, col, _ = node:start()
+				line = line + 1
 
-		local row = vim.api.nvim_win_get_cursor(0)[1] -- Get cursor line
-		local next_match = nil
-		local matches = {}
-
-		-- Recursive function to extract all function definitions
-		local function find_functions(symbols)
-			for _, symbol in ipairs(symbols) do
-				local kind = symbol.kind
-				local range = symbol.range
-
-				-- Function (12) or Method (6)
-				if kind == 12 or kind == 6 then
-					table.insert(matches, {
-						name = symbol.name,
-						line = range.start.line + 1,
-						col = range.start.character,
-						type = "definition",
-					})
-				end
-
-				if symbol.children then
-					find_functions(symbol.children)
-				end
+				-- Store function call information
+				table.insert(calls, { name = func_name, line = line, col = col })
 			end
 		end
-
-		-- Find all function definitions
-		find_functions(result)
-
-		-- Use regex to search for function calls (e.g., `foo(...)`)
-		local current_line = row
-		while current_line < vim.api.nvim_buf_line_count(0) do
-			local line_content = vim.api.nvim_buf_get_lines(0, current_line, current_line + 1, false)[1]
-			if line_content then
-				local match_start, match_end = string.find(line_content, "([%w_]+)%s*%(")
-				if match_start then
-					table.insert(matches, {
-						name = string.sub(line_content, match_start, match_end),
-						line = current_line + 1,
-						col = match_start - 1,
-						type = "call",
-					})
-				end
-			end
-			current_line = current_line + 1
+		-- Recursively check children
+		for child in node:iter_children() do
+			traverse(child)
 		end
+	end
 
-		-- Sort matches by line number to ensure correct order
-		table.sort(matches, function(a, b) return a.line < b.line end)
+	traverse(root)
 
-		-- Find the first function call/definition after the cursor position
-		for _, match in ipairs(matches) do
-			if match.line > row then
-				next_match = match
-				break
-			end
+	-- 🔹 Debugging Output: Print All Found Calls
+	-- print("📌 [DEBUG] Function Calls Found:")
+	-- for _, call in ipairs(calls) do
+	-- 	print("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
+	-- end
+
+	return calls
+end
+
+local function goto_next_function_call()
+	local calls = get_function_calls()
+	if #calls == 0 then
+		print("❌ No function calls found in this file.")
+		return nil
+	end
+
+	local row, col = unpack(vim.api.nvim_win_get_cursor(0)) -- Get cursor position
+	local next_call = nil
+
+	-- 🔹 Find the first function call that occurs after the cursor position
+	for _, call in ipairs(calls) do
+		if call.line > row or (call.line == row and call.col > col) then
+			next_call = call
+			break
 		end
+	end
 
-		-- Move cursor to the next function call/definition
-		if next_match then
-			print("🔹 Jumping to:", next_match.name, "| Type:", next_match.type, "| Line:", next_match.line)
-			vim.api.nvim_win_set_cursor(0, { next_match.line, next_match.col })
-		else
-			print("❌ No next function call or definition found.")
-		end
-	end)
+	if next_call then
+		print("🔹 Jumping to function call:", next_call.name, "at line", next_call.line, "column", next_call.col)
+		vim.api.nvim_win_set_cursor(0, { next_call.line, next_call.col })
+		return next_call
+	else
+		print("❌ No next function call found.")
+	end
 end
 
 -- LSP Hover
@@ -656,11 +641,12 @@ keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find referenc
 
 keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
 keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
-keymap.set("n", "gs", goto_next_function_or_call, opts("Go to next function"))
-keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
-keymap.set("n", "ge", builtin.lsp_incoming_calls, opts("Incoming calls (Those who call this functions)"))
-keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
-keymap.set("n", "gw", builtin.lsp_outgoing_calls, opts("Outcoming calls (Those this function calls)"))
+keymap.set("n", "gs", goto_next_function_call, opts("Go to next function"))
+keymap.set("n", "gn", goto_next_function_call, opts("Go to next function"))
+keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Telescope)"))
+keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Telescope)"))
+keymap.set("n", "ge", vim.lsp.buf.incoming_calls, opts("Incoming calls (lsp buff)"))
+keymap.set("n", "gw", vim.lsp.buf.outgoing_calls, opts("Outcoming calls (lsp buff)"))
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "java",
@@ -974,6 +960,29 @@ local dap = require("dap")
 local dapui = require("dapui")
 local widgets = require("dap.ui.widgets")
 
+local function debug_next_function()
+	local session = require("dap").session()
+	if not session then
+		print("❌ Debugger is not running!")
+		return
+	end
+
+	if session.stopped_thread_id then
+		-- Move to the next function call
+		local next_call = goto_next_function_call()
+		if not next_call then
+			print("❌ No next function call found.")
+			return
+		end
+
+		-- dap.set_breakpoint()
+		-- dap.continue()
+		dap.run_to_cursor()
+	else
+		print("⏸ Debugger must be paused before running to the next function call!")
+	end
+end
+
 -- Breakpoint Keybindings
 keymap.set("n", "<leader>bb", dap.toggle_breakpoint, opts("Toggle breakpoint at current line"))
 keymap.set("n", "<leader>bc", function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, opts("Set conditional breakpoint"))
@@ -998,6 +1007,9 @@ keymap.set("n", "<leader>db", dap.reverse_continue, opts("-- Reverse continue (r
 keymap.set("n", "<leader>dBl", dap.step_back, opts("--Step backward (previous line)"))
 -- Reverse Step Instruction (Step back one assembly instruction)
 
+keymap.set("n", "<leader>dC", dap.run_to_cursor, opts("Step to cursor"))
+keymap.set("n", "<leader>df", debug_next_function, opts("execute untill next function call"))
+
 -- Debugging Stop/Disconnect
 keymap.set("n", "<leader>dd", function()
 	dap.disconnect()
@@ -1009,13 +1021,15 @@ keymap.set("n", "<leader>dt", function()
 	dapui.close()
 end, { desc = "Terminate debugging session (kill process)" })
 
+_G.last_debugged_file = nil -- Store the last file debugged
+
 local dap_run = function()
 	-- Check if a DAP REPL buffer exists
 	for _, win in ipairs(vim.api.nvim_list_wins()) do
 		local buf = vim.api.nvim_win_get_buf(win)
 		local buf_name = vim.api.nvim_buf_get_name(buf):lower()
 		if buf_name:match("dap%-repl") then
-			vim.api.nvim_set_current_win(win) -- Focus the REPL if it's already open
+			-- vim.api.nvim_set_current_win(win) -- Focus the REPL if it's already open
 			goto evaluate
 		end
 	end
@@ -1024,13 +1038,17 @@ local dap_run = function()
 	dap.repl.open()
 
 	::evaluate::
+	print("\n")
 	local input_expr = vim.fn.input("Evaluate expression: ") -- Get input first
 	if input_expr and input_expr ~= "" then
-		local filetype = vim.bo.filetype
-		if filetype == "c" or filetype == "cpp" then
+		local file_ext = _G.last_debugged_file or "" -- Use stored file extension
+		print("\nfiletype: " .. file_ext)
+		if file_ext == ".c" or file_ext == ".cpp" then
 			input_expr = "-exec " .. input_expr -- Prefix with "-exec" for GDB-based debuggers
 		end
+		print("running " .. input_expr)
 		dap.repl.execute(input_expr) -- Pass it to REPL
+		-- wont show the diff though?
 	end
 end
 
@@ -1044,11 +1062,11 @@ keymap.set("n", "<leader>di", widgets.hover, opts("Hover to inspect variable und
 keymap.set("n", "<leader>du", dapui.toggle, opts("Toggle DAP UI"))
 
 keymap.set("n", "<leader>dv", function() widgets.centered_float(widgets.scopes) end, opts("Show debugging scopes (floating window)"))
-keymap.set("n", "<leader>da", function() widgets.centered_float(widgets.variables) end, opts("Show all variables (floating window)"))
-keymap.set("n", "<leader>ds", function() widgets.centered_float(widgets.frames) end, opts("Show call stack (floating window)"))
+-- keymap.set("n", "<leader>da", function() widgets.centered_float(widgets.variables) end, opts("Show all variables (floating window)"))
+keymap.set("n", "<leader>dS", function() widgets.centered_float(widgets.frames) end, opts("Show call stack (floating window)"))
 
 -- Telescope DAP Integrations
-keymap.set("n", "<leader>df", function() telescope.extensions.dap.frames() end, opts("Show stack frames (Telescope UI)"))
+keymap.set("n", "<leader>ds", function() telescope.extensions.dap.frames() end, opts("Show stack frames (Telescope UI)"))
 keymap.set("n", "<leader>dh", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
 
 keymap.set("n", "<leader>de", function() builtin.diagnostics({ default_text = ":E:" }) end, opts("Show errors and diagnostics (Telescope UI)"))
@@ -1405,6 +1423,45 @@ keymap.set("n", "zb", "zb", { noremap = true, silent = true })
 ------------------------------------------ SYMBOL SEARCH FUNCTION FOR MACROS ---------------
 
 -- Function to fetch symbols (LSP + buffer fallback)
+
+local function get_local_variables()
+	local parser = vim.treesitter.get_parser(0, "c") -- Treesitter for C
+	local tree = parser:parse()[1]
+	local root = tree:root()
+	local locals = {}
+
+	local function traverse(node)
+		-- Look for function definitions
+		if node:type() == "function_definition" then
+			local function_name_node = node:child(1) -- Function name is usually the second child
+			local function_name = function_name_node and vim.treesitter.get_node_text(function_name_node, 0) or "<unknown>"
+
+			-- Find local variables inside function body
+			local function_body = node:child(node:child_count() - 1) -- Usually last child is the function body
+
+			if function_body and function_body:type() == "compound_statement" then
+				for var_decl in function_body:iter_children() do
+					if var_decl:type() == "declaration" then
+						local var_name_node = var_decl:child(1) -- Variable name is usually second child
+						if var_name_node and var_name_node:type() == "identifier" then
+							local var_name = vim.treesitter.get_node_text(var_name_node, 0)
+							table.insert(locals, { name = var_name, kind = "Local Variable", scope = function_name })
+						end
+					end
+				end
+			end
+		end
+
+		-- Recursively check all children
+		for child in node:iter_children() do
+			traverse(child)
+		end
+	end
+
+	traverse(root)
+	return locals
+end
+
 local function get_symbols()
 	local symbols = {}
 
@@ -1433,7 +1490,12 @@ local function get_symbols()
 		end
 	end
 
-	-- 🔹 2. Try fetching workspace symbols (across imported files)
+	-- 🔹 2. Fetch Local Variables via Treesitter
+	for _, local_var in ipairs(get_local_variables()) do
+		table.insert(symbols, local_var)
+	end
+
+	-- 🔹 3. Try fetching workspace symbols (across imported files)
 	local workspace_results = vim.lsp.buf_request_sync(0, "workspace/symbol", { query = "" }, 1000)
 	if workspace_results then
 		for _, server in pairs(workspace_results) do
@@ -1446,7 +1508,7 @@ local function get_symbols()
 		end
 	end
 
-	-- 🔹 3. Fallback: Extract words from buffer if no LSP symbols
+	-- 🔹 4. Fallback: Extract words from buffer if no LSP symbols
 	if #symbols == 0 then
 		local word_set = {}
 		for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
@@ -1613,12 +1675,87 @@ function _G.debug_utils.write_function_debug()
 	end)
 end
 
+-- Function to show symbols in Telescope and jump to the selected one
+local function select_symbol_and_jump()
+	local symbols = get_symbols()
+
+	if #symbols == 0 then
+		print("❌ No symbols found!")
+		return
+	end
+
+	pickers
+		.new({}, {
+			prompt_title = "Select Symbol",
+			finder = finders.new_table({
+				results = symbols,
+				entry_maker = function(entry)
+					return {
+						value = entry,
+						display = entry.name .. " (" .. entry.kind .. ")",
+						ordinal = entry.name,
+					}
+				end,
+			}),
+			sorter = conf.generic_sorter({}),
+			attach_mappings = function(_, map)
+				map("i", "<CR>", function(prompt_bufnr)
+					local selection = action_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					if selection and selection.value then
+						vim.cmd("normal! gg") -- Move to top before searching
+						vim.fn.search("\\<" .. selection.value.name .. "\\>", "w") -- Search for symbol
+					end
+				end)
+				return true
+			end,
+		})
+		:find()
+end
+
+local function get_function_calls()
+	local parser = vim.treesitter.get_parser(0, "c") -- Use Treesitter for C
+	local tree = parser:parse()[1]
+	local root = tree:root()
+	local calls = {}
+
+	local function traverse(node)
+		if node:type() == "call_expression" then
+			local func_node = node:child(0) -- Function name
+			if func_node then
+				local func_name = vim.treesitter.get_node_text(func_node, 0)
+				local line, col, _ = node:start()
+				line = line + 1
+
+				-- Store function call information
+				table.insert(calls, { name = func_name, line = line, col = col })
+			end
+		end
+		-- Recursively check children
+		for child in node:iter_children() do
+			traverse(child)
+		end
+	end
+
+	traverse(root)
+
+	-- 🔹 Debugging Output: Print All Found Calls
+	print("📌 [DEBUG] Function Calls Found:")
+	for _, call in ipairs(calls) do
+		print("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
+	end
+
+	return calls
+end
+
 ---- Bind the functions to keymaps -----
-keymap.set("n", "<leader>wfs", _G.debug_utils.write_function_simple, { noremap = true, silent = true, desc = "Write Function Simple" })
-keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, { noremap = true, silent = true, desc = "Write Function Numpy" })
-keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, { noremap = true, silent = true, desc = "Write Function Numpy NewLine" })
-keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, { noremap = true, silent = true, desc = "Write Function NewLine" })
-keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, { noremap = true, silent = true, desc = "Write Function Debug" })
+keymap.set("n", "<leader>wfs", _G.debug_utils.write_function_simple, opts("Write Function Simple"))
+keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, opts("Write Function Numpy"))
+keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, opts("Write Function Numpy NewLine"))
+keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, opts("Write Function NewLine"))
+keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, opts("Write Function Debug"))
+
+keymap.set("n", "<leader>ss", get_function_calls, opts("jump to selected symbols"))
 --------------------------------- GENERAL UTILS MACRO --------------------------------------
 _G.general_utils_franck = {}
 function _G.general_utils_franck.not_invert()
@@ -1698,6 +1835,7 @@ keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, opts("
 keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, opts("Search next occurance of this word"))
 
 keymap.set("n", "<leader>rd", function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end, { desc = "Print LSP Root Directory" })
+
 ----------------------------------------------- END OF CONFIG FILE
 
 -- print("Vim configuration reloaded")
