@@ -196,12 +196,12 @@ lspconfig.jdtls.setup({
 	end,
 })
 
+------------------------------------------------ End of Java Config ----------------------------------------
+
 require("lspconfig").solargraph.setup({})
 require("lspconfig").ts_ls.setup({})
 require("lspconfig").gopls.setup({})
 require("lspconfig").tailwindcss.setup({})
-
-local lspconfig = require("lspconfig")
 
 local tex_output = os.getenv("HOME") .. "/.texfiles/" -- Directory for auxiliary files
 local pdf_output_dir = vim.fn.expand("%:p:h") -- Directory where the PDF should be saved

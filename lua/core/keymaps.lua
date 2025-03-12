@@ -646,7 +646,8 @@ keymap.set("n", "gn", goto_next_function_call, opts("Go to next function"))
 keymap.set("n", "gi", builtin.lsp_incoming_calls, opts("Incoming calls (Telescope)"))
 keymap.set("n", "go", builtin.lsp_outgoing_calls, opts("Outcoming calls (Telescope)"))
 keymap.set("n", "ge", vim.lsp.buf.incoming_calls, opts("Incoming calls (lsp buff)"))
-keymap.set("n", "gw", vim.lsp.buf.outgoing_calls, opts("Outcoming calls (lsp buff)"))
+keymap.set("n", "gy", vim.lsp.buf.outgoing_calls, opts("Outcoming calls (lsp buff)"))
+keymap.set("n", "gw", function() builtin.live_grep({ default_text = vim.fn.expand("<cword>") }) end, opts("Live grep current word"))
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "java",
@@ -669,6 +670,7 @@ keymap.set("n", "<leader>Ll", function()
 end, opts("List workspace folders"))
 
 -- Diagnostics
+keymap.set("n", "<leader>Ld", vim.diagnostic.open_float, opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
 keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
 keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), opts("Go to previous diagnostic"))
 keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), opts("Go to next diagnostic"))

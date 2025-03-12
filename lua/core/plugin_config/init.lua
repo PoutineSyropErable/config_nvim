@@ -17,6 +17,7 @@ require("core.plugin_config.black")
 require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
+require("core.plugin_config.java")
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.toggleterm")
@@ -31,11 +32,9 @@ require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
-require("core.plugin_config.bufferline")
-
-require("core.plugin_config.barbar")
-
 require("core.plugin_config.lualine")
+require("core.plugin_config.bufferline")
+-- require("core.plugin_config.barbar")
 
 require("core.plugin_config.nvim-possession")
 

@@ -67,6 +67,16 @@ require("lazy").setup({
 		ft = { "python" }, -- Only load when editing Python files
 	},
 
+	------- Java DAP Support -----
+	{
+		"mfussenegger/nvim-jdtls",
+		dependencies = {
+			"mfussenegger/nvim-dap",
+			"rcarriga/nvim-dap-ui",
+		},
+		ft = { "java" },
+	},
+
 	-- BASH DAP support?
 	"bash-lsp/bash-language-server",
 

@@ -523,3 +523,140 @@ dap.configurations.c = {
 }
 
 dap.configurations.cpp = dap.configurations.c -- Apply same config for C++
+
+-------------------------------- JAVA ----------------------------------
+local function get_class_path()
+	-- Get the full path of the current Java file
+	local java_file_path = vim.api.nvim_buf_get_name(0)
+
+	-- Ensure the file is a Java file
+	local file_ext = vim.fn.fnamemodify(java_file_path, ":e")
+	if file_ext ~= "java" then
+		print("❌ (In get_class_path), Error: This is not a Java file!")
+		return nil
+	end
+
+	-- Define the Python script location
+	local home = vim.fn.expand("$HOME")
+	AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava/"
+	local dap_utils_script = home .. AutoMakeJava_location .. "src/dap-utils.py"
+
+	-- Construct the command to run Python script
+	local command = "python3 " .. vim.fn.shellescape(dap_utils_script) .. " " .. vim.fn.shellescape(java_file_path) .. " --getClassPath"
+	print("running.. (" .. command .. ")")
+
+	-- Execute the command and capture the output
+	local result = vim.fn.system(command)
+
+	-- Trim whitespace and newlines
+	result = result:gsub("%s+$", "")
+
+	-- Handle errors (empty output means something went wrong)
+	if result == "" then
+		print("❌ Error: `dap-utils.py` did not return a classpath!")
+		return nil
+	end
+
+	-- Convert classpath string into a Lua table (split by `:`)
+	local classpaths = {}
+	for path in result:gmatch("[^:]+") do
+		table.insert(classpaths, path)
+	end
+
+	return classpaths
+end
+
+local function get_main_class()
+	-- Get the full path of the current Java file
+	local java_file_path = vim.api.nvim_buf_get_name(0)
+
+	-- Ensure the file is a Java file
+	local file_ext = vim.fn.fnamemodify(java_file_path, ":e")
+	if file_ext ~= "java" then
+		print("❌ (in get_main_class) Error: This is not a Java file!")
+		return nil
+	end
+
+	-- Define the Python script location
+	local home = vim.fn.expand("$HOME")
+	AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava/"
+	local dap_utils_script = home .. AutoMakeJava_location .. "src/dap-utils.py"
+
+	-- Construct the command to run Python script
+	local command = "python3 " .. vim.fn.shellescape(dap_utils_script) .. " " .. vim.fn.shellescape(java_file_path) .. " --mainModule"
+	print("running.. (" .. command .. ")")
+
+	-- Execute the command and capture the output
+	local result = vim.fn.system(command)
+
+	-- Trim whitespace and newlines
+	result = result:gsub("%s+$", "")
+
+	-- Handle errors (empty output means something went wrong)
+	if result == "" then
+		print("❌ Error: `dap-utils.py` did not return a main class!")
+		return nil
+	end
+
+	return result -- Return the main class name
+end
+
+local jdtls = require("jdtls") -- Ensure `nvim-jdtls` is loaded
+
+-- ✅ Ensure dap.adapters.java is registered BEFORE dap.configurations.java
+dap.adapters.java = function(callback)
+	jdtls.start_debug_session(function(port)
+		if not port then
+			print("❌ Error: Failed to retrieve Java debug port!")
+			return
+		end
+		callback({
+			type = "server",
+			host = "127.0.0.1",
+			port = port,
+		})
+	end)
+end
+
+dap.configurations.java = {
+	{
+		-- 🚀 Attach to a Running JVM Debug Session
+		type = "java",
+		request = "attach",
+		name = "Debug (Attach) - Remote",
+		hostName = "127.0.0.1",
+		port = 5005, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
+	},
+	{
+		-- 🚀 Launch Java Application with Debugging
+		type = "java",
+		request = "launch",
+		name = "Launch Java Application",
+
+		-- Use functions so values are fetched dynamically at runtime
+		classPaths = function() return get_class_path() end,
+		mainClass = function() return get_main_class() end,
+
+		javaExec = "/usr/lib/jvm/java-21-openjdk/bin/java",
+
+		-- If using a multi-module project, remove this
+		-- projectName = "yourProjectName",
+
+		-- This is automatically set by `nvim-jdtls`
+		modulePaths = {},
+	},
+}
+
+vim.keymap.set("n", "<F8>", function()
+	local class_path = get_class_path()
+	if class_path then
+		print("✅ Java Class Path: " .. table.concat(class_path, "\n"))
+	end
+end, { noremap = true, silent = true })
+
+vim.keymap.set("n", "<F9>", function()
+	local main_class = get_main_class()
+	if main_class then
+		print("✅ Java Main Class: " .. main_class)
+	end
+end, { noremap = true, silent = true })
