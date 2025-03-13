@@ -17,7 +17,10 @@ require("core.plugin_config.black")
 require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
-require("core.plugin_config.java")
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "java",
+	callback = function() require("core.plugin_config.java") end,
+})
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.toggleterm")

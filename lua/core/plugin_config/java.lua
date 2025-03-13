@@ -76,7 +76,4 @@ local config = {
 	},
 }
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "java",
-	callback = function() require("jdtls").start_or_attach(config) end,
-})
+jdtls.start_or_attach(config)
