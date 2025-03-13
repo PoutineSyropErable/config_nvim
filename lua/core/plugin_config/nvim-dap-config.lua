@@ -601,22 +601,14 @@ local function get_main_class()
 	return result -- Return the main class name
 end
 
-local jdtls = require("jdtls") -- Ensure `nvim-jdtls` is loaded
+local javaDapPort = 5005
 
--- ✅ Ensure dap.adapters.java is registered BEFORE dap.configurations.java
-dap.adapters.java = function(callback)
-	jdtls.start_debug_session(function(port)
-		if not port then
-			print("❌ Error: Failed to retrieve Java debug port!")
-			return
-		end
-		callback({
-			type = "server",
-			host = "127.0.0.1",
-			port = port,
-		})
-	end)
-end
+-- ✅ Manually register the Java DAP adapter
+dap.adapters.java = {
+	type = "server",
+	host = "127.0.0.1",
+	port = javaDapPort, -- This matches the port used by your Python script running the Java process
+}
 
 dap.configurations.java = {
 	{
@@ -625,7 +617,7 @@ dap.configurations.java = {
 		request = "attach",
 		name = "Debug (Attach) - Remote",
 		hostName = "127.0.0.1",
-		port = 5005, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
+		port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
 	},
 	{
 		-- 🚀 Launch Java Application with Debugging
