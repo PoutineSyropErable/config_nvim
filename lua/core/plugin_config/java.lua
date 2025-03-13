@@ -38,7 +38,7 @@ end
 -- ✅ Correcting -configuration and -data paths
 local config = {
 	cmd = {
-		"java",
+		vim.fn.expand("$JAVA_HOME/bin/java"),
 		"-XX:+IgnoreUnrecognizedVMOptions",
 		"-Declipse.application=org.eclipse.jdt.ls.core.id1",
 		"-Dosgi.bundles.defaultStartLevel=4",
@@ -65,7 +65,7 @@ local config = {
 		java = {
 			configuration = {
 				runtimes = {
-					{ name = "JavaSE-17", path = "/home/francois/.local/java/java-17-openjdk" },
+					{ name = "JavaSE-21", path = "/home/francois/.local/java/java-21-openjdk" },
 				},
 			},
 		},
