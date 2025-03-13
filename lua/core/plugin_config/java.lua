@@ -71,6 +71,10 @@ if not vim.fn.filereadable(java_modules) then
 end
 
 vim.notify("java_modules: " .. java_modules, vim.log.levels.INFO)
+
+local classpath = project_root .. "/.classpath"
+
+vim.notify("classpath: " .. classpath, vim.log.levels.INFO)
 local hardCmd = {
 	java_executable,
 	"-XX:+IgnoreUnrecognizedVMOptions",
@@ -95,6 +99,8 @@ local hardCmd = {
 	jdtls_config_path, -- ✅ Ensure this is correct
 	"-data",
 	workspace_dir,
+	"cp", -- optional
+	classpath, --optional
 } -- ✅ Ensure workspace is in $HOME/.cache
 
 local jdtls_path = vim.fn.expand(jdtls_home .. "/bin/jdtls")
