@@ -53,7 +53,12 @@ int main(int argc, char* argv[]) {
 
 	// If a path is provided as an argument, use it; otherwise, use the current directory
 	if (argc > 1) {
-		target_path = fs::canonical(argv[1]); // Resolve full path
+		fs::path input_path(argv[1]);
+		if (!fs::exists(input_path)) {
+			std::cerr << "❌ Error: The provided path does not exist: " << input_path.string() << std::endl;
+			return 1;
+		}
+		target_path = fs::canonical(input_path); // Resolve full path
 	} else {
 		target_path = fs::current_path();
 	}

@@ -1759,7 +1759,6 @@ keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, opts("Write 
 
 keymap.set("n", "<leader>ss", get_function_calls, opts("jump to selected symbols"))
 --------------------------------- GENERAL UTILS MACRO --------------------------------------
-_G.general_utils_franck = {}
 function _G.general_utils_franck.not_invert()
 	local word = vim.fn.expand("<cword>")
 	local replacements = {
