@@ -71,43 +71,7 @@ end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
-	-- Get the absolute path of the current buffer
-	local buffer_path = vim.fn.expand("%:p")
-
-	-- Fallback if the buffer is empty
-	if buffer_path == "" then
-		buffer_path = vim.fn.getcwd()
-	end
-
-	local buffer_dir = vim.fn.expand("%:p:h") -- `%:p:h` extracts the directory of the current file
-	-- Call the external script and capture the output
-	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
-
-	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
-	-- Trim whitespace and newlines
-	project_root = project_root:gsub("%s+$", "")
-
-	-- 🚨 **Validation Checks**
-	if project_root == "" then
-		print("❌ Error: `find_project_root` returned an empty string!")
-		return original_location
-	end
-
-	if #project_root > 256 then
-		print("❌ Error: Project root path too long (> 256 chars)!")
-		print("\nproject root was: \n(" .. project_root .. ")\n\n")
-		return original_location
-	end
-
-	if project_root:find("[\n\r]") then
-		print("❌ Error: Project root contains unexpected newlines!")
-		return original_location
-	end
-
-	if not vim.fn.isdirectory(project_root) then
-		print("❌ Error: `find_project_root` did not return a valid directory!")
-		return original_location
-	end
+	local project_root = general_utils_franck.find_project_root()
 
 	-- Use the detected
 	session_dir = project_root .. "/.nvim-session/"
