@@ -43,6 +43,8 @@ _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+--------------------------------------- BASH ---------------------------------------
+
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
 	filetypes = { "sh", "bash" },
@@ -54,6 +56,13 @@ lspconfig.bashls.setup({
 	},
 })
 
+lspconfig.zls.setup({
+	cmd = { "zls" },
+	filetypes = { "zsh" },
+	root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
+})
+
+--------------------------------------- LUA ---------------------------------------
 lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
@@ -71,6 +80,7 @@ lspconfig.lua_ls.setup({
 	},
 })
 
+--------------------------------------- PYTHON ---------------------------------------
 lspconfig.pyright.setup({
 
 	settings = {
@@ -100,6 +110,8 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	vim.cmd("!pyright --verbose")
 end, {})
 
+--------------------------------------- C/C++ ---------------------------------------
+
 lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
@@ -127,6 +139,7 @@ lspconfig.clangd.setup({
 	end,
 })
 
+--------------------------------------- RUST ---------------------------------------
 lspconfig.rust_analyzer.setup({
 	cmd = { "rust-analyzer" },
 	capabilities = lsp_defaults.capabilities, -- Enable LSP capabilities
@@ -160,48 +173,36 @@ lspconfig.rust_analyzer.setup({
 	end,
 })
 
-local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
+------------------------------------------------ End of LANGUAGE Config ----------------------------------------
 
--- Add each JavaFX JAR file
-local javafx_libs = {
-	javafx_path .. "/javafx.base.jar",
-	javafx_path .. "/javafx.controls.jar",
-	javafx_path .. "/javafx.fxml.jar",
-	javafx_path .. "/javafx.graphics.jar",
-	javafx_path .. "/javafx.media.jar",
-	javafx_path .. "/javafx.swing.jar",
-	javafx_path .. "/javafx.web.jar",
-}
+lspconfig.solargraph.setup({})
+lspconfig.ts_ls.setup({})
+lspconfig.gopls.setup({})
+lspconfig.tailwindcss.setup({})
 
-lspconfig.jdtls.setup({
-	cmd = { "jdtls" },
-	root_dir = lspconfig.util.root_pattern(".git", "pom.xml", "build.gradle", ".classpath"),
-	settings = {
-		java = {
-			configuration = {
-				runtimes = {
-					{ name = "JavaSE-23", path = "/usr/lib/jvm/java-23-openjdk" },
-					-- { name = "JavaFX-23", path = "/usr/lib/jvm/javafx-sdk-23.0.1/lib" },
-					{ name = "JavaSE-17", path = "/usr/lib/jvm/java-17-openjdk" },
-					-- { name = "JavaFX-17", path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib" },
-				},
-			},
-		},
-	},
-	capabilities = lsp_defaults.capabilities,
-	on_attach = function(client, bufnr)
-		-- Update the global variable when the LSP attaches
-		_G.MyRootDir = client.config.root_dir
-		-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+-- Hyprlang LSP
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+	pattern = { "*.hl", "hypr*.conf" },
+	callback = function(event)
+		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
+		vim.lsp.start({
+			name = "hyprlang",
+			cmd = { "hyprls" },
+			root_dir = vim.fn.getcwd(),
+		})
 	end,
 })
 
------------------------------------------------- End of Java Config ----------------------------------------
+vim.api.nvim_create_autocmd("VimLeavePre", {
+	callback = function()
+		-- Properly shut down LSP servers when exiting Neovim
+		for _, client in pairs(vim.lsp.get_active_clients()) do
+			client.stop()
+		end
+	end,
+})
 
-require("lspconfig").solargraph.setup({})
-require("lspconfig").ts_ls.setup({})
-require("lspconfig").gopls.setup({})
-require("lspconfig").tailwindcss.setup({})
+------------------------------------------------ LATEX AND TEXLIVE ------------------------------------------------
 
 local tex_output = os.getenv("HOME") .. "/.texfiles/" -- Directory for auxiliary files
 local pdf_output_dir = vim.fn.expand("%:p:h") -- Directory where the PDF should be saved
@@ -270,28 +271,6 @@ vim.g.vimtex_compiler_latexmk = {
 	continuous = false, -- Enable continuous compilation
 	background = false,
 }
-
--- Hyprlang LSP
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-	pattern = { "*.hl", "hypr*.conf" },
-	callback = function(event)
-		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
-		vim.lsp.start({
-			name = "hyprlang",
-			cmd = { "hyprls" },
-			root_dir = vim.fn.getcwd(),
-		})
-	end,
-})
-
-vim.api.nvim_create_autocmd("VimLeavePre", {
-	callback = function()
-		-- Properly shut down LSP servers when exiting Neovim
-		for _, client in pairs(vim.lsp.get_active_clients()) do
-			client.stop()
-		end
-	end,
-})
 
 -- vim.api.nvim_create_user_command("CheckLSP", function()
 -- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
