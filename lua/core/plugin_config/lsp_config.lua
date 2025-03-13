@@ -47,19 +47,13 @@ lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabiliti
 
 lspconfig.bashls.setup({
 	cmd = { "bash-language-server", "start" },
-	filetypes = { "sh", "bash" },
+	filetypes = { "sh", "bash", "zsh" },
 	root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
 	settings = {
 		bash = {
 			useLinting = true,
 		},
 	},
-})
-
-lspconfig.zls.setup({
-	cmd = { "zls" },
-	filetypes = { "zsh" },
-	root_dir = lspconfig.util.root_pattern(".git", vim.fn.getcwd()),
 })
 
 --------------------------------------- LUA ---------------------------------------
