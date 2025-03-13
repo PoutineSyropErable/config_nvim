@@ -601,13 +601,85 @@ local function get_main_class()
 	return result -- Return the main class name
 end
 
+local function wait_for_debugger_async(host, port, timeout, callback)
+	local uv = vim.loop
+	local start_time = uv.now()
+
+	print("⏳ Waiting for Java Debugger to start on " .. host .. ":" .. port .. "...")
+
+	local function check_debugger()
+		local socket = uv.new_tcp()
+		socket:connect(host, port, function(err)
+			if not err then
+				socket:close()
+				print("✅ Java Debugger is ready! Attaching...")
+				callback(true)
+			else
+				if (uv.now() - start_time) >= timeout then
+					print("❌ Timeout! Java Debugger did not start within " .. timeout .. "ms.")
+					callback(false)
+				else
+					-- Retry in 500ms (non-blocking)
+					uv.timer_start(uv.new_timer(), 500, 0, check_debugger)
+				end
+			end
+		end)
+	end
+
+	-- Start checking
+	check_debugger()
+end
+
+local function start_automake()
+	local filepath = vim.api.nvim_buf_get_name(0) -- Get the full file path
+	local java_file = vim.fn.shellescape(filepath)
+	if java_file == "" then
+		print("❌ No Java file selected!")
+		return
+	end
+
+	local home = vim.fn.expand("$HOME")
+	local AutoMakeJava_location = "/Documents/University (Real)/Semester 10/Comp 303/AutomakeJava"
+	local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
+
+	-- local cmd = "python3 " .. autoMakeScript .. java_file .. '" --debug &'
+	local cmd = string.format('python3 "%s" "%s" --debug &', autoMakeScript, filepath)
+	vim.fn.jobstart(cmd, {
+		on_exit = function(_, code)
+			if code == 0 then
+				print("✅ Automake started Java Debugger.")
+			else
+				print("❌ Automake failed.")
+			end
+		end,
+	})
+end
+
+local other_java_dap = {
+	-- 🚀 Launch Java Application with Debugging
+	type = "java",
+	request = "launch",
+	name = "Launch Java Application",
+
+	-- Use functions so values are fetched dynamically at runtime
+	classPaths = function() return get_class_path() end,
+	mainClass = function() return get_main_class() end,
+
+	javaExec = "/usr/lib/jvm/java-21-openjdk/bin/java",
+
+	-- If using a multi-module project, remove this
+	-- projectName = "yourProjectName",
+
+	-- This is automatically set by `nvim-jdtls`
+	modulePaths = {},
+}
+
 local javaDapPort = 5005
 
--- ✅ Manually register the Java DAP adapter
 dap.adapters.java = {
 	type = "server",
 	host = "127.0.0.1",
-	port = javaDapPort, -- This matches the port used by your Python script running the Java process
+	port = javaDapPort,
 }
 
 dap.configurations.java = {
@@ -618,37 +690,24 @@ dap.configurations.java = {
 		name = "Debug (Attach) - Remote",
 		hostName = "127.0.0.1",
 		port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
+		timeout = 30000,
 	},
-	{
-		-- 🚀 Launch Java Application with Debugging
-		type = "java",
-		request = "launch",
-		name = "Launch Java Application",
-
-		-- Use functions so values are fetched dynamically at runtime
-		classPaths = function() return get_class_path() end,
-		mainClass = function() return get_main_class() end,
-
-		javaExec = "/usr/lib/jvm/java-21-openjdk/bin/java",
-
-		-- If using a multi-module project, remove this
-		-- projectName = "yourProjectName",
-
-		-- This is automatically set by `nvim-jdtls`
-		modulePaths = {},
-	},
+	-- other_java_dap
 }
 
+local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 vim.keymap.set("n", "<F8>", function()
 	local class_path = get_class_path()
 	if class_path then
 		print("✅ Java Class Path: " .. table.concat(class_path, "\n"))
 	end
-end, { noremap = true, silent = true })
+end, opts("get class path"))
 
 vim.keymap.set("n", "<F9>", function()
 	local main_class = get_main_class()
 	if main_class then
 		print("✅ Java Main Class: " .. main_class)
 	end
-end, { noremap = true, silent = true })
+end, opts("get main class"))
+
+vim.keymap.set("n", "<F10>", start_automake, opts("Start automake debugger"))
