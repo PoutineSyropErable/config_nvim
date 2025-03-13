@@ -31,16 +31,14 @@ local config = {
 		java = {
 			configuration = {
 				runtimes = {
-					{ name = "JavaSE-11", path = "/usr/lib/jvm/java-11-openjdk/" },
-					{ name = "JavaSE-17", path = "/usr/lib/jvm/java-17-openjdk/" },
-					{ name = "JavaSE-21", path = "/usr/lib/jvm/java-21-openjdk/" },
+					{ name = "JavaSE-17", path = "/home/francois/.local/java/java-17-openjdk/" },
 				},
 			},
 		},
 	},
 
 	init_options = {
-		bundles = { vim.fn.glob("~/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin.jar", true) },
+		bundles = { vim.fn.expand("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin.jar") },
 	},
 }
 
@@ -49,5 +47,7 @@ local config = {
 -- }
 --
 -- config.init_options.bundles = bundles
-
-jdtls.start_or_attach(config)
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "java",
+	callback = function() require("jdtls").start_or_attach(config) end,
+})
