@@ -10,7 +10,6 @@ require("core.plugin_config.neoclip")
 
 require("core.plugin_config.mason")
 require("core.plugin_config.lsp_config")
-require("core.plugin_config.java_lsp_old")
 require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
@@ -18,10 +17,11 @@ require("core.plugin_config.black")
 require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
--- vim.api.nvim_create_autocmd("FileType", {
--- 	pattern = "java",
--- 	callback = function() require("core.plugin_config.java") end,
--- })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "java",
+	callback = function() require("core.plugin_config.java") end,
+})
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.toggleterm")

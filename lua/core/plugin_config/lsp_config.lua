@@ -167,6 +167,69 @@ lspconfig.rust_analyzer.setup({
 	end,
 })
 
+---------------------------------------------------- Start of Java ------------------------------------------
+local useJavaLspConfig = false
+
+if useJavaLspConfig then
+	local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
+
+	local jdtls_home = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls")
+	local jdtls_executable = vim.fn.expand(jdtls_home .. "/bin/jdtls")
+
+	-- Add each JavaFX JAR file
+	local javafx_libs = {
+		javafx_path .. "/javafx.base.jar",
+		javafx_path .. "/javafx.controls.jar",
+		javafx_path .. "/javafx.fxml.jar",
+		javafx_path .. "/javafx.graphics.jar",
+		javafx_path .. "/javafx.media.jar",
+		javafx_path .. "/javafx.swing.jar",
+		javafx_path .. "/javafx.web.jar",
+	}
+
+	local general_utils = _G.general_utils_franck
+	if not general_utils then
+		vim.notify("❌ Error: `_G.general_utils_franck` not found!")
+		return
+	end
+	local project_root = general_utils.find_project_root()
+
+	if not project_root then
+		vim.notify("⚠️(java): Could not determine project root, using current working directory.")
+		project_root = vim.fn.getcwd()
+	end
+	vim.notify("🔍 JDTLS root_dir: " .. project_root, vim.log.levels.INFO)
+
+	-- Extract project name from project root
+	local project_name = vim.fn.fnamemodify(project_root, ":t")
+	vim.notify("(java) ✅ Project Name: " .. project_name, vim.log.levels.INFO)
+
+	-- Ensure workspace directory is valid
+	local workspace_dir = vim.fn.expand("$HOME/.cache/jdtls/workspace") .. "/" .. project_name
+
+	lspconfig.jdtls.setup({
+		cmd = { "jdtls", "-data", workspace_dir },
+		root_dir = lspconfig.util.root_pattern(".git", "pom.xml", "build.gradle", ".classpath"),
+		settings = {
+			java = {
+				configuration = {
+					runtimes = {
+						{ name = "JavaSE-23", path = "/usr/lib/jvm/java-23-openjdk" },
+						{ name = "JavaSE-21", path = "/usr/lib/jvm/java-21-openjdk" },
+						{ name = "JavaSE-17", path = "/usr/lib/jvm/java-17-openjdk" },
+					},
+				},
+			},
+		},
+		capabilities = lsp_defaults.capabilities,
+		on_attach = function(client, bufnr)
+			-- Update the global variable when the LSP attaches
+			_G.MyRootDir = client.config.root_dir
+			-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+		end,
+	})
+end
+
 ------------------------------------------------ End of LANGUAGE Config ----------------------------------------
 
 lspconfig.solargraph.setup({})
