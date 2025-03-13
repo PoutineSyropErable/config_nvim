@@ -72,16 +72,13 @@ end
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
 	local project_root = general_utils_franck.find_project_root()
+	if project_root == nil then
+		session_dir = original_location
+		return nil
+	end
 
-	-- Use the detected
 	session_dir = project_root .. "/.nvim-session/"
-
-	-- Ensure session directory exists (The script takes care of it), hence redundant
 	vim.fn.mkdir(session_dir, "p")
-
-	-- Debug message
-	-- print("💾 Session directory set to:", session_dir)
-	-- ^^this doesn't work
 	return session_dir
 end
 
@@ -154,6 +151,8 @@ nvim_possession.setup({
 })
 
 local function ensure_session_exists()
+	print("F: session_dir = " .. session_dir)
+	print("F: original_location = " .. original_location)
 	if session_dir == original_location then
 		return
 	end
