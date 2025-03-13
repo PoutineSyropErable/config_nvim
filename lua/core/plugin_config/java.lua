@@ -40,14 +40,14 @@ local config = {
 	},
 
 	init_options = {
-		bundles = {},
+		bundles = { vim.fn.glob("~/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin.jar", true) },
 	},
 }
 
-local bundles = {
-	vim.fn.glob("~/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin.jar", true),
-}
-
-config.init_options.bundles = bundles
+-- local bundles = {
+-- 	vim.fn.glob("~/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin.jar", true),
+-- }
+--
+-- config.init_options.bundles = bundles
 
 jdtls.start_or_attach(config)

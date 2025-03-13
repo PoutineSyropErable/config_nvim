@@ -688,7 +688,7 @@ dap.configurations.java = {
 		type = "java",
 		request = "attach",
 		name = "Debug (Attach) - Remote",
-		hostName = "127.0.0.1",
+		hostName = "*",
 		port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
 		timeout = 30000,
 	},
