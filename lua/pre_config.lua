@@ -18,7 +18,12 @@ _G.general_utils_franck.find_project_root = function()
 
 	-- Run the script and capture the output
 	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
+	if project_root == nil then
+		return nil
+	end
+
 	project_root = vim.trim(project_root) -- Trim whitespace/newlines
+	print("F: (before checks), project_root = ", project_root)
 
 	-- 🚨 **Validation Checks**
 	if project_root == "" or not vim.fn.isdirectory(project_root) then
