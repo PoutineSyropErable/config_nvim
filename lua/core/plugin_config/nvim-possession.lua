@@ -151,8 +151,8 @@ nvim_possession.setup({
 })
 
 local function ensure_session_exists()
-	print("F: session_dir = " .. session_dir)
-	print("F: original_location = " .. original_location)
+	-- print("F: session_dir = " .. session_dir)
+	-- print("F: original_location = " .. original_location)
 	if session_dir == original_location then
 		return
 	end

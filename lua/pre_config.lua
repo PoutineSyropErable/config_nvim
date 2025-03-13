@@ -23,7 +23,6 @@ _G.general_utils_franck.find_project_root = function()
 	end
 
 	project_root = vim.trim(project_root) -- Trim whitespace/newlines
-	print("F: (before checks), project_root = ", project_root)
 
 	-- 🚨 **Validation Checks**
 	if project_root == "" or not vim.fn.isdirectory(project_root) then

@@ -1,14 +1,29 @@
+-- 🔍 Validate Java Home
+local java_home = vim.fn.expand("$JAVA_HOME")
+if not vim.fn.isdirectory(java_home) then
+	vim.notify("❌ JAVA_HOME is not set correctly: " .. java_home)
+	return
+end
+local java_executable = java_home .. "/bin/java"
+
+vim.notify("java executable = " .. java_executable, vim.log.levels.INFO)
+
+-- Define the base JDTLS directory as a variable
+local jdtls_home = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls")
+
 local general_utils = _G.general_utils_franck
 if not general_utils then
 	vim.notify("❌ Error: `_G.general_utils_franck` not found!")
 	return
 end
+
 local project_root = general_utils.find_project_root()
 
 if not project_root then
 	vim.notify("⚠️(java): Could not determine project root, using current working directory.")
 	project_root = vim.fn.getcwd()
 end
+vim.notify("🔍 JDTLS root_dir: " .. project_root, vim.log.levels.INFO)
 
 -- Extract project name from project root
 local project_name = vim.fn.fnamemodify(project_root, ":t")
@@ -25,7 +40,8 @@ end
 
 local jdtls = require("jdtls")
 
-local jdtls_launcher = vim.fn.glob("$HOME/.local/share/eclipse.jdt.ls/plugins/org.eclipse.equinox.launcher_*.jar")
+-- Use the jdtls_home variable to find the JDTLS launcher
+local jdtls_launcher = vim.fn.glob(jdtls_home .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 if jdtls_launcher == "" or not vim.fn.filereadable(jdtls_launcher) then
 	vim.notify("❌ JDTLS Launcher not found or is not readable!")
 	return
@@ -40,17 +56,10 @@ if debug_plugin == "" or not vim.fn.filereadable(debug_plugin) then
 end
 vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
 
--- Ensure JDTLS configuration path is correct
-local jdtls_config_path = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls/config_linux")
+-- Use the jdtls_home variable to find the JDTLS configuration path
+local jdtls_config_path = jdtls_home .. "/config_linux"
 if not vim.fn.isdirectory(jdtls_config_path) then
 	vim.notify("❌ JDTLS configuration directory not found: " .. jdtls_config_path)
-	return
-end
-
--- 🔍 Validate Java Home
-local java_home = vim.fn.expand("$JAVA_HOME")
-if not vim.fn.isdirectory(java_home) then
-	vim.notify("❌ JAVA_HOME is not set correctly: " .. java_home)
 	return
 end
 
@@ -61,8 +70,9 @@ if not vim.fn.filereadable(java_modules) then
 	return
 end
 
+vim.notify("java_modules: " .. java_modules, vim.log.levels.INFO)
 local hardCmd = {
-	java_home .. "/bin/java", -- 🛠 Ensure Java is correctly set
+	java_executable,
 	"-XX:+IgnoreUnrecognizedVMOptions",
 	"-XX:+IgnoreUnrecognizedVMOptions",
 	"-Declipse.application=org.eclipse.jdt.ls.core.id1",
@@ -87,7 +97,7 @@ local hardCmd = {
 	workspace_dir,
 } -- ✅ Ensure workspace is in $HOME/.cache
 
-local jdtls_path = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls/bin/jdtls")
+local jdtls_path = vim.fn.expand(jdtls_home .. "/bin/jdtls")
 local simpleCmd = {
 	jdtls_path,
 	"-configuration",
@@ -96,15 +106,9 @@ local simpleCmd = {
 	workspace_dir,
 }
 
--- local useSimple = true
--- local useCmd = hardCmd
--- if useSimple then
--- 	useCmd = simpleCmd
--- end
-
 -- ✅ Correcting -configuration and -data paths
 local config = {
-	cmd = simpleCmd,
+	cmd = hardCmd,
 
 	root_dir = project_root, -- Use detected project root (or fallback to CWD)
 
@@ -124,6 +128,5 @@ local config = {
 }
 
 vim.notify("🚀 Starting JDTLS for " .. project_name, vim.log.levels.INFO)
-vim.notify("🔍 JDTLS root_dir: " .. config.root_dir, vim.log.levels.INFO)
 
 jdtls.start_or_attach(config)

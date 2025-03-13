@@ -2,9 +2,14 @@ local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
+vim.lsp.set_log_level("debug")
+
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 --------------------------------------- JAVA  ---------------------------------------
 local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
+
+local jdtls_home = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls")
+local jdtls_executable = vim.fn.expand(jdtls_home .. "/bin/jdtls")
 
 -- Add each JavaFX JAR file
 local javafx_libs = {
@@ -26,6 +31,7 @@ lspconfig.jdtls.setup({
 				runtimes = {
 					{ name = "JavaSE-23", path = "/usr/lib/jvm/java-23-openjdk" },
 					-- { name = "JavaFX-23", path = "/usr/lib/jvm/javafx-sdk-23.0.1/lib" },
+					{ name = "JavaSE-21", path = "/usr/lib/jvm/java-21-openjdk" },
 					{ name = "JavaSE-17", path = "/usr/lib/jvm/java-17-openjdk" },
 					-- { name = "JavaFX-17", path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib" },
 				},
