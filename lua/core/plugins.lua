@@ -67,18 +67,17 @@ require("lazy").setup({
 		ft = { "python" }, -- Only load when editing Python files
 	},
 
-	------- Java DAP Support -----
-	-- {
-	-- 	"mfussenegger/nvim-jdtls",
-	-- 	dependencies = {
-	-- 		"mfussenegger/nvim-dap",
-	-- 		"rcarriga/nvim-dap-ui",
-	-- 	},
-	-- 	ft = { "java" },
-	-- },
-
+	------- Java Support -----
+	PRE_CONFIG_FRANCK.jdtls,
+	PRE_CONFIG_FRANCK.java,
 	-- BASH DAP support?
 	"bash-lsp/bash-language-server",
+
+	-- Terminal file managers (lf)
+	{
+		"rolv-apneseth/tfm.nvim",
+		lazy = false, -- Load the plugin immediately
+	},
 
 	"psf/black",
 

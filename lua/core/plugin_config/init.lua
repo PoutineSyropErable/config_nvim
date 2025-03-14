@@ -7,23 +7,27 @@ require("core.plugin_config.oil")
 require("core.plugin_config.treesitter")
 require("core.plugin_config.telescope")
 require("core.plugin_config.neoclip")
+require("core.plugin_config.terminal_file_manager")
 
 require("core.plugin_config.mason")
+if PRE_CONFIG_FRANCK.useNvimJava then
+	require("core.plugin_config.nvim-java")
+end
 require("core.plugin_config.lsp_config")
 require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
 
-require("core.plugin_config.nvim-dap-config")
+-- require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
 
---if PRE_CONFIG_FRANCK.useNvimJdtls then
---	vim.api.nvim_create_autocmd("FileType", {
---		pattern = "java",
---		callback = function() require("core.plugin_config.nvim-jdtls") end,
---	})
---end
+if PRE_CONFIG_FRANCK.useNvimJdtls then
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "java",
+		callback = function() require("core.plugin_config.nvim-jdtls") end,
+	})
+end
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.toggleterm")

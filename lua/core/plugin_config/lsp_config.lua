@@ -244,6 +244,10 @@ if useJavaLspConfig then
 	})
 end
 
+if PRE_CONFIG_FRANCK.useNvimJava and not PRE_CONFIG_FRANCK.useJavaLspConfig then
+	require("lspconfig").jdtls.setup({})
+end
+
 ------------------------------------------------ End of LANGUAGE Config ----------------------------------------
 
 lspconfig.solargraph.setup({})

@@ -1,8 +1,25 @@
 -- Ensure PRE_CONFIG_FRANCK exists
 _G.PRE_CONFIG_FRANCK = {}
 PRE_CONFIG_FRANCK.use_bufferline = true
+
+-- Java
 PRE_CONFIG_FRANCK.useJavaLspConfig = true
 PRE_CONFIG_FRANCK.useNvimJdtls = false
+PRE_CONFIG_FRANCK.useNvimJava = true
+PRE_CONFIG_FRANCK.useMyJavaDap = false
+
+PRE_CONFIG_FRANCK.jdtls = PRE_CONFIG_FRANCK.useNvimJdtls
+		and {
+			"mfussenegger/nvim-jdtls",
+			dependencies = {
+				"mfussenegger/nvim-dap",
+				"rcarriga/nvim-dap-ui",
+			},
+			ft = { "java" },
+		}
+	or {}
+
+PRE_CONFIG_FRANCK.java = PRE_CONFIG_FRANCK.useNvimJava and { "nvim-java/nvim-java" } or {}
 
 _G.general_utils_franck = {}
 _G.general_utils_franck.find_project_root = function()

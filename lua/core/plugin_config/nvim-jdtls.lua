@@ -2,29 +2,29 @@ vim.notify("Using nvim-jdtls for java", vim.log.levels.INFO)
 -- 🔍 Validate Java Home
 local java_home = vim.fn.expand("$JAVA_HOME")
 if not vim.fn.isdirectory(java_home) then
-	vim.notify("❌ JAVA_HOME is not set correctly: " .. java_home)
+	-- vim.notify("❌ JAVA_HOME is not set correctly: " .. java_home)
 	return
 end
 local java_executable = java_home .. "/bin/java"
 
-vim.notify("java executable = " .. java_executable, vim.log.levels.INFO)
+-- vim.notify("java executable = " .. java_executable .. "\n", vim.log.levels.INFO)
 
 -- Define the base JDTLS directory as a variable
 local jdtls_home = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls")
 
 local general_utils = _G.general_utils_franck
 if not general_utils then
-	vim.notify("❌ Error: `_G.general_utils_franck` not found!")
+	-- vim.notify("❌ Error: `_G.general_utils_franck` not found!")
 	return
 end
 
 local project_root = general_utils.find_project_root()
 
 if not project_root then
-	vim.notify("⚠️(java): Could not determine project root, using current working directory.")
+	-- vim.notify("⚠️(java): Could not determine project root, using current working directory.")
 	project_root = vim.fn.getcwd()
 end
-vim.notify("🔍 JDTLS root_dir: " .. project_root, vim.log.levels.INFO)
+-- vim.notify("🔍 JDTLS root_dir: " .. project_root, vim.log.levels.INFO)
 
 -- Extract project name from project root
 local project_name = vim.fn.fnamemodify(project_root, ":t")
@@ -36,7 +36,7 @@ local workspace_dir = vim.fn.expand("$HOME/.cache/jdtls/workspace/") .. "/" .. p
 -- Ensure workspace directory exists
 if not vim.fn.isdirectory(workspace_dir) then
 	vim.fn.mkdir(workspace_dir, "p")
-	vim.notify("📂 Created workspace directory: " .. workspace_dir, vim.log.levels.INFO)
+	-- vim.notify("📂 Created workspace directory: " .. workspace_dir, vim.log.levels.INFO)
 end
 
 local jdtls = require("jdtls")
@@ -44,38 +44,38 @@ local jdtls = require("jdtls")
 -- Use the jdtls_home variable to find the JDTLS launcher
 local jdtls_launcher = vim.fn.glob(jdtls_home .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 if jdtls_launcher == "" or not vim.fn.filereadable(jdtls_launcher) then
-	vim.notify("❌ JDTLS Launcher not found or is not readable!")
+	-- vim.notify("❌ JDTLS Launcher not found or is not readable!")
 	return
 end
-vim.notify("JDTLS Launcher path: " .. jdtls_launcher, vim.log.levels.INFO)
+-- vim.notify("JDTLS Launcher path: " .. jdtls_launcher, vim.log.levels.INFO)
 
 -- Ensure debug plugin exists
 local debug_plugin = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
 if debug_plugin == "" or not vim.fn.filereadable(debug_plugin) then
-	vim.notify("❌ Java Debug Plugin not found or is not readable!")
+	-- vim.notify("❌ Java Debug Plugin not found or is not readable!")
 	return
 end
-vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
+-- vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
 
 -- Use the jdtls_home variable to find the JDTLS configuration path
 local jdtls_config_path = jdtls_home .. "/config_linux"
 if not vim.fn.isdirectory(jdtls_config_path) then
-	vim.notify("❌ JDTLS configuration directory not found: " .. jdtls_config_path)
+	-- vim.notify("❌ JDTLS configuration directory not found: " .. jdtls_config_path)
 	return
 end
 
 -- ✅ Ensure Java 21+ Modules Path
 local java_modules = java_home .. "/jmods"
 if not vim.fn.filereadable(java_modules) then
-	vim.notify("❌ Java modules not found in: " .. java_modules)
+	-- vim.notify("❌ Java modules not found in: " .. java_modules)
 	return
 end
 
-vim.notify("java_modules: " .. java_modules, vim.log.levels.INFO)
+-- vim.notify("java_modules: " .. java_modules, vim.log.levels.INFO)
 
 local classpath = project_root .. "/.classpath"
 
-vim.notify("classpath: " .. classpath, vim.log.levels.INFO)
+-- vim.notify("classpath: " .. classpath, vim.log.levels.INFO)
 local hardCmd = {
 	java_executable,
 	"-XX:+IgnoreUnrecognizedVMOptions",
@@ -134,6 +134,6 @@ local config = {
 	},
 }
 
-vim.notify("🚀 Starting JDTLS for " .. project_name, vim.log.levels.INFO)
+-- vim.notify("🚀 Starting JDTLS for " .. project_name, vim.log.levels.INFO)
 
 jdtls.start_or_attach(config)

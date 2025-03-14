@@ -674,8 +674,6 @@ local other_java_dap = {
 	modulePaths = {},
 }
 
-local javaDapPort = 5005
-
 -- dap.adapters.java = function(callback)
 -- 	-- FIXME:
 -- 	-- Here a function needs to trigger the `vscode.java.startDebugSession` LSP command
@@ -687,38 +685,41 @@ local javaDapPort = 5005
 -- 	})
 -- end
 
-dap.adapters.java = function(callback)
-	-- Send a request to the LSP to start the debug session
-	vim.lsp.buf_request(0, "workspace/executeCommand", {
-		command = "vscode.java.startDebugSession",
-		arguments = {},
-	}, function(err, result)
-		if err then
-			vim.notify("Failed to start debug session: " .. err.message)
-		else
-			vim.notify("Result is: " .. result)
-			local port = result
-			callback({
-				type = "server",
-				host = "127.0.0.1",
-				port = port,
-			})
-		end
-	end)
-end
+if PRE_CONFIG_FRANCK.useMyJavaDap then
+	dap.adapters.java = function(callback)
+		-- Send a request to the LSP to start the debug session
+		vim.lsp.buf_request(0, "workspace/executeCommand", {
+			command = "vscode.java.startDebugSession",
+			arguments = {},
+		}, function(err, result)
+			if err then
+				vim.notify("Failed to start debug session: " .. err.message)
+			else
+				vim.notify("Result is: " .. result)
+				local port = result
+				callback({
+					type = "server",
+					host = "127.0.0.1",
+					port = port,
+				})
+			end
+		end)
+	end
 
-dap.configurations.java = {
-	{
-		-- 🚀 Attach to a Running JVM Debug Session
-		type = "java",
-		request = "attach",
-		name = "Debug (Attach) - Remote",
-		hostName = "127.0.0.1",
-		port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
-		timeout = 30000,
-	},
-	-- other_java_dap
-}
+	local javaDapPort = 5005
+	dap.configurations.java = {
+		{
+			-- 🚀 Attach to a Running JVM Debug Session
+			type = "java",
+			request = "attach",
+			name = "Debug (Attach) - Remote",
+			hostName = "127.0.0.1",
+			port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
+			timeout = 30000,
+		},
+		-- other_java_dap
+	}
+end
 
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 vim.keymap.set("n", "<F8>", function()
