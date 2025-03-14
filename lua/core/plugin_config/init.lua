@@ -18,10 +18,12 @@ require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "java",
-	callback = function() require("core.plugin_config.java") end,
-})
+--if PRE_CONFIG_FRANCK.useNvimJdtls then
+--	vim.api.nvim_create_autocmd("FileType", {
+--		pattern = "java",
+--		callback = function() require("core.plugin_config.nvim-jdtls") end,
+--	})
+--end
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.toggleterm")
@@ -54,7 +56,7 @@ require("core.plugin_config.nvim-possession")
 -- require("core.plugin_config.EXTRA_DEBUG")
 
 -- require("core.plugin_config.tabout")
--- require("core.plugin_config.noice")
+require("core.plugin_config.noice")
 
 -- End of file
 

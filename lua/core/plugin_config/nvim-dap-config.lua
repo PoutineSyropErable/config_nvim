@@ -1,5 +1,5 @@
 local dap = require("dap")
-dap.set_log_level("TRACE")
+dap.set_log_level("DEBUG")
 
 local function debug_log(func_name, ...)
 	local args = table.concat({ ... }, ", ")
@@ -676,11 +676,36 @@ local other_java_dap = {
 
 local javaDapPort = 5005
 
-dap.adapters.java = {
-	type = "server",
-	host = "127.0.0.1",
-	port = javaDapPort,
-}
+-- dap.adapters.java = function(callback)
+-- 	-- FIXME:
+-- 	-- Here a function needs to trigger the `vscode.java.startDebugSession` LSP command
+-- 	-- The response to the command must be the `port` used below
+-- 	callback({
+-- 		type = "server",
+-- 		host = "127.0.0.1",
+-- 		port = javaDapPort,
+-- 	})
+-- end
+
+dap.adapters.java = function(callback)
+	-- Send a request to the LSP to start the debug session
+	vim.lsp.buf_request(0, "workspace/executeCommand", {
+		command = "vscode.java.startDebugSession",
+		arguments = {},
+	}, function(err, result)
+		if err then
+			vim.notify("Failed to start debug session: " .. err.message)
+		else
+			vim.notify("Result is: " .. result)
+			local port = result
+			callback({
+				type = "server",
+				host = "127.0.0.1",
+				port = port,
+			})
+		end
+	end)
+end
 
 dap.configurations.java = {
 	{
@@ -688,7 +713,7 @@ dap.configurations.java = {
 		type = "java",
 		request = "attach",
 		name = "Debug (Attach) - Remote",
-		hostName = "*",
+		hostName = "127.0.0.1",
 		port = javaDapPort, -- Ensure your Java app is started with `-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`
 		timeout = 30000,
 	},

@@ -1,6 +1,8 @@
 -- Ensure PRE_CONFIG_FRANCK exists
 _G.PRE_CONFIG_FRANCK = {}
 PRE_CONFIG_FRANCK.use_bufferline = true
+PRE_CONFIG_FRANCK.useJavaLspConfig = true
+PRE_CONFIG_FRANCK.useNvimJdtls = false
 
 _G.general_utils_franck = {}
 _G.general_utils_franck.find_project_root = function()

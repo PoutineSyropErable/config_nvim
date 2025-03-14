@@ -168,9 +168,10 @@ lspconfig.rust_analyzer.setup({
 })
 
 ---------------------------------------------------- Start of Java ------------------------------------------
-local useJavaLspConfig = false
+local useJavaLspConfig = PRE_CONFIG_FRANCK.useJavaLspConfig
 
 if useJavaLspConfig then
+	vim.notify("Using lsp config for java", vim.log.levels.INFO)
 	local javafx_path = "/usr/lib/jvm/javafx-sdk-17.0.13/lib"
 
 	local jdtls_home = vim.fn.expand("$HOME/.local/share/eclipse.jdt.ls")
@@ -187,6 +188,14 @@ if useJavaLspConfig then
 		javafx_path .. "/javafx.web.jar",
 	}
 
+	-- Ensure debug plugin exists
+	local debug_plugin = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
+	if debug_plugin == "" or not vim.fn.filereadable(debug_plugin) then
+		vim.notify("❌ Java Debug Plugin not found or is not readable!")
+		return
+	end
+	vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
+
 	local general_utils = _G.general_utils_franck
 	if not general_utils then
 		vim.notify("❌ Error: `_G.general_utils_franck` not found!")
@@ -202,14 +211,15 @@ if useJavaLspConfig then
 
 	-- Extract project name from project root
 	local project_name = vim.fn.fnamemodify(project_root, ":t")
-	vim.notify("(java) ✅ Project Name: " .. project_name, vim.log.levels.INFO)
+	vim.notify("(java) ✅ Project Name: " .. project_name .. "\n", vim.log.levels.INFO)
 
 	-- Ensure workspace directory is valid
 	local workspace_dir = vim.fn.expand("$HOME/.cache/jdtls/workspace") .. "/" .. project_name
 
 	lspconfig.jdtls.setup({
-		cmd = { "jdtls", "-data", workspace_dir },
-		root_dir = lspconfig.util.root_pattern(".git", "pom.xml", "build.gradle", ".classpath"),
+		-- cmd = { "jdtls", "-data", workspace_dir },
+		cmd = { "jdtls" },
+		root_dir = project_root,
 		settings = {
 			java = {
 				configuration = {
@@ -220,6 +230,10 @@ if useJavaLspConfig then
 					},
 				},
 			},
+		},
+
+		init_options = {
+			bundles = { debug_plugin }, -- Use validated debug plugin path
 		},
 		capabilities = lsp_defaults.capabilities,
 		on_attach = function(client, bufnr)

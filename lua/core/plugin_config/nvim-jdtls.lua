@@ -1,3 +1,4 @@
+vim.notify("Using nvim-jdtls for java", vim.log.levels.INFO)
 -- 🔍 Validate Java Home
 local java_home = vim.fn.expand("$JAVA_HOME")
 if not vim.fn.isdirectory(java_home) then
@@ -27,7 +28,7 @@ vim.notify("🔍 JDTLS root_dir: " .. project_root, vim.log.levels.INFO)
 
 -- Extract project name from project root
 local project_name = vim.fn.fnamemodify(project_root, ":t")
-vim.notify("(java) ✅ Project Name: " .. project_name, vim.log.levels.INFO)
+--vim.notify("(java) ✅ Project Name: " .. project_name .. "\n", vim.log.levels.INFO)
 
 -- Ensure workspace directory is valid
 local workspace_dir = vim.fn.expand("$HOME/.cache/jdtls/workspace/") .. "/" .. project_name
