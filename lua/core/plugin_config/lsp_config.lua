@@ -217,15 +217,15 @@ if useJavaLspConfig then
 	local workspace_dir = vim.fn.expand("$HOME/.cache/jdtls/workspace") .. "/" .. project_name
 
 	lspconfig.jdtls.setup({
-		-- cmd = { "jdtls", "-data", workspace_dir },
-		cmd = { "jdtls" },
+		cmd = { "jdtls", "-data", workspace_dir },
+		-- cmd = { "jdtls" },
 		root_dir = project_root,
 		settings = {
 			java = {
 				configuration = {
 					runtimes = {
+						{ name = "JavaSE-21", path = "/usr/lib/jvm/java-21-openjdk", default = true },
 						{ name = "JavaSE-23", path = "/usr/lib/jvm/java-23-openjdk" },
-						{ name = "JavaSE-21", path = "/usr/lib/jvm/java-21-openjdk" },
 						{ name = "JavaSE-17", path = "/usr/lib/jvm/java-17-openjdk" },
 					},
 				},
