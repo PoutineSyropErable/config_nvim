@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace fs = std::filesystem;
+const bool USE_GIT_ONLY = false;
 
 // List of project root markers
 const std::vector<std::string> ROOT_MARKERS = {
@@ -20,6 +21,10 @@ const std::vector<std::string> ROOT_MARKERS = {
     // Rust
     "Cargo.toml"};
 
+const std::vector<std::string> GIT_MARKER = {".git"};
+
+const std::vector<std::string>& CHOSEN_ROOT_MARKERS = USE_GIT_ONLY ? GIT_MARKER : ROOT_MARKERS;
+
 // Function to find the project root
 fs::path find_project_root(fs::path start_path) {
 	// If the input path is a file, get its containing directory
@@ -29,7 +34,7 @@ fs::path find_project_root(fs::path start_path) {
 
 	while (true) {
 		// Check if any marker exists in the current directory
-		for (const auto& marker : ROOT_MARKERS) {
+		for (const auto& marker : CHOSEN_ROOT_MARKERS) {
 			if (fs::exists(start_path / marker)) {
 				return start_path;
 			}
