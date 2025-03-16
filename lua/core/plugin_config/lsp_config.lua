@@ -188,13 +188,22 @@ if useJavaLspConfig then
 		javafx_path .. "/javafx.web.jar",
 	}
 
-	-- Ensure debug plugin exists
-	local debug_plugin = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
-	if debug_plugin == "" or not vim.fn.filereadable(debug_plugin) then
-		vim.notify("❌ Java Debug Plugin not found or is not readable!")
-		return
+	local get_debug_plugin = function()
+		local home = os.getenv("HOME")
+		local cmd = "ls -1 " .. home .. "/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar 2>/dev/null"
+
+		local result = vim.fn.systemlist(cmd)
+
+		-- Check if the command returned valid output
+		if #result > 0 then
+			return result[1] -- Return the first match
+		else
+			return nil -- No file found
+		end
 	end
-	vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
+
+	debug_plugin = get_debug_plugin()
+	print("Java Debug Plugin Path:", debug_plugin)
 
 	local general_utils = _G.general_utils_franck
 	if not general_utils then
@@ -233,7 +242,7 @@ if useJavaLspConfig then
 		},
 
 		init_options = {
-			bundles = { debug_plugin }, -- Use validated debug plugin path
+			--bundles = { debug_plugin }, -- Use validated debug plugin path
 		},
 		capabilities = lsp_defaults.capabilities,
 		on_attach = function(client, bufnr)
@@ -243,6 +252,8 @@ if useJavaLspConfig then
 		end,
 	})
 end
+
+-- att the bundles back here
 
 if PRE_CONFIG_FRANCK.useNvimJava and not PRE_CONFIG_FRANCK.useJavaLspConfig then
 	require("lspconfig").jdtls.setup({})

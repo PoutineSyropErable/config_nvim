@@ -6,6 +6,15 @@ local function debug_log(func_name, ...)
 	print("[DEBUG] Called: " .. func_name .. " with args: " .. args)
 end
 
+local arg_func = function()
+	local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
+	print("")
+	if args == "" then
+		return nil
+	end
+	local ret = vim.split(args, " ")
+	return ret
+end
 -------------------------------- PYTHON ----------------------------------
 require("dap-python").setup(vim.fn.exepath("python")) -- Use system Python by default
 
@@ -27,13 +36,10 @@ dap.configurations.python = {
 			return vim.fn.exepath("python3") or "python"
 		end,
 
-		program = "${file}", -- Run the currently open file
-		args = function()
-			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
-			print("")
-			local ret = vim.split(args, " ")
-			return ret
-		end,
+		-- program = "${file}", -- Run the currently open file
+		cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
+		module = "303MUD.client_local",
+		args = arg_func,
 	},
 }
 
@@ -54,7 +60,7 @@ dap.configurations.sh = {
 		request = "launch",
 		program = "${file}", -- Current file
 		cwd = "${workspaceFolder}",
-		args = {}, -- Script arguments
+		args = arg_func, -- Script arguments
 		env = {}, -- Environment variables
 		stopOnEntry = false,
 	},
@@ -494,12 +500,7 @@ dap.configurations.c = {
 		setupCommands = setupCommands,
 
 		program = find_executable_custom_debug,
-		args = function()
-			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
-			print("\n")
-			local ret = vim.split(args, " ")
-			return ret
-		end,
+		args = arg_func,
 	},
 	{
 		name = "C++ Debugger by itself",
@@ -512,12 +513,7 @@ dap.configurations.c = {
 		setupCommands = setupCommands,
 
 		program = find_executable,
-		args = function()
-			local args = vim.fn.input("[DAP] Enter the program's arguments (space-separated): ")
-			print("\n")
-			local ret = vim.split(args, " ")
-			return ret
-		end,
+		args = arg_func,
 	},
 	-- other_c_dap,
 }

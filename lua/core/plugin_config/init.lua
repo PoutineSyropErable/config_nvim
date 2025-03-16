@@ -13,7 +13,7 @@ require("core.plugin_config.mason")
 if PRE_CONFIG_FRANCK.useNvimJava then
 	require("core.plugin_config.nvim-java")
 end
-require("core.plugin_config.lsp_config")
+--require("core.plugin_configlsp_config")
 require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
@@ -47,7 +47,6 @@ require("core.plugin_config.bufferline")
 -- require("core.plugin_config.barbar")
 
 require("core.plugin_config.nvim-possession")
-
 ------ ##### DEACTIVATED ##### -------
 
 -- not needed vv (hologram) (and markdown_preview)
@@ -60,8 +59,5 @@ require("core.plugin_config.nvim-possession")
 -- require("core.plugin_config.EXTRA_DEBUG")
 
 -- require("core.plugin_config.tabout")
-require("core.plugin_config.noice")
 
 -- End of file
-
-require("core.plugin_config.last")

@@ -1,4 +1,13 @@
 --  Store session directory once when Neovim starts
+
+local function notify_debug(message)
+	local cmd = string.format("notify-send '[Neovim Debug]' '%s'", message)
+	os.execute(cmd) -- Send notification
+	print("🟢 Debug: " .. message) -- Also log to Neovim
+end
+
+notify_debug("can notify debug")
+
 local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
@@ -7,7 +16,7 @@ local nvim_possession = require("nvim-possession")
 local bufferline = require("bufferline")
 local tabpage = require("bufferline.tabpages") -- Ensure it exists
 
-local DEBUG = false -- Set to `true` to enable debug logs
+local DEBUG = true -- Set to `true` to enable debug logs
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -74,10 +83,13 @@ local function set_session_dir()
 	local project_root = general_utils_franck.find_project_root()
 	if project_root == nil then
 		session_dir = original_location
-		return nil
+		return original_location
 	end
 
 	session_dir = project_root .. "/.nvim-session/"
+	if DEBUG then
+		print("session dir is : " .. session_dir)
+	end
 	vim.fn.mkdir(session_dir, "p")
 	return session_dir
 end
@@ -104,7 +116,7 @@ nvim_possession.setup({
 	},
 
 	-- ✅ Hook: Load Scope.nvim state after loading a session
-	post_hook = function(session_data)
+	post_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		if vim.fn.filereadable(session_file) == 0 and not require("nvim-possession").status() then
 			require("nvim-possession").new(session_name) -- Save session with "default" name
@@ -151,17 +163,15 @@ nvim_possession.setup({
 })
 
 local function ensure_session_exists()
-	-- print("F: session_dir = " .. session_dir)
-	-- print("F: original_location = " .. original_location)
 	if session_dir == original_location then
 		return
 	end
 	local session_file = session_dir .. session_name .. ".vim"
-
+	print("session file = " .. session_file)
+	--
 	-- If no session exists, create "default" session
 	if vim.fn.filereadable(session_file) == 0 then
 		nvim_possession.create(session_name) -- Save session with name "default"
-		-- print("📂 Auto-created session:", session_file)
 	end
 end
 

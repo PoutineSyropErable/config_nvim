@@ -49,13 +49,19 @@ if jdtls_launcher == "" or not vim.fn.filereadable(jdtls_launcher) then
 end
 -- vim.notify("JDTLS Launcher path: " .. jdtls_launcher, vim.log.levels.INFO)
 
--- Ensure debug plugin exists
-local debug_plugin = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar")
-if debug_plugin == "" or not vim.fn.filereadable(debug_plugin) then
-	-- vim.notify("❌ Java Debug Plugin not found or is not readable!")
-	return
+local status, debug_plugin = pcall(function()
+  local path = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar", true, true)
+  if path == "" then
+    error("No Java Debug plugin found!")
+  end
+  return path
+end)
+
+if not status then
+  vim.notify("Error loading Java Debug plugin: " .. debug_plugin, vim.log.levels.ERROR)
+else
+  print("Using Debug Plugin:", debug_plugin)
 end
--- vim.notify("Debug Plugin path: " .. debug_plugin, vim.log.levels.INFO)
 
 -- Use the jdtls_home variable to find the JDTLS configuration path
 local jdtls_config_path = jdtls_home .. "/config_linux"
@@ -130,7 +136,7 @@ local config = {
 	},
 
 	init_options = {
-		bundles = { debug_plugin }, -- Use validated debug plugin path
+--		bundles = { debug_plugin }, -- Use validated debug plugin path
 	},
 }
 

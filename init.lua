@@ -20,6 +20,7 @@ require("core.plugins")
 require("core.plugin_config")
 require("core.spellcheck")
 require("core.keymaps")
+-- require("core.plugin_config.noice")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number

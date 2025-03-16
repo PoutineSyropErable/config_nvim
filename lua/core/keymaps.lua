@@ -442,6 +442,7 @@ keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
 keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
 
 keymap.set("n", "<leader>f<leader>", builtin.oldfiles, opts("Recently used files (Old files)"))
+keymap.set("n", "<leader>fr", builtin.oldfiles, opts("Recently used files (Old files)"))
 keymap.set("n", "<leader>fo", builtin.oldfiles, opts("Recently used files (Old files)"))
 keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
 keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
@@ -714,7 +715,7 @@ keymap.set("n", "<leader>ga", ":Git add .<CR>", { desc = "Stage all changes (git
 -- Git commit
 keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
 -- Git Push Current Branch
-keymap.set("n", "<leader>gp", ":Git push<CR>", { desc = "Push current branch to remote" })
+keymap.set("n", "<leader>gp", ":Git push origin $(git branch --show-current)<CR>", { desc = "Push current branch to remote" })
 
 -- Git log
 keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" })
