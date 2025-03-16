@@ -4,9 +4,9 @@ PRE_CONFIG_FRANCK.use_bufferline = true
 
 -- Java
 PRE_CONFIG_FRANCK.useJavaLspConfig = true
+PRE_CONFIG_FRANCK.useMyJavaDap = true
 PRE_CONFIG_FRANCK.useNvimJdtls = false
-PRE_CONFIG_FRANCK.useNvimJava = true
-PRE_CONFIG_FRANCK.useMyJavaDap = false
+PRE_CONFIG_FRANCK.useNvimJava = false
 
 PRE_CONFIG_FRANCK.jdtls = PRE_CONFIG_FRANCK.useNvimJdtls
 		and {
