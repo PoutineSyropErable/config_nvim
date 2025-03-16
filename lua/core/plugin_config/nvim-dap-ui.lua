@@ -47,7 +47,7 @@ end
 dap.listeners.before.event_initialized["dapui_config"] = function()
 	-- Open the dapui
 	dapui.open()
-	focusOnDapTerminal()
+	-- focusOnDapTerminal()
 	-- focusOnDapDebugTerminal()
 end
 

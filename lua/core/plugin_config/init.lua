@@ -18,7 +18,7 @@ require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
 
--- require("core.plugin_config.nvim-dap-config")
+require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
 require("core.plugin_config.nvim-dap-ui")
 
