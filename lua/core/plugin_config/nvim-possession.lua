@@ -6,8 +6,6 @@ local function notify_debug(message)
 	print("🟢 Debug: " .. message) -- Also log to Neovim
 end
 
-notify_debug("can notify debug")
-
 local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
