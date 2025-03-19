@@ -30,6 +30,7 @@ if PRE_CONFIG_FRANCK.useNvimJdtls then
 end
 
 require("core.plugin_config.fugitive")
+require("core.plugin_config.undotree")
 require("core.plugin_config.toggleterm")
 require("core.plugin_config.markview")
 require("core.plugin_config.image")
@@ -47,6 +48,8 @@ require("core.plugin_config.bufferline")
 -- require("core.plugin_config.barbar")
 
 require("core.plugin_config.nvim-possession")
+require("core.plugin_config.nvim-ufo")
+
 ------ ##### DEACTIVATED ##### -------
 
 -- not needed vv (hologram) (and markdown_preview)

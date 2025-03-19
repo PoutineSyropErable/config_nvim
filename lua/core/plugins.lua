@@ -150,6 +150,24 @@ require("lazy").setup({
 	"lewis6991/gitsigns.nvim",
 	"tpope/vim-fugitive",
 	-- New git plugins vv, needed? idk
+	{
+		"jiaoshijie/undotree",
+		dependencies = "nvim-lua/plenary.nvim",
+		config = true,
+	},
+
+	-- {
+	-- 	"NeogitOrg/neogit",
+	-- 	dependencies = {
+	-- 		"nvim-lua/plenary.nvim", -- required
+	-- 		"sindrets/diffview.nvim", -- optional - Diff integration
+
+	-- 		-- Only one of these is needed.
+	-- 		"nvim-telescope/telescope.nvim", -- optional
+	-- 	},
+	-- 	config = true,
+	-- },
+	"ThePrimeagen/git-worktree.nvim",
 
 	-- "f-person/git-blame.nvim",
 	"tpope/vim-rhubarb",
@@ -188,6 +206,11 @@ require("lazy").setup({
 				"clangd",
 			},
 		},
+	},
+	-- Lazy.nvim
+	{
+		"folke/neodev.nvim",
+		opts = {}, -- No additional config needed
 	},
 	"williamboman/mason-lspconfig.nvim",
 	"WhoIsSethDaniel/mason-tool-installer.nvim",

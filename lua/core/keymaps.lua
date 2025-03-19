@@ -40,7 +40,7 @@ keymap.set("v", "<BS>", '"_d', { noremap = true, silent = true })
 
 ---------------------- Fixes
 -- To have access to a way to increase an number
-keymap.set("n", "<leader>u", "<C-a>", { noremap = true, silent = true })
+keymap.set("n", "<leader>y", "<C-a>", { noremap = true, silent = true })
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
 
@@ -694,6 +694,9 @@ keymap.set("n", "<leader>gz", ":noh<CR>", opts(d))
 -- Lazygit
 keymap.set("n", "<leader>lg", ":LazyGit<CR>", { desc = "Open LazyGit" })
 
+-- Undo Tree (Not git)
+keymap.set("n", "<leader>u", function() require("undotree").toggle() end, opts("Toggle undo tree"))
+
 -- Git History (Telescope)
 keymap.set("n", "<leader>gC", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
 keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Buffer Commits (Telescope)" })
@@ -722,6 +725,9 @@ keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" 
 
 -- Git blame (Avoids `<leader>gb` conflict)
 keymap.set("n", "<leader>gB", ":Git blame<CR>", { desc = "Git blame (Fugitive)" })
+
+local git_branches = function() require("neogit").open({ "branch" }) end
+keymap.set("n", "<leader>gg", git_branches, opts("Git branches side"))
 
 ---------------------------------------------- Diff keymaps
 function ApplyDiffGet(version)
@@ -1835,7 +1841,7 @@ function _G.general_utils_franck.cdHere()
 	print("Changed directory to: " .. file_dir)
 end
 
-vim.keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
+keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
 
 keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, opts("Invert true/false under cursor"))
 keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, opts("Copy file path to clipboard"))
