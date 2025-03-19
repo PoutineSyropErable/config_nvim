@@ -77,17 +77,23 @@ int main(int argc, char* argv[]) {
 		std::cout << "🔍 Searching for project root starting from: " << target_path << std::endl;
 	}
 
+	fs::path project_root;
 	try {
-		fs::path project_root = find_project_root(target_path);
-		if (!project_root.empty()) {
-			std::cout << project_root.string() << std::endl; // Always print if found
-			return 0;
-		}
+		project_root = find_project_root(target_path);
 	} catch (const std::exception& e) {
 		if (VERBOSE) {
 			std::cerr << "⚠️ Error finding project root: " << e.what() << std::endl;
 		}
+		return 1;
 	}
 
-	return 1; // Print nothing and return 1 if root was not found
+	if (project_root.empty()) {
+		if (VERBOSE) {
+			std::cerr << "⚠️ No project root found from: " << target_path << std::endl;
+		}
+		return 1;
+	}
+
+	std::cout << project_root.string() << std::endl; // Always print if found
+	return 0;
 }
