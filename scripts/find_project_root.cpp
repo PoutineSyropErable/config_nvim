@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Resolve full path
-	target_path = fs::canonical(target_path);
+	target_path = fs::weakly_canonical(target_path);
 
 	if (VERBOSE) {
 		std::cout << "🔍 Searching for project root starting from: " << target_path << std::endl;
