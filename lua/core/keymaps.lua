@@ -430,6 +430,22 @@ local function all_workspace_symbols()
 	})
 end
 
+-- Toggle flag to switch between project root and current file's directory
+_G.use_project_root = true
+
+local function toggle_find_files()
+	local root_dir = _G.use_project_root and utils.get_default(opts) or vim.fn.getcwd()
+	_G.use_project_root = not _G.use_project_root -- Toggle state
+
+	builtin.find_files({
+		cwd = root_dir,
+		hidden = true, -- Show hidden files
+		no_ignore = true, -- Show Git-ignored files
+	})
+end
+
+vim.keymap.set("n", "<leader>ft", toggle_find_files, { desc = "Toggle Find Files (Project Root / CWD)" })
+
 keymap.set("n", "<leader>fs", all_document_symbols, opts("All Variable/Symbols Information (Document)"))
 keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols Information (Workspace)"))
 
