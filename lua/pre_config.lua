@@ -32,20 +32,25 @@ _G.general_utils_franck.find_project_root = function()
 	-- Extract the directory containing the current file
 	local buffer_dir = vim.fn.fnamemodify(buffer_path, ":h")
 
-	-- Define the external script to find the project root
+	-- Define the external script path
 	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 
-	-- Run the script and capture the output
-	local project_root = vim.fn.system(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
-	if project_root == nil then
-		return nil
-	end
-
-	project_root = vim.trim(project_root) -- Trim whitespace/newlines
+	-- Run the script and capture output + exit code
+	local result = vim.fn.systemlist(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
+	local exit_code = vim.v.shell_error -- Get the command's exit code
 
 	-- 🚨 **Validation Checks**
+	if exit_code ~= 0 or #result == 0 then
+		print("the exit code was: " .. exit_code)
+		return nil -- Script failed, or output is empty
+	end
+
+	local project_root = table.concat(result, "\n") -- Convert table to string
+	project_root = vim.trim(project_root) -- Trim whitespace/newlines
+
+	-- Additional Safety Checks
 	if project_root == "" or not vim.fn.isdirectory(project_root) then
-		return nil -- Silent failure, returns nil instead of error message
+		return nil
 	end
 
 	if #project_root > 256 then
