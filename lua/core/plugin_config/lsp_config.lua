@@ -46,6 +46,24 @@ lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabiliti
 
 local initialized_lsps = {} -- Cache LSPs per root directory
 
+------------------------------------------- Helper functions ----------------------------
+
+local function create_find_root_dir_function(patterns, fallback)
+	local lsp_util = require("lspconfig.util")
+	local root_dir_fn = lsp_util.root_pattern(unpack(patterns))
+
+	-- Return a function that dynamically determines the root directory
+	return function(fname)
+		local root = root_dir_fn(fname)
+		if not root and fallback then
+			root = vim.fn.getcwd()
+			print("⚠️ No root directory detected, falling back to CWD: " .. root)
+		else
+			print("✅ Root directory detected: " .. (root or "None"))
+		end
+		return root
+	end
+end
 --------------------------------------- BASH ---------------------------------------
 
 local bash_setup_dict = {}
@@ -67,20 +85,24 @@ local lua_setup_dict = {}
 local neodev_setup_dict = {}
 
 local lua_pre_setup = function()
-	neodev_setup_dict = {}
-	require("neodev").setup(neodev_setup_dict)
-	lua_setup_dict = {
-		settings = {
-			Lua = {
-				telemetry = { enable = false }, -- Disable telemetry
-				diagnostics = {
-					globals = { "vim" },
-				},
-				workspace = {
-					library = {
-						[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-						[vim.fn.stdpath("config") .. "/lua"] = true,
-					},
+	print("Running lua pre setup (Inside the function)")
+	require("neodev").setup({})
+
+	-- Modify the existing global setup_dict instead of overwriting it
+	lua_setup_dict.root_dir = create_find_root_dir_function({ ".git", ".luarc.json", ".luarc.jsonc" }, true)
+	lua_setup_dict.on_attach = function(client, bufnr)
+		print("✅ LSP " .. client.name .. " attached to buffer " .. bufnr)
+		--
+	end
+	lua_setup_dict.filetypes = { "lua" }
+	lua_setup_dict.settings = {
+		Lua = {
+			telemetry = { enable = false },
+			diagnostics = { globals = { "vim" } },
+			workspace = {
+				library = {
+					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+					[vim.fn.stdpath("config") .. "/lua"] = true,
 				},
 			},
 		},
@@ -291,34 +313,6 @@ local java_pre_setup = function()
 	if PRE_CONFIG_FRANCK.useNvimJava and not PRE_CONFIG_FRANCK.useJavaLspConfig then
 	end
 end
------------------------------------------------- End of LANGUAGE Config ----------------------------------------
-
-lspconfig.solargraph.setup({})
-lspconfig.ts_ls.setup({})
-lspconfig.gopls.setup({})
-lspconfig.tailwindcss.setup({})
-
--- Hyprlang LSP
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-	pattern = { "*.hl", "hypr*.conf" },
-	callback = function(event)
-		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
-		vim.lsp.start({
-			name = "hyprlang",
-			cmd = { "hyprls" },
-			root_dir = vim.fn.getcwd(),
-		})
-	end,
-})
-
-vim.api.nvim_create_autocmd("VimLeavePre", {
-	callback = function()
-		-- Properly shut down LSP servers when exiting Neovim
-		for _, client in pairs(vim.lsp.get_active_clients()) do
-			client.stop()
-		end
-	end,
-})
 
 ------------------------------------------------ LATEX AND TEXLIVE ------------------------------------------------
 
@@ -411,6 +405,9 @@ local texlab_post_setup = function()
 	-- 	end
 	-- end, {})
 end
+
+------------------------------------------------ End of LANGUAGE Config ----------------------------------------
+
 -------------------------------------- LAZY LOADING THE LSP ---------------------------------------
 
 -- Store all LSP configs in a table for easy lookup
@@ -431,36 +428,138 @@ local lsp_configs = {
 	bib = { name = "texlab", setup_dict = texlab_setup_dict, pre_setup = texlab_pre_setup, post_setup = texlab_post_setup },
 }
 
-local function setup_lsp(name, setup_dict, pre_setup, post_setup)
-	-- Detect the root directory for this buffer
-	local bufname = vim.api.nvim_buf_get_name(0)
-	local root_dir = setup_dict.root_dir and setup_dict.root_dir(bufname) or vim.fn.getcwd()
+local additional_lsps = {
+	ruby = { name = "solargraph", setup_dict = {} }, -- Solargraph for Ruby
+	typescript = { name = "tsserver", setup_dict = {} }, -- TypeScript LSP
+	javascript = { name = "tsserver", setup_dict = {} }, -- TypeScript LSP also handles JavaScript
+	go = { name = "gopls", setup_dict = {} }, -- Go LSP
+	html = { name = "tailwindcss", setup_dict = {} }, -- TailwindCSS LSP for HTML
+	css = { name = "tailwindcss", setup_dict = {} }, -- TailwindCSS LSP for CSS files
+}
 
-	-- Prevent re-setup if already initialized for this root
-	if initialized_lsps[name] and initialized_lsps[name][root_dir] then
+-- Merge additional LSPs into `lsp_configs`
+for ft, config in pairs(additional_lsps) do
+	lsp_configs[ft] = config
+end
+----------------------------------------------------------------- LSP attach function ---------------------------------------
+--- Ensures that the specified LSP is attached to the current buffer.
+---
+--- @param name string The name of the LSP server (e.g., "pyright", "clangd").
+local function attach_lsp_to_buffer(name)
+	local bufnr = vim.api.nvim_get_current_buf()
+	local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
+
+	-- Check if the LSP client is already attached
+	for _, client in ipairs(clients) do
+		if client.name == name then
+			print("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
+			return
+		end
+	end
+
+	-- Try to find the initialized LSP and attach it
+	for _, client in ipairs(vim.lsp.get_active_clients()) do
+		if client.name == name then
+			vim.lsp.buf_attach_client(bufnr, client.id)
+			print("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+			return
+		end
+	end
+
+	print("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
+end
+
+---------------------------------------------------------------- Lazy setup --------------------------------------------------
+--- Sets up an LSP server with optional pre- and post-setup hooks.
+---
+--- This function initializes an LSP server only if it hasn't been initialized
+--- for the given root directory. It also ensures that necessary setup functions
+--- are executed before and after setting up the LSP.
+---
+--- @param name string: The name of the LSP server (e.g., "pyright", "clangd").
+--- @param setup_dict table: The LSP configuration dictionary that includes settings,
+---                          commands, capabilities, and filetypes.
+--- @param pre_setup function|nil: (Optional) A function that runs before setting up the LSP.
+---                                Useful for additional configuration like setting global variables.
+--- @param post_setup function|nil: (Optional) A function that runs after setting up the LSP.
+---                                 Useful for defining user commands or further customization.
+
+local function setup_lsp(name, setup_dict, pre_setup, post_setup)
+	print("🔍 Setting up LSP: " .. name)
+
+	-- Ensure setup_dict is valid
+	if not setup_dict then
+		print("⚠️ Error: LSP setup_dict is nil for " .. name)
 		return
 	end
 
-	-- Run pre-setup hook if available
-	if pre_setup then
+	local bufname = vim.api.nvim_buf_get_name(0)
+
+	-- If root_dir is missing, run pre_setup() to initialize it
+	if not setup_dict.root_dir and pre_setup then
+		print("⚠️ No root_dir detected, running pre_setup() for " .. name)
 		pre_setup()
 	end
+
+	-- Compute root_dir if it's a function
+	local root_dir = nil
+	if setup_dict.root_dir then
+		if type(setup_dict.root_dir) == "function" then
+			root_dir = setup_dict.root_dir(bufname)
+			print("🔄 root_dir function evaluated for " .. name .. ": " .. (root_dir or "nil"))
+		else
+			root_dir = setup_dict.root_dir
+		end
+	end
+
+	-- Fallback to `getcwd()` if `root_dir` is still nil
+	if not root_dir or root_dir == "" then
+		print("⚠️ root_dir is still nil, falling back to CWD")
+		root_dir = vim.fn.getcwd()
+	end
+
+	print("✅ Final root_dir for " .. name .. ": " .. root_dir)
+
+	-- Prevent re-setup if already initialized
+	initialized_lsps[name] = initialized_lsps[name] or {}
+	if initialized_lsps[name][root_dir] then
+		print("ℹ️ LSP " .. name .. " already initialized for " .. root_dir)
+
+		-- ⚠️ Manually attach LSP to the buffer if setup already happened
+		attach_lsp_to_buffer(name)
+		return
+	end
+
+	-- Ensure `on_init` handles attachment
+	setup_dict.on_init = function(client, _)
+		print("🔄 LSP " .. name .. " is ready for attachment.")
+		attach_lsp_to_buffer(name)
+
+		-- Call post-setup AFTER attachment
+		if post_setup then
+			post_setup()
+		end
+	end
+
+	-- Ensure `on_attach` is always set
+	setup_dict.on_attach = function(client, bufnr)
+		print("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+		if post_setup then
+			post_setup()
+		end
+	end
+
+	-- Debugging: Print full setup dictionary
+	print("🔍 Setting up LSP: " .. name .. " with config: " .. vim.inspect(setup_dict))
 
 	-- Setup the LSP
 	lspconfig[name].setup(setup_dict)
 
 	-- Mark LSP as initialized for this root
-	if not initialized_lsps[name] then
-		initialized_lsps[name] = {}
-	end
 	initialized_lsps[name][root_dir] = true
-
-	-- Run post-setup hook if available
-	if post_setup then
-		post_setup()
-	end
 end
 
+----------------------------------------------------------------- Execute Lazy Setup -----------------------------------------------
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = vim.tbl_keys(lsp_configs),
 	callback = function(args)
@@ -473,6 +572,35 @@ vim.api.nvim_create_autocmd("FileType", {
 			end
 
 			setup_lsp(lsp_info.name, lsp_info.setup_dict, lsp_info.pre_setup, lsp_info.post_setup)
+		end
+	end,
+})
+
+-------------------------------------------------- HYPRLANG LSP --------------------------------------------------
+
+-- Prevent multiple instances of Hyprlang LSP from starting
+if not vim.g.hyprls_started then
+	vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+		pattern = { "*.hl", "hypr*.conf" },
+		callback = function(event)
+			if not vim.g.hyprls_started then
+				vim.g.hyprls_started = true
+				vim.lsp.start({
+					name = "hyprlang",
+					cmd = { "hyprls" },
+					root_dir = vim.fn.getcwd(),
+				})
+			end
+		end,
+	})
+end
+
+------------------------------------------------ End of LANGUAGE Config ----------------------------------------
+vim.api.nvim_create_autocmd("VimLeavePre", {
+	callback = function()
+		-- Properly shut down LSP servers when exiting Neovim
+		for _, client in pairs(vim.lsp.get_active_clients()) do
+			client.stop()
 		end
 	end,
 })

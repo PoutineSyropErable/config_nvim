@@ -18,7 +18,7 @@ end
 telescope.setup({
 	defaults = {
 		-- Ignore node_modules directory
-		file_ignore_patterns = { "node_modules/.*" }, -- Ignore node_modules
+		file_ignore_patterns = { "node_modules/.*", "%.git/.*", ".nvim-session/.*" }, -- Ignore node_modules
 	},
 	pickers = {
 		find_files = {
