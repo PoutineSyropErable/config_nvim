@@ -431,18 +431,26 @@ local function all_workspace_symbols()
 end
 
 -- Toggle flag to switch between project root and current file's directory
-_G.use_project_root = true
+local use_project_root = true
 
 local function toggle_find_files()
-	local root_dir = _G.use_project_root and utils.get_default(opts) or vim.fn.getcwd()
-	_G.use_project_root = not _G.use_project_root -- Toggle state
-
-	builtin.find_files({
-		cwd = root_dir,
-		hidden = true, -- Show hidden files
-		no_ignore = true, -- Show Git-ignored files
-	})
+	use_project_root = not use_project_root
+	--
 end
+
+local function telescope_cwd()
+	local tel_cwd = nil
+	if use_project_root then
+		tel_cwd = _G.general_utils_franck.find_project_root()
+		return tel_cwd
+	end
+	tel_cwd = vim.fn.getcwd()
+	return tel_cwd
+end
+
+local function find_files() builtin.find_files({ cwd = telescope_cwd() }) end
+local function live_grep() builtin.live_grep({ cwd = telescope_cwd() }) end
+local function live_grep_current_word() builtin.live_grep({ default_text = vim.fn.expand("<cword>"), cwd = telescope_cwd() }) end
 
 vim.keymap.set("n", "<leader>ft", toggle_find_files, { desc = "Toggle Find Files (Project Root / CWD)" })
 
@@ -451,8 +459,9 @@ keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols 
 
 keymap.set("n", "<leader>fk", builtin.keymaps, opts("Find Keymaps"))
 
-keymap.set("n", "<leader>fg", builtin.live_grep, opts("Live Grep"))
-keymap.set("n", "<leader>fw", function() builtin.live_grep({ default_text = vim.fn.expand("<cword>") }) end, opts("Live grep current word"))
+keymap.set("n", "<leader>ff", find_files, opts("Find Files"))
+keymap.set("n", "<leader>fg", live_grep, opts("Live Grep"))
+keymap.set("n", "<leader>fw", live_grep_current_word, opts("Live grep current word"))
 
 keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
 keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
@@ -460,7 +469,6 @@ keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current B
 keymap.set("n", "<leader>f<leader>", builtin.oldfiles, opts("Recently used files (Old files)"))
 keymap.set("n", "<leader>fr", builtin.oldfiles, opts("Recently used files (Old files)"))
 keymap.set("n", "<leader>fo", builtin.oldfiles, opts("Recently used files (Old files)"))
-keymap.set("n", "<leader>ff", builtin.find_files, opts("Find Files"))
 keymap.set("n", "<leader>fb", builtin.buffers, opts("Buffers"))
 keymap.set("n", "<leader>fB", telescope.extensions.scope.buffers, opts("Telescope File Browser"))
 keymap.set("n", "<leader><leader>", telescope.extensions.file_browser.file_browser, opts("Telescope File Browser"))
