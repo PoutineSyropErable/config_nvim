@@ -113,10 +113,11 @@ else
 	print("Neither Bufferline nor Barbar is installed!")
 end
 
--- Bind <leader>1 to <leader>0 for buffer switching
+--  <leader># leader# leadern <leader>n <leader><n>   (search strings)
 for i = 1, 9 do
 	keymap.set("n", "<leader>" .. i, function() goto_buffer(i) end, opts("Go to buffer " .. i))
 end
+-- Bind <leader>0 to goto 10for buffer switching
 keymap.set("n", "<leader>0", function() goto_buffer(10) end, opts("Go to buffer 10"))
 
 -- Keymaps for splits (vertical and horizontal)

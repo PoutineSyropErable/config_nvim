@@ -49,7 +49,15 @@ bufferline.setup({
 				highlight = "Directory",
 				text_align = "center",
 				separator = true, -- Show a separator between nvim-tree and buffers
-				padding = 1, -- Space between the file tree and bufferline
+				padding = 0, -- Space between the file tree and bufferline
+			},
+			{
+				filetype = "undotree",
+				text = "Undo History",
+				highlight = "Function",
+				text_align = "center",
+				separator = true,
+				padding = 0,
 			},
 		},
 	},
