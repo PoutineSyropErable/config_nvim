@@ -14,6 +14,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+require("pre_keymaps")
 require("pre_config") -- The config before the plugins loading
 require("core.options")
 require("core.plugins")

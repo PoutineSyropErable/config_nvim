@@ -40,9 +40,19 @@ _G.general_utils_franck.find_project_root = function()
 	local exit_code = vim.v.shell_error -- Get the command's exit code
 
 	-- 🚨 **Validation Checks**
-	if exit_code ~= 0 or #result == 0 then
-		print("the exit code was: " .. exit_code)
+	if exit_code == 2 or #result == 0 then
+		print("In pre_config::find_project_root, the exit code of the c++ script was: " .. exit_code)
+		local caller = debug.getinfo(2, "Sl") -- 2 = the caller's stack frame
+		if caller then
+			print("func() was called from: " .. caller.short_src .. ":" .. caller.currentline)
+		else
+			print("Caller info not available")
+		end
 		return nil -- Script failed, or output is empty
+	end
+
+	if exit_code == 1 then
+		print("In pre_config::find_project_root, exit code of the c++ script was 1, meaning it's using current cwd for project root\n")
 	end
 
 	local project_root = table.concat(result, "\n") -- Convert table to string
