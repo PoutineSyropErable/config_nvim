@@ -3,10 +3,13 @@
 Here's a screenshots with some stuff toggled on:
 (The undo tree, and nvim tree file manager), though it also supports telescope's file manager, and lf
 
+Example of the things you can toggle (a terminal, a file manager tree, and a undo tree [There's more])
 ![Screenshots example of toggle-able](./screenshots.png)
 
+Example of autocompletion
 ![Example of autocomplete](./auto_complete.png)
 
+Example of a debugger
 ![Example of Debugger](./debugger.png)
 
 # Installation
