@@ -634,7 +634,10 @@ keymap.set("n", "<leader>ga", ":Git add .<CR>", { desc = "Stage all changes (git
 -- Git commit
 keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
 -- Git Push Current Branch
-keymap.set("n", "<leader>gp", ":Git push origin $(git branch --show-current)<CR>", { desc = "Push current branch to remote" })
+vim.keymap.set("n", "<leader>gp", function()
+	local branch = vim.fn.system("git branch --show-current"):gsub("\n", "")
+	vim.cmd("Git push origin " .. branch)
+end, { desc = "Push current branch to remote" })
 
 -- Git log
 keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" })
