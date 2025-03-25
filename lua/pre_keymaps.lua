@@ -5,69 +5,56 @@ local keymap = vim.keymap
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
-keymap.set("i", "jk", "<Esc>", { noremap = true })
-keymap.set("i", "JK", "<Esc>", { noremap = true })
-keymap.set("v", "jk", "<Esc>", { noremap = true })
-keymap.set("v", "JK", "<Esc>", { noremap = true })
-keymap.set("x", "jk", "<Esc>", { noremap = true })
-keymap.set("x", "JK", "<Esc>", { noremap = true })
+keymap.set("i", "jk", "<Esc>", opts("Exit Insert Mode"))
+keymap.set("i", "JK", "<Esc>", opts("Exit Insert Mode"))
+keymap.set("v", "jk", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("v", "JK", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("x", "jk", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("x", "JK", "<Esc>", opts("Exit Visual Mode"))
 
-keymap.set("i", "jl", "<Esc>", { noremap = true })
-keymap.set("i", "JL", "<Esc>", { noremap = true })
-keymap.set("v", "jl", "<Esc>", { noremap = true })
-keymap.set("v", "JL", "<Esc>", { noremap = true })
-keymap.set("x", "jl", "<Esc>", { noremap = true })
-keymap.set("x", "JL", "<Esc>", { noremap = true })
+keymap.set("i", "jl", "<Esc>", opts("Exit Insert Mode"))
+keymap.set("i", "JL", "<Esc>", opts("Exit Insert Mode"))
+keymap.set("v", "jl", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("v", "JL", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("x", "jl", "<Esc>", opts("Exit Visual Mode"))
+keymap.set("x", "JL", "<Esc>", opts("Exit Visual Mode"))
 
 -- Map Enter in normal mode to add a new line
-keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
+keymap.set("n", "<CR>", "o<Esc>", opts("Open a new line"))
 
 ---------------------------------------------------------REGULAR NAVIGATION
 ---------------------- remap of movement keys and insert, add start/end of line support
 -------- USE    i
 ------------  j k l
--- rather then hjkl for movement, h is insert ---------------------------
-keymap.set("n", "j", "h", { noremap = true, silent = true })
-keymap.set("n", "l", "l", { noremap = true, silent = true })
-keymap.set("n", "i", "k", { noremap = true, silent = true })
-keymap.set("n", "k", "j", { noremap = true, silent = true })
-keymap.set("n", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
+-- rather than hjkl for movement, h is insert ---------------------------
+keymap.set("n", "j", "h", opts("Move left (h mapped to j)"))
+keymap.set("n", "l", "l", opts("Move right (l remains l)"))
+keymap.set("n", "i", "k", opts("Move up (k mapped to i)"))
+keymap.set("n", "k", "j", opts("Move down (j mapped to k)"))
+keymap.set("n", "h", "i", opts("Enter insert mode"))
 
-keymap.set("n", "J", "_", { noremap = true, silent = true })
-keymap.set("n", "L", "$", { noremap = true, silent = true })
-keymap.set("n", "I", "H", { noremap = true, silent = true })
-keymap.set("n", "K", "L", { noremap = true, silent = true })
-keymap.set("n", "H", "I", { noremap = true, silent = true })
-keymap.set("n", "<leader>hd", "K", { noremap = true, silent = true })
+keymap.set("n", "J", "_", opts("Move to beginning of line"))
+keymap.set("n", "L", "$", opts("Move to end of line"))
+keymap.set("n", "I", "H", opts("Move to the top of the view port"))
+keymap.set("n", "K", "L", opts("Move to the bottom of the view port"))
+keymap.set("n", "H", "I", opts("Move to the start of the line (And go to insert mode)"))
+keymap.set("n", "<leader>hd", "K", opts("Helper for K"))
 
-keymap.set("v", "j", "h", { noremap = true, silent = true })
-keymap.set("v", "l", "l", { noremap = true, silent = true })
-keymap.set("v", "i", "k", { noremap = true, silent = true })
-keymap.set("v", "k", "j", { noremap = true, silent = true })
--- keymap.set("v", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
+keymap.set("v", "j", "h", opts("Move left (h mapped to j)"))
+keymap.set("v", "l", "l", opts("Move right (l remains l)"))
+keymap.set("v", "i", "k", opts("Move up (k mapped to i)"))
+keymap.set("v", "k", "j", opts("Move down (j mapped to k)"))
+-- keymap.set("v", "h", "i", opts("Insert Mode remains unchanged")) -- Insert Mode remains unchanged
 
-keymap.set("v", "J", "_", { noremap = true, silent = true })
-keymap.set("v", "L", "$", { noremap = true, silent = true })
-keymap.set("v", "I", "H", { noremap = true, silent = true })
-keymap.set("v", "K", "L", { noremap = true, silent = true })
-keymap.set("v", "H", "I", { noremap = true, silent = true })
--- keymap.set("v", "h", "I", { noremap = true, silent = true })
--- keymap.set("v", "a", "A", { noremap = true, silent = true })
+keymap.set("v", "J", "_", opts("Move to beginning of line"))
+keymap.set("v", "L", "$", opts("Move to end of line"))
+keymap.set("v", "I", "H", opts("Move to top of the view port"))
+keymap.set("v", "K", "L", opts("Move to bottom of the view port"))
+keymap.set("v", "H", "I", opts("Move to the start of the line (and go into insert mode)"))
+-- keymap.set("v", "h", "I", opts("Insert Mode remains unchanged"))
+-- keymap.set("v", "a", "A", opts("Select till the end of line"))
 
-keymap.set("x", "j", "h", { noremap = true, silent = true })
-keymap.set("x", "l", "l", { noremap = true, silent = true })
-keymap.set("x", "i", "k", { noremap = true, silent = true })
-keymap.set("x", "k", "j", { noremap = true, silent = true })
-keymap.set("x", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
-
-keymap.set("x", "J", "_", { noremap = true, silent = true })
-keymap.set("x", "L", "$", { noremap = true, silent = true })
-keymap.set("x", "I", "H", { noremap = true, silent = true })
-keymap.set("x", "K", "L", { noremap = true, silent = true })
-keymap.set("x", "H", "I", { noremap = true, silent = true })
--- keymap.set("x", "h", "I", { noremap = true, silent = true })
--- keymap.set("x", "a", "A", { noremap = true, silent = true })
-
+-- "x mode does not exist"
 -- K was help on cursor
 
 ------------------------------------------------------PAGE NAVIGATION
