@@ -18,6 +18,7 @@ vim.o.autoindent = true -- Maintain indentation from the previous line
 vim.o.smartindent = true -- More intelligent auto-indentation
 
 vim.opt.mousemoveevent = true -- activate mouse
+vim.opt.mouse = "nvc" -- Enable mouse in Normal, Visual, and Command mode
 
 vim.cmd([[ set noswapfile ]])
 vim.cmd([[ set termguicolors ]])
