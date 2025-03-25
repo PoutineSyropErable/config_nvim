@@ -35,6 +35,11 @@ _G.general_utils_franck.find_project_root = function()
 	-- Define the external script path
 	local find_project_root_script = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 
+	if vim.fn.filereadable(find_project_root_script) ~= 1 then
+		print("Cpp binary to find project root doesn't even exist")
+		return nil
+	end
+
 	-- Run the script and capture output + exit code
 	local result = vim.fn.systemlist(find_project_root_script .. " " .. vim.fn.shellescape(buffer_dir))
 	local exit_code = vim.v.shell_error -- Get the command's exit code

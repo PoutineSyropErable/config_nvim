@@ -24,6 +24,8 @@ fs::path find_project_root(fs::path start_path) {
 		start_path = start_path.parent_path();
 	}
 
+	fs::path root_path = start_path.root_path();
+
 	while (true) {
 		for (const auto& marker : CHOSEN_ROOT_MARKERS) {
 			if (fs::exists(start_path / marker)) {
@@ -34,16 +36,19 @@ fs::path find_project_root(fs::path start_path) {
 			}
 		}
 
-		if (start_path == start_path.root_path()) {
+		if (start_path == root_path) {
 			break;
+
+			if (VERBOSE) {
+				std::cerr << "⚠️ No project root found, returning empty path.\n";
+			}
+			return {};
 		}
 
 		start_path = start_path.parent_path();
 	}
 
-	if (VERBOSE) {
-		std::cerr << "⚠️ No project root found, returning empty path.\n";
-	}
+	// should never arrive here, placed for linting warning
 	return {};
 }
 
