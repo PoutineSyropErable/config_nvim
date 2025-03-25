@@ -1,6 +1,22 @@
+# Screenshots
+
+Here's a screenshots with some stuff toggled on:
+(The undo tree, and nvim tree file manager), though it also supports telescope's file manager, and lf
+
+Example of the things you can toggle (a terminal, a file manager tree, and a undo tree [There's more])
+![Screenshots example of toggle-able](./screenshots.png)
+
+Example of autocompletion
+![Example of autocomplete](./auto_complete.png)
+
+Example of a debugger
+![Example of Debugger](./debugger.png)
+
+# Installation
+
 how to install:
 
-```
+```bash
 # Ensure the logs directory exists
 mkdir -p ~/.config/nvim_logs
 
@@ -16,7 +32,7 @@ Packages to install:
 
 On Arch: (Use Paru or whatever else if thats what you are using. Though if you are on arch you probably dont need my help lol)
 
-```
+```bash
 # Install system packages from the official Arch repositories
 sudo pacman -S --needed clang rust-analyzer ruby npm nodejs prettier \
 python-pip python-virtualenv flake8 lua-language-server bash-language-server go \
@@ -42,7 +58,7 @@ go install github.com/hyprland-community/hyprls/cmd/hyprls@latest
 On MacOS:
 Note: I don't have a mac, so it might not work perfectly, in which case we'll need to go and find out which package manager gives them
 
-```
+```bash
 # Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server \
@@ -60,7 +76,7 @@ brew install hyprland-lsp
 
 Here's another list, in case the previous one didn't work. If not, we'll have to merge and modify them
 
-```
+```bash
 # Install system packages, Core LSP and dependencies
 brew install clang-format rust-analyzer ruby npm node prettier \
 python@3.11 lua-language-server bash-language-server go jdtls
@@ -79,12 +95,12 @@ go install github.com/hyprland-community/hyprls/cmd/hyprls@latest
 
 Install commands from inside neovim:
 
-```
+```bash
 :MasonInstall lua_ls solargraph tsserver pyright clangd rust_analyzer \
 bash-language-server jdtls gopls tailwindcss hyprls
 ```
 
-```
+```bash
 :MasonInstall black debugpy flake8 isort mypy pylint ruff \
 prettier clang-format
 ```

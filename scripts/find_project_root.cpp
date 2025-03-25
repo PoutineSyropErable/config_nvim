@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Resolve full path
-	target_path = fs::canonical(target_path);
+	target_path = fs::weakly_canonical(target_path);
 
 	if (VERBOSE) {
 		std::cout << "🔍 Searching for project root starting from: " << target_path << std::endl;
@@ -84,13 +84,15 @@ int main(int argc, char* argv[]) {
 		if (VERBOSE) {
 			std::cerr << "⚠️ Error finding project root: " << e.what() << std::endl;
 		}
-		return 1;
+		return 2;
 	}
 
 	if (project_root.empty()) {
 		if (VERBOSE) {
 			std::cerr << "⚠️ No project root found from: " << target_path << std::endl;
+			std::cerr << "  So, using cwd as root path" << std::endl;
 		}
+		std::cout << fs::current_path().string() << std::endl;
 		return 1;
 	}
 
