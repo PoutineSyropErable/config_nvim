@@ -6,14 +6,18 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
 keymap.set("i", "jk", "<Esc>", { noremap = true })
-keymap.set("v", "jk", "<Esc>", { noremap = true })
 keymap.set("i", "JK", "<Esc>", { noremap = true })
+keymap.set("v", "jk", "<Esc>", { noremap = true })
 keymap.set("v", "JK", "<Esc>", { noremap = true })
+keymap.set("x", "jk", "<Esc>", { noremap = true })
+keymap.set("x", "JK", "<Esc>", { noremap = true })
 
 keymap.set("i", "jl", "<Esc>", { noremap = true })
-keymap.set("v", "jl", "<Esc>", { noremap = true })
 keymap.set("i", "JL", "<Esc>", { noremap = true })
-keymap.set("v", "JK", "<Esc>", { noremap = true })
+keymap.set("v", "jl", "<Esc>", { noremap = true })
+keymap.set("v", "JL", "<Esc>", { noremap = true })
+keymap.set("x", "jl", "<Esc>", { noremap = true })
+keymap.set("x", "JL", "<Esc>", { noremap = true })
 
 -- Map Enter in normal mode to add a new line
 keymap.set("n", "<CR>", "o<Esc>", { noremap = true, silent = true })
@@ -29,26 +33,41 @@ keymap.set("n", "i", "k", { noremap = true, silent = true })
 keymap.set("n", "k", "j", { noremap = true, silent = true })
 keymap.set("n", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
 
-keymap.set("x", "j", "h", { noremap = true, silent = true })
-keymap.set("x", "l", "l", { noremap = true, silent = true })
-keymap.set("x", "i", "k", { noremap = true, silent = true })
-keymap.set("x", "k", "j", { noremap = true, silent = true })
-keymap.set("x", "h", "i", { noremap = true, silent = true }) -- Keep Insert mode
-
-keymap.set("v", "J", "_", { noremap = true, silent = true })
-keymap.set("v", "L", "$", { noremap = true, silent = true })
-keymap.set("v", "I", "H", { noremap = true, silent = true })
-keymap.set("v", "K", "L", { noremap = true, silent = true })
-keymap.set("v", "H", "I", { noremap = true, silent = true })
-keymap.set("v", "h", "I", { noremap = true, silent = true })
-keymap.set("v", "a", "A", { noremap = true, silent = true })
-
 keymap.set("n", "J", "_", { noremap = true, silent = true })
 keymap.set("n", "L", "$", { noremap = true, silent = true })
 keymap.set("n", "I", "H", { noremap = true, silent = true })
 keymap.set("n", "K", "L", { noremap = true, silent = true })
 keymap.set("n", "H", "I", { noremap = true, silent = true })
 keymap.set("n", "<leader>hd", "K", { noremap = true, silent = true })
+
+keymap.set("v", "j", "h", { noremap = true, silent = true })
+keymap.set("v", "l", "l", { noremap = true, silent = true })
+keymap.set("v", "i", "k", { noremap = true, silent = true })
+keymap.set("v", "k", "j", { noremap = true, silent = true })
+-- keymap.set("v", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
+
+keymap.set("v", "J", "_", { noremap = true, silent = true })
+keymap.set("v", "L", "$", { noremap = true, silent = true })
+keymap.set("v", "I", "H", { noremap = true, silent = true })
+keymap.set("v", "K", "L", { noremap = true, silent = true })
+keymap.set("v", "H", "I", { noremap = true, silent = true })
+-- keymap.set("v", "h", "I", { noremap = true, silent = true })
+-- keymap.set("v", "a", "A", { noremap = true, silent = true })
+
+keymap.set("x", "j", "h", { noremap = true, silent = true })
+keymap.set("x", "l", "l", { noremap = true, silent = true })
+keymap.set("x", "i", "k", { noremap = true, silent = true })
+keymap.set("x", "k", "j", { noremap = true, silent = true })
+keymap.set("x", "h", "i", { noremap = true, silent = true }) -- Insert Mode remains unchanged
+
+keymap.set("x", "J", "_", { noremap = true, silent = true })
+keymap.set("x", "L", "$", { noremap = true, silent = true })
+keymap.set("x", "I", "H", { noremap = true, silent = true })
+keymap.set("x", "K", "L", { noremap = true, silent = true })
+keymap.set("x", "H", "I", { noremap = true, silent = true })
+-- keymap.set("x", "h", "I", { noremap = true, silent = true })
+-- keymap.set("x", "a", "A", { noremap = true, silent = true })
+
 -- K was help on cursor
 
 ------------------------------------------------------PAGE NAVIGATION
@@ -93,13 +112,13 @@ keymap.set("n", "«", "@", { noremap = true, silent = true })
 ------------------------------------------- REMAP of w,s for start of word
 -- Map `w` to move to the start of the next word
 keymap.set("n", "w", "w", { noremap = true, silent = true })
--- Map `s` to move to the start of the previous word
+-- Map `s` to move to the end of the previous word
 keymap.set("n", "s", "ge", { noremap = true, silent = true })
 keymap.set("n", "S", "gE", { noremap = true, silent = true })
 
--- Map `s` to move to the end of the next word
+-- Map `e` to move to the end of the next word
 keymap.set("n", "e", "e", { noremap = true, silent = true })
--- Map `q` to move to the end of the previous word
+-- Map `q` to move to the start of the previous word
 keymap.set("n", "q", "b", { noremap = true, silent = true })
 keymap.set("n", "Q", "B", { noremap = true, silent = true })
 
@@ -108,20 +127,32 @@ keymap.set("n", "Q", "B", { noremap = true, silent = true })
 
 -- Map `w` to move to the start of the next word
 keymap.set("v", "w", "w", { noremap = true, silent = true })
--- Map `s` to move to the start of the previous word
+-- Map `s` to move to the end of the previous word
 keymap.set("v", "s", "ge", { noremap = true, silent = true })
 keymap.set("v", "S", "gE", { noremap = true, silent = true })
 
--- Map `s` to move to the end of the next word
+-- Map `e` to move to the end of the next word
 keymap.set("v", "e", "e", { noremap = true, silent = true })
--- Map `q` to move to the end of the previous word
-keymap.set("v", "q", "ge", { noremap = true, silent = true })
-keymap.set("v", "Q", "gE", { noremap = true, silent = true })
+-- Map `q` to move to the start of the previous word
+keymap.set("v", "q", "b", { noremap = true, silent = true })
+keymap.set("v", "Q", "B", { noremap = true, silent = true })
+
+-- Map `w` to move to the start of the next word
+keymap.set("x", "w", "w", { noremap = true, silent = true })
+-- Map `s` to move to the end of the previous word
+keymap.set("x", "s", "ge", { noremap = true, silent = true })
+keymap.set("x", "S", "gE", { noremap = true, silent = true })
+
+-- Map `e` to move to the end of the next word
+keymap.set("x", "e", "e", { noremap = true, silent = true })
+-- Map `q` to move to the start of the previous word
+keymap.set("x", "q", "b", { noremap = true, silent = true })
+keymap.set("x", "Q", "B", { noremap = true, silent = true })
 
 ---------------------------------------------- Other useful keymaps:
 
 ----------------------------------------- Clipboard
--- keymap.set("n", "<leader>y", '"+y', { noremap = true, silent = true })
+-- keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
 -- keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
 -- keymap.set("n", "<leader>yy", '"+yy', { noremap = true, silent = true })
 keymap.set("n", "<leader>C", '"+yy', { noremap = true, silent = true })
