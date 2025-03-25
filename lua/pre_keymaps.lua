@@ -94,22 +94,23 @@ keymap.set("n", "«", "@", { noremap = true, silent = true })
 -- Map `w` to move to the start of the next word
 keymap.set("n", "w", "w", { noremap = true, silent = true })
 -- Map `s` to move to the start of the previous word
-keymap.set("n", "s", "b", { noremap = true, silent = true })
-keymap.set("n", "S", "B", { noremap = true, silent = true })
+keymap.set("n", "s", "ge", { noremap = true, silent = true })
+keymap.set("n", "S", "gE", { noremap = true, silent = true })
 
 -- Map `s` to move to the end of the next word
 keymap.set("n", "e", "e", { noremap = true, silent = true })
 -- Map `q` to move to the end of the previous word
-keymap.set("n", "q", "ge", { noremap = true, silent = true })
-keymap.set("n", "Q", "gE", { noremap = true, silent = true })
+keymap.set("n", "q", "b", { noremap = true, silent = true })
+keymap.set("n", "Q", "B", { noremap = true, silent = true })
 
 -- aaa-bbb-ccc eee-fff-ggg xxx-yyy-zzz  111.222.333 cvb.zxc-asd_jkl
+---  aaaaaaaaaaaaaaaa  bbbbbbbbbbbbbbbbbb cccccccccccccccc  kkkkkkkkk
 
 -- Map `w` to move to the start of the next word
 keymap.set("v", "w", "w", { noremap = true, silent = true })
 -- Map `s` to move to the start of the previous word
-keymap.set("v", "s", "b", { noremap = true, silent = true })
-keymap.set("v", "S", "B", { noremap = true, silent = true })
+keymap.set("v", "s", "ge", { noremap = true, silent = true })
+keymap.set("v", "S", "gE", { noremap = true, silent = true })
 
 -- Map `s` to move to the end of the next word
 keymap.set("v", "e", "e", { noremap = true, silent = true })
