@@ -9,15 +9,11 @@ keymap.set("i", "jk", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("i", "JK", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("v", "jk", "<Esc>", opts("Exit Visual Mode"))
 keymap.set("v", "JK", "<Esc>", opts("Exit Visual Mode"))
-keymap.set("x", "jk", "<Esc>", opts("Exit Visual Mode"))
-keymap.set("x", "JK", "<Esc>", opts("Exit Visual Mode"))
 
 keymap.set("i", "jl", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("i", "JL", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("v", "jl", "<Esc>", opts("Exit Visual Mode"))
 keymap.set("v", "JL", "<Esc>", opts("Exit Visual Mode"))
-keymap.set("x", "jl", "<Esc>", opts("Exit Visual Mode"))
-keymap.set("x", "JL", "<Esc>", opts("Exit Visual Mode"))
 
 -- Map Enter in normal mode to add a new line
 keymap.set("n", "<CR>", "o<Esc>", opts("Open a new line"))
@@ -123,18 +119,6 @@ keymap.set("v", "e", "e", { noremap = true, silent = true })
 -- Map `q` to move to the start of the previous word
 keymap.set("v", "q", "b", { noremap = true, silent = true })
 keymap.set("v", "Q", "B", { noremap = true, silent = true })
-
--- Map `w` to move to the start of the next word
-keymap.set("x", "w", "w", { noremap = true, silent = true })
--- Map `s` to move to the end of the previous word
-keymap.set("x", "s", "ge", { noremap = true, silent = true })
-keymap.set("x", "S", "gE", { noremap = true, silent = true })
-
--- Map `e` to move to the end of the next word
-keymap.set("x", "e", "e", { noremap = true, silent = true })
--- Map `q` to move to the start of the previous word
-keymap.set("x", "q", "b", { noremap = true, silent = true })
-keymap.set("x", "Q", "B", { noremap = true, silent = true })
 
 ---------------------------------------------- Other useful keymaps:
 
