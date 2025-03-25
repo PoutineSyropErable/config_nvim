@@ -168,6 +168,14 @@ require("lazy").setup({
 	-- 	config = true,
 	-- },
 	"ThePrimeagen/git-worktree.nvim",
+	{
+		"sindrets/diffview.nvim",
+		dependencies = { "nvim-lua/plenary.nvim" },
+	},
+	{
+		"akinsho/git-conflict.nvim",
+		config = true,
+	},
 
 	-- "f-person/git-blame.nvim",
 	"tpope/vim-rhubarb",

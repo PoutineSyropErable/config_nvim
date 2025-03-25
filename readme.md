@@ -104,3 +104,7 @@ bash-language-server jdtls gopls tailwindcss hyprls
 :MasonInstall black debugpy flake8 isort mypy pylint ruff \
 prettier clang-format
 ```
+
+Go compile scripts/find_project_root
+using the build.sh script
+Since its not tracked anymore
