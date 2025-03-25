@@ -1,6 +1,7 @@
 require("mason-lspconfig").setup({
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
 	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
+	automatic_installation = true,
 })
 
 require("mason-tool-installer").setup({
@@ -42,6 +43,14 @@ local lsp_defaults = lspconfig.util.default_config
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+
+---------------------------------------- ASM -------------------------------------
+
+lspconfig.asm_lsp.setup({
+	cmd = { "asm-lsp" },
+	filetypes = { "asm", "s", "S" },
+	root_dir = lspconfig.util.root_pattern(".git", ".asm-lsp.toml"),
+})
 
 --------------------------------------- BASH ---------------------------------------
 
