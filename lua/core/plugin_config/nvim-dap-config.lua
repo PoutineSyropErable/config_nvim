@@ -719,18 +719,18 @@ if PRE_CONFIG_FRANCK.useMyJavaDap then
 end
 
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
-vim.keymap.set("n", "<F8>", function()
+vim.keymap.set("n", "<leader><F8>", function()
 	local class_path = get_class_path()
 	if class_path then
 		print("✅ Java Class Path: " .. table.concat(class_path, "\n"))
 	end
 end, opts("get class path"))
 
-vim.keymap.set("n", "<F9>", function()
+vim.keymap.set("n", "<leader><F9>", function()
 	local main_class = get_main_class()
 	if main_class then
 		print("✅ Java Main Class: " .. main_class)
 	end
 end, opts("get main class"))
 
-vim.keymap.set("n", "<F10>", start_automake, opts("Start automake debugger"))
+vim.keymap.set("n", "<leader><F10>", start_automake, opts("Start automake debugger"))

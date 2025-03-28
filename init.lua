@@ -21,6 +21,7 @@ require("core.plugins")
 require("core.plugin_config")
 require("core.spellcheck")
 require("core.keymaps")
+require("pre_keymaps") -- need a repeat in case plugins default cahnged it
 -- require("core.plugin_config.noice")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers

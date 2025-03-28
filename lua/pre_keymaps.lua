@@ -209,13 +209,29 @@ local function run_build_test_script()
 end
 
 local function run_build_script() vim.cmd("!bash ./build.sh") end
+local function run_do_all()
+	local proj_root = general_utils_franck.find_project_root()
+	if not proj_root then
+		vim.notify("❌ Project root not found", vim.log.levels.ERROR)
+		return
+	end
+
+	print("proj_root = " .. proj_root)
+
+	local all_cmd = "!cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
+	print("all cmd = " .. all_cmd)
+
+	vim.cmd(all_cmd)
+end
 
 keymap.set("n", "<F1>", copy_current_file_path, opts("Copy current file path"))
 keymap.set("n", "<F2>", execute_current_file, opts("Stupidly execute current file"))
+keymap.set("n", "<F3>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 keymap.set("n", "<F4>", RunCurrentFile, opts("Run current file"))
 keymap.set("n", "<F5>", run_build_script, opts("Run build script (No argument) - (build.sh)"))
 keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with this file as argument) - (build.sh $thisFile)"))
 keymap.set("n", "<F7>", run_build_test_script, opts("Run test script (with this file as argument) - (build_test.sh $thisFile)"))
+keymap.set("n", "<F8>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 
 local oil_open = function() require("oil").open() end
 
