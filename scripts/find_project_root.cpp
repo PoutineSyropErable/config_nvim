@@ -10,7 +10,9 @@ const bool USE_GIT_ONLY = false;
 
 // List of project root markers
 const std::vector<std::string> ROOT_MARKERS = {
-    ".git", ".hg", ".svn", "Makefile", "CMakeLists.txt",
+    ".git", ".hg", ".svn",
+    //"Makefile",
+    "CMakeLists.txt",
     "pyproject.toml", "Pipfile", "requirements.txt", "setup.py", "setup.cfg",
     "compile_commands.json", "meson.build", "configure.ac", "autogen.sh",
     "pom.xml", "build.gradle", "settings.gradle", ".classpath", ".project",
@@ -30,7 +32,7 @@ fs::path find_project_root(fs::path start_path) {
 		for (const auto& marker : CHOSEN_ROOT_MARKERS) {
 			if (fs::exists(start_path / marker)) {
 				if (VERBOSE) {
-					std::cout << "✅ Found project root marker: " << marker << " in " << start_path << std::endl;
+					std::cerr << "✅ Found project root marker: " << marker << " in " << start_path << std::endl;
 				}
 				return start_path;
 			}
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]) {
 	target_path = fs::weakly_canonical(target_path);
 
 	if (VERBOSE) {
-		std::cout << "🔍 Searching for project root starting from: " << target_path << std::endl;
+		std::cerr << "🔍 Searching for project root starting from: " << target_path << std::endl;
 	}
 
 	fs::path project_root;
