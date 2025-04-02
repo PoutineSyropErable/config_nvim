@@ -103,7 +103,7 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	vim.cmd("LspInfo")
 
 	-- Print the detected root directory
-	local clients = vim.lsp.get_active_clients()
+	local clients = vim.lsp.get_clients()
 	for _, client in ipairs(clients) do
 		if client.name == "pyright" then
 			print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
@@ -292,7 +292,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 vim.api.nvim_create_autocmd("VimLeavePre", {
 	callback = function()
 		-- Properly shut down LSP servers when exiting Neovim
-		for _, client in pairs(vim.lsp.get_active_clients()) do
+		for _, client in pairs(vim.lsp.get_clients()) do
 			client.stop()
 		end
 	end,
