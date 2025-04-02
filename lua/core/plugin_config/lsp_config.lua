@@ -1,7 +1,7 @@
 require("mason-lspconfig").setup({
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
-	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
-	automatic_installation = true,
+	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
+	-- automatic_installation = true,
 })
 
 require("mason-tool-installer").setup({
@@ -220,7 +220,7 @@ if useJavaLspConfig then
 		vim.notify("❌ Error: `_G.general_utils_franck` not found!")
 		return
 	end
-	local project_root = general_utils.find_project_root()
+	local project_root = general_utils.find_project_root(true)
 
 	if not project_root then
 		vim.notify("⚠️(java): Could not determine project root, using current working directory.")

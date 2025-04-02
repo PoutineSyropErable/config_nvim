@@ -301,7 +301,7 @@ end
 local function telescope_cwd()
 	local tel_cwd = nil
 	if use_project_root then
-		tel_cwd = _G.general_utils_franck.find_project_root()
+		tel_cwd = _G.general_utils_franck.find_project_root(false)
 		return tel_cwd
 	end
 	tel_cwd = vim.fn.getcwd()

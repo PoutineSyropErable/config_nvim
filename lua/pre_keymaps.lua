@@ -4,6 +4,12 @@ local keymap = vim.keymap
 -- makes keymap seting easier
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
+local function notify_debug(message)
+	local cmd = string.format("notify-send '[Neovim Debug]' '%s'", message)
+	os.execute(cmd) -- Send notification
+	print("🟢 Debug: " .. message) -- Also log to Neovim
+end
+
 -------- Apply 'jk' to exit insert mode and visual mode ----------
 keymap.set("i", "jk", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("i", "JK", "<Esc>", opts("Exit Insert Mode"))
@@ -210,23 +216,24 @@ end
 
 local function run_build_script() vim.cmd("!bash ./build.sh") end
 local function run_do_all()
-	local proj_root = general_utils_franck.find_project_root()
+	local proj_root = general_utils_franck.find_project_root(true)
 	if not proj_root then
 		vim.notify("❌ Project root not found", vim.log.levels.ERROR)
 		return
 	end
 
-	print("proj_root = " .. proj_root)
+	-- print("proj_root = " .. proj_root)
 
-	local all_cmd = "!cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
-	print("all cmd = " .. all_cmd)
+	local all_cmd = "cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
+	print("all cmd = " .. all_cmd, vim.log.levels.INFO)
 
-	vim.cmd(all_cmd)
+	local output = vim.fn.system(all_cmd)
+	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
 end
 
 keymap.set("n", "<F1>", copy_current_file_path, opts("Copy current file path"))
 keymap.set("n", "<F2>", execute_current_file, opts("Stupidly execute current file"))
-keymap.set("n", "<F3>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
+-- keymap.set("n", "<F3>", run_do_all, opts("Run do all script (build, run, and more) {./aaa_doall.sh}"))
 keymap.set("n", "<F4>", RunCurrentFile, opts("Run current file"))
 keymap.set("n", "<F5>", run_build_script, opts("Run build script (No argument) - (build.sh)"))
 keymap.set("n", "<F6>", run_build_script_with_file, opts("Run build script (with this file as argument) - (build.sh $thisFile)"))

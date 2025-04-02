@@ -78,7 +78,7 @@ end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
-	local project_root = general_utils_franck.find_project_root()
+	local project_root = general_utils_franck.find_project_root(true)
 	if project_root == nil then
 		session_dir = original_location
 		return original_location

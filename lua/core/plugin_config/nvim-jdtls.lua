@@ -18,7 +18,7 @@ if not general_utils then
 	return
 end
 
-local project_root = general_utils.find_project_root()
+local project_root = general_utils.find_project_root(true)
 
 if not project_root then
 	-- vim.notify("⚠️(java): Could not determine project root, using current working directory.")
@@ -50,17 +50,17 @@ end
 -- vim.notify("JDTLS Launcher path: " .. jdtls_launcher, vim.log.levels.INFO)
 
 local status, debug_plugin = pcall(function()
-  local path = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar", true, true)
-  if path == "" then
-    error("No Java Debug plugin found!")
-  end
-  return path
+	local path = vim.fn.glob("$HOME/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar", true, true)
+	if path == "" then
+		error("No Java Debug plugin found!")
+	end
+	return path
 end)
 
 if not status then
-  vim.notify("Error loading Java Debug plugin: " .. debug_plugin, vim.log.levels.ERROR)
+	vim.notify("Error loading Java Debug plugin: " .. debug_plugin, vim.log.levels.ERROR)
 else
-  print("Using Debug Plugin:", debug_plugin)
+	print("Using Debug Plugin:", debug_plugin)
 end
 
 -- Use the jdtls_home variable to find the JDTLS configuration path
@@ -136,7 +136,7 @@ local config = {
 	},
 
 	init_options = {
---		bundles = { debug_plugin }, -- Use validated debug plugin path
+		--		bundles = { debug_plugin }, -- Use validated debug plugin path
 	},
 }
 
