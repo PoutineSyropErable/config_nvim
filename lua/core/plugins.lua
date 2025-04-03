@@ -199,6 +199,18 @@ require("lazy").setup({
 	"hrsh7th/cmp-cmdline",
 	"saadparwaiz1/cmp_luasnip",
 	-- "mfussenegger/nvim-lint",
+
+	-- {
+	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+	-- 	config = function()
+	-- 		require("lsp_lines").setup()
+	-- 		vim.diagnostic.config({
+	-- 			virtual_text = false,
+	-- 			virtual_lines = true,
+	-- 		})
+	-- 	end,
+	-- },
+
 	"clangd/clangd",
 	"Civitasv/cmake-tools.nvim",
 	"elkowar/yuck.vim",
