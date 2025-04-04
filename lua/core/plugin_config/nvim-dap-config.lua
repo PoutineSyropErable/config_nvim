@@ -37,8 +37,8 @@ dap.configurations.python = {
 		end,
 
 		-- program = "${file}", -- Run the currently open file
-		cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
-		-- cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
+		-- cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
+		cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
 		module = "303MUD.client_local",
 		args = arg_func,
 	},
