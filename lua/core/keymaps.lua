@@ -1091,6 +1091,7 @@ local is_windows = uname.sysname == "Windows_NT"
 
 if is_windows then
 	-- Windows-specific keymaps
+	print("Is windows (keymaps)")
 	keymap.set("", "<C-s>j", ":wincmd h<CR>")
 	keymap.set("", "<C-s>k", ":wincmd j<CR>")
 	keymap.set("", "<C-s>i", ":wincmd k<CR>")
@@ -1113,6 +1114,7 @@ if is_windows then
 	keymap.set("", "<C-w><Up>", ":wincmd k<CR>")
 	keymap.set("", "<C-w><Right>", ":wincmd l<CR>")
 else
+	print("Is linux (keymaps)")
 	-- Linux-specific keymaps (using nvim-tmux navigator)
 	keymap.set("", "<C-s>j", nvim_tmux_nav.NvimTmuxNavigateLeft)
 	keymap.set("", "<C-s>k", nvim_tmux_nav.NvimTmuxNavigateDown)

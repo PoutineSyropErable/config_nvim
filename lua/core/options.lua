@@ -87,7 +87,24 @@ vim.opt.sessionoptions = { -- required
 }
 -- let g:gitgutter_enabled = 0
 
-vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
+-- Define path to verbose log file
+local log_path = vim.fn.expand("$HOME/.config/nvim_logs/nvim_log.lua")
+
+-- Ensure the directory and file exist
+if vim.fn.filereadable(log_path) == 0 then
+	vim.fn.mkdir(vim.fn.fnamemodify(log_path, ":h"), "p") -- create ~/.config/nvim_logs if missing
+	local file = io.open(log_path, "w")
+	if file then
+		file:write("-- Neovim verbose log file created\n")
+		file:close()
+	else
+		vim.notify("Failed to create verbose log file", vim.log.levels.ERROR)
+	end
+end
+
+-- Set verbosefile
+vim.cmd("set verbosefile=" .. log_path)
+
 vim.opt.undofile = true -- Enable persistent undo
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo" -- Set undo directory
 

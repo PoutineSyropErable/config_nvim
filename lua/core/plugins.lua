@@ -1,6 +1,8 @@
 -- Detect if the OS is Linux
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
+print("is Linux: " .. tostring(is_linux))
+
 local get_buffer_plugins = require("buffer_manager")
 local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
@@ -81,7 +83,7 @@ require("lazy").setup({
 
 	"psf/black",
 
-	"preservim/vimux",
+	--"preservim/vimux",
 	"norcalli/nvim-colorizer.lua",
 	{
 		"powerman/vim-plugin-AnsiEsc",
@@ -249,10 +251,10 @@ require("lazy").setup({
 
 	-- 🖼️ Image Preview (Kitty Terminal Required) -- Images
 
-	{
-		"3rd/image.nvim",
-		opts = {},
-	},
+	-- {
+	-- 	"3rd/image.nvim",
+	-- 	opts = {},
+	-- },
 	-- this should be the right one
 
 	{
