@@ -173,4 +173,4 @@ local function ensure_session_exists()
 	end
 end
 
-ensure_session_exists()
+-- ensure_session_exists()

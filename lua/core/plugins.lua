@@ -147,14 +147,44 @@ require("lazy").setup({
 	"TamaMcGlinn/quickfixdd",
 	"szw/vim-maximizer",
 
-	"lewis6991/gitsigns.nvim",
-	"tpope/vim-fugitive",
-	-- New git plugins vv, needed? idk
 	{
 		"jiaoshijie/undotree",
 		dependencies = "nvim-lua/plenary.nvim",
 		config = true,
 	},
+
+	"lewis6991/gitsigns.nvim",
+	"tpope/vim-fugitive",
+	"kdheepak/lazygit.nvim",
+	"itchyny/vim-gitbranch",
+
+	-- {
+	-- 	"sindrets/diffview.nvim",
+	-- 	dependencies = { "nvim-lua/plenary.nvim" },
+	-- },
+	{
+		"akinsho/git-conflict.nvim",
+		event = { "BufReadPost" },
+		config = function()
+			require("git-conflict").setup({
+				default_mappings = true, -- enable default keymaps
+				disable_diagnostics = true, -- disable lsp diagnostics while resolving
+				highlights = {
+					incoming = "DiffAdd",
+					current = "DiffText",
+				},
+			})
+
+			-- disable in special buffers like fugitive
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = { "fugitive", "git", "gitcommit", "gitrebase" },
+				callback = function() vim.b.git_conflict_disable = true end,
+			})
+		end,
+	},
+	-- "f-person/git-blame.nvim",
+	"ThePrimeagen/git-worktree.nvim",
+	-- New git plugins vv, needed? idk
 
 	-- {
 	-- 	"NeogitOrg/neogit",
@@ -167,23 +197,11 @@ require("lazy").setup({
 	-- 	},
 	-- 	config = true,
 	-- },
-	"ThePrimeagen/git-worktree.nvim",
-	{
-		"sindrets/diffview.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-	},
-	{
-		"akinsho/git-conflict.nvim",
-		config = true,
-	},
 
-	-- "f-person/git-blame.nvim",
 	"tpope/vim-rhubarb",
 	"tpope/vim-surround",
 	-- "airblade/vim-gitgutter",
 	"mhinz/vim-signify",
-	"kdheepak/lazygit.nvim",
-	"itchyny/vim-gitbranch",
 
 	"szw/vim-maximizer",
 	"folke/which-key.nvim",
@@ -303,6 +321,7 @@ require("lazy").setup({
 	"echasnovski/mini.surround",
 	"Wansmer/treesj",
 	"stevearc/conform.nvim",
+
 
 	{
 		"AckslD/nvim-neoclip.lua",

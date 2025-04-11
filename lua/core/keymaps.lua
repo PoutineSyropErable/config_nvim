@@ -726,125 +726,150 @@ local function push_hunk(direction)
 		print("No adjacent window found to the " .. direction)
 	end
 end
--- Move it to the **current buffer** (LOCAL, BASE, REMOTE)
-keymap.set("n", "<leader>kL", ":diffget LOCAL<CR>", opts("Take LOCAL version into current buffer"))
-keymap.set("n", "<leader>kB", ":diffget BASE<CR>", opts("Take BASE version into current buffer"))
-keymap.set("n", "<leader>kR", ":diffget REMOTE<CR>", opts("Take REMOTE version into current buffer"))
 
--- Move it to the **output buffer** (final merged file)
-keymap.set("n", "<leader>kl", function() ApplyDiffGet("LOCAL") end, opts("Apply LOCAL version to output buffer"))
-keymap.set("n", "<leader>kb", function() ApplyDiffGet("BASE") end, opts("Apply BASE version to output buffer"))
-keymap.set("n", "<leader>kr", function() ApplyDiffGet("REMOTE") end, opts("Apply REMOTE version to output buffer"))
+local use_git_conflict = true
 
--- Push hunk to the left buffer
-keymap.set("n", "<leader>ka", function() push_hunk("left") end, opts("Push hunk to the left buffer"))
+if use_git_conflict then
+	-- Write it here
 
--- Push hunk to the right buffer
-keymap.set("n", "<leader>kd", function() push_hunk("right") end, opts("Push hunk to the right buffer"))
+	local conflict = require("git-conflict")
 
--- Pull hunk from the left buffer
-keymap.set("n", "<leader>kq", function() pull_hunk("left") end, opts("Pull hunk from the left buffer"))
+	keymap.set("n", "<leader>kj", function() conflict.choose("ours") end, opts("Accept ours (HEAD)"))
+	keymap.set("n", "<leader>kt", function() conflict.choose("theirs") end, opts("Accept theirs (incoming)"))
+	keymap.set("n", "<leader>kb", function() conflict.choose("both") end, opts("Accept both"))
+	keymap.set("n", "<leader>k0", function() conflict.choose("none") end, opts("Accept none"))
 
--- Pull hunk from the right buffer
-keymap.set("n", "<leader>ke", function() pull_hunk("right") end, opts("Pull hunk from the right buffer"))
+	keymap.set("n", "<leader>kb", function() conflict.find_prev("both") end, opts("Previous conflict (both)"))
+	keymap.set("n", "<leader>kn", function() conflict.find_next("both") end, opts("Next conflict (both)"))
 
--- Function to push the current hunk into the final output buffer
--- Function to push the current hunk into the final output buffer
-local function push_to_output()
-	local current_win = vim.api.nvim_get_current_win() -- Save current window
-	local current_buf = vim.api.nvim_get_current_buf() -- Save current buffer
-	local output_win = nil
+	keymap.set("n", "<leader>kB", function() conflict.find_prev("ours") end, opts("Previous conflict (ours/head)"))
+	keymap.set("n", "<leader>kN", function() conflict.find_next("ours") end, opts("Previous conflict (ours/Head)"))
 
-	-- Find the output buffer window (should be the one without _LOCAL_, _BASE_, _REMOTE_)
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
-		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
-			output_win = win
-			break
+	keymap.set("n", "<leader>kv", function() conflict.find_prev("theirs") end, opts("Previous conflict (theirs/incoming)"))
+	keymap.set("n", "<leader>kc", function() conflict.find_next("theirs") end, opts("Previous conflict (theirs/incoming)"))
+end
+
+if not use_git_conflict then
+	-- Move it to the **current buffer** (LOCAL, BASE, REMOTE)
+	keymap.set("n", "<leader>kL", ":diffget LOCAL<CR>", opts("Take LOCAL version into current buffer"))
+	keymap.set("n", "<leader>kB", ":diffget BASE<CR>", opts("Take BASE version into current buffer"))
+	keymap.set("n", "<leader>kR", ":diffget REMOTE<CR>", opts("Take REMOTE version into current buffer"))
+
+	-- Move it to the **output buffer** (final merged file)
+	keymap.set("n", "<leader>kl", function() ApplyDiffGet("LOCAL") end, opts("Apply LOCAL version to output buffer"))
+	keymap.set("n", "<leader>kb", function() ApplyDiffGet("BASE") end, opts("Apply BASE version to output buffer"))
+	keymap.set("n", "<leader>kr", function() ApplyDiffGet("REMOTE") end, opts("Apply REMOTE version to output buffer"))
+
+	-- Push hunk to the left buffer
+	keymap.set("n", "<leader>ka", function() push_hunk("left") end, opts("Push hunk to the left buffer"))
+
+	-- Push hunk to the right buffer
+	keymap.set("n", "<leader>kd", function() push_hunk("right") end, opts("Push hunk to the right buffer"))
+
+	-- Pull hunk from the left buffer
+	keymap.set("n", "<leader>kq", function() pull_hunk("left") end, opts("Pull hunk from the left buffer"))
+
+	-- Pull hunk from the right buffer
+	keymap.set("n", "<leader>ke", function() pull_hunk("right") end, opts("Pull hunk from the right buffer"))
+
+	-- Function to push the current hunk into the final output buffer
+	-- Function to push the current hunk into the final output buffer
+	local function push_to_output()
+		local current_win = vim.api.nvim_get_current_win() -- Save current window
+		local current_buf = vim.api.nvim_get_current_buf() -- Save current buffer
+		local output_win = nil
+
+		-- Find the output buffer window (should be the one without _LOCAL_, _BASE_, _REMOTE_)
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+			if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+				output_win = win
+				break
+			end
+		end
+
+		if output_win then
+			vim.api.nvim_set_current_win(output_win) -- Switch to output buffer
+			vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
+			vim.api.nvim_set_current_win(current_win) -- Return to original buffer
+		else
+			print("Output buffer not found!")
 		end
 	end
 
-	if output_win then
-		vim.api.nvim_set_current_win(output_win) -- Switch to output buffer
-		vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
-		vim.api.nvim_set_current_win(current_win) -- Return to original buffer
-	else
-		print("Output buffer not found!")
+	keymap.set("n", "<leader>kp", push_to_output, opts("Put current hunk into the final output buffer"))
+
+	-- Jump to next conflict
+	keymap.set("n", "<leader>kn", "]c", opts("Jump to next conflict"))
+
+	-- Jump to previous conflict
+	keymap.set("n", "<leader>kN", "[c", opts("Jump to previous conflict"))
+	keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
+
+	-- Function to apply a selected version's hunk to all other buffers
+	local function apply_hunk_to_all(version)
+		local current_win = vim.api.nvim_get_current_win() -- Save the current window
+		local output_win = nil
+
+		-- Identify the output buffer
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+			if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+				output_win = win
+				break
+			end
+		end
+
+		-- Apply diffget from the chosen version to all buffers except the output buffer
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			local target_buf = vim.api.nvim_win_get_buf(win)
+			if win ~= output_win then
+				vim.api.nvim_set_current_win(win) -- Move to target buffer
+				vim.cmd("diffget " .. version) -- Apply hunk from the selected version
+			end
+		end
+
+		-- Apply the selected hunk to the output buffer without moving to the next hunk
+		if output_win then
+			vim.api.nvim_set_current_win(output_win) -- Move to output buffer
+			vim.cmd("diffget " .. version) -- Apply hunk without changing cursor position
+		end
+
+		-- Return to the original window
+		vim.api.nvim_set_current_win(current_win)
 	end
-end
 
-keymap.set("n", "<leader>kp", push_to_output, opts("Put current hunk into the final output buffer"))
+	-- Function to detect the current buffer type and apply it to all buffers
+	local function apply_current_hunk_to_all()
+		local bufname = vim.api.nvim_buf_get_name(0)
 
--- Jump to next conflict
-keymap.set("n", "<leader>kn", "]c", opts("Jump to next conflict"))
-
--- Jump to previous conflict
-keymap.set("n", "<leader>kN", "[c", opts("Jump to previous conflict"))
-keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
-
--- Function to apply a selected version's hunk to all other buffers
-local function apply_hunk_to_all(version)
-	local current_win = vim.api.nvim_get_current_win() -- Save the current window
-	local output_win = nil
-
-	-- Identify the output buffer
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
-		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
-			output_win = win
-			break
+		if bufname:match("_LOCAL_") then
+			apply_hunk_to_all("LOCAL")
+		elseif bufname:match("_BASE_") then
+			apply_hunk_to_all("BASE")
+		elseif bufname:match("_REMOTE_") then
+			apply_hunk_to_all("REMOTE")
+		else
+			print("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
 		end
 	end
 
-	-- Apply diffget from the chosen version to all buffers except the output buffer
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		local target_buf = vim.api.nvim_win_get_buf(win)
-		if win ~= output_win then
-			vim.api.nvim_set_current_win(win) -- Move to target buffer
-			vim.cmd("diffget " .. version) -- Apply hunk from the selected version
-		end
-	end
+	-- Apply LOCAL hunk to all buffers
+	keymap.set("n", "<leader>kcl", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
+	-- Apply BASE hunk to all buffers
+	keymap.set("n", "<leader>kcb", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
+	-- Apply REMOTE hunk to all buffers
+	keymap.set("n", "<leader>kcr", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
+	-- Apply CURRENT buffer's hunk to all buffers
+	keymap.set("n", "<leader>kC", apply_current_hunk_to_all, opts("Apply current buffer's hunk to all buffers"))
 
-	-- Apply the selected hunk to the output buffer without moving to the next hunk
-	if output_win then
-		vim.api.nvim_set_current_win(output_win) -- Move to output buffer
-		vim.cmd("diffget " .. version) -- Apply hunk without changing cursor position
-	end
-
-	-- Return to the original window
-	vim.api.nvim_set_current_win(current_win)
+	-- Apply LOCAL hunk to all buffers
+	keymap.set("n", "<leader>kf", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
+	-- Apply BASE hunk to all buffers
+	keymap.set("n", "<leader>kg", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
+	-- Apply REMOTE hunk to all buffers
+	keymap.set("n", "<leader>kh", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
 end
-
--- Function to detect the current buffer type and apply it to all buffers
-local function apply_current_hunk_to_all()
-	local bufname = vim.api.nvim_buf_get_name(0)
-
-	if bufname:match("_LOCAL_") then
-		apply_hunk_to_all("LOCAL")
-	elseif bufname:match("_BASE_") then
-		apply_hunk_to_all("BASE")
-	elseif bufname:match("_REMOTE_") then
-		apply_hunk_to_all("REMOTE")
-	else
-		print("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
-	end
-end
-
--- Apply LOCAL hunk to all buffers
-keymap.set("n", "<leader>kcl", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
--- Apply BASE hunk to all buffers
-keymap.set("n", "<leader>kcb", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
--- Apply REMOTE hunk to all buffers
-keymap.set("n", "<leader>kcr", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
--- Apply CURRENT buffer's hunk to all buffers
-keymap.set("n", "<leader>kC", apply_current_hunk_to_all, opts("Apply current buffer's hunk to all buffers"))
-
--- Apply LOCAL hunk to all buffers
-keymap.set("n", "<leader>kf", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))
--- Apply BASE hunk to all buffers
-keymap.set("n", "<leader>kg", function() apply_hunk_to_all("BASE") end, opts("Apply BASE hunk to all buffers"))
--- Apply REMOTE hunk to all buffers
-keymap.set("n", "<leader>kh", function() apply_hunk_to_all("REMOTE") end, opts("Apply REMOTE hunk to all buffers"))
 
 -- ---------------------------------------------ufo
 local ufo = require("ufo")

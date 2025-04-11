@@ -83,6 +83,8 @@ require("conform").setup({
 		lsp_format = "fallback",
 	},
 
+	disabled = { "python" },
+
 	-- formatters = {
 	-- 	my_c_formatter = {
 	-- 		command = "clang-format", -- Use clang-format as the command

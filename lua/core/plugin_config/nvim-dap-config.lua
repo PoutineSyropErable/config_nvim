@@ -40,6 +40,7 @@ dap.configurations.python = {
 		-- cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
 		cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
 		module = "303MUD.client_local",
+		-- module = "303MUD.client_remote",
 		args = arg_func,
 	},
 }
