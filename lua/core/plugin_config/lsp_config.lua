@@ -44,6 +44,17 @@ _G.MyRootDir = nil -- Global variable to hold the root directory
 
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+vim.diagnostic.config({
+	virtual_text = {
+		spacing = 2,
+		prefix = "●", -- could be '■', '●', '▎', '■', etc.
+	},
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+})
+
 ---------------------------------------- ASM -------------------------------------
 
 lspconfig.asm_lsp.setup({
