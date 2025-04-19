@@ -84,4 +84,15 @@ dap.listeners.after.event_stopped["jump_to_error"] = function(session, body)
 	end
 end
 
+dap.listeners.after.event_stopped["print_backtrace"] = function(session, body)
+	if body.reason == "exception" or body.reason == "error" or body.reason == "signal" then
+		-- Delay execution slightly so the debug session is fully ready
+		vim.defer_fn(function()
+			-- Send the command `-exec bt` to GDB or compatible debugger
+
+			dap.repl.execute("-exec bt") -- Pass it to REPL
+		end, 200)
+	end
+end
+
 --

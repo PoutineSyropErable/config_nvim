@@ -1,7 +1,7 @@
 --  Store session directory once when Neovim starts
 
 local function notify_debug(message)
-	local cmd = string.format("notify-send '[Neovim Debug]' '%s'", message)
+	local cmd = string.format("notify-send -t 5000 '[Neovim Debug]' '%s'", message)
 	os.execute(cmd) -- Send notification
 	print("🟢 Debug: " .. message) -- Also log to Neovim
 end
@@ -14,7 +14,7 @@ local nvim_possession = require("nvim-possession")
 local bufferline = require("bufferline")
 local tabpage = require("bufferline.tabpages") -- Ensure it exists
 
-local DEBUG = true -- Set to `true` to enable debug logs
+local DEBUG = false -- Set to `true` to enable debug logs
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -78,11 +78,14 @@ end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
-	local project_root = general_utils_franck.find_project_root(true)
+	local project_root = general_utils_franck.find_project_root(false)
+	-- print("setting session dir")
 	if project_root == nil then
+		-- print("is nill")
 		session_dir = original_location
 		return original_location
 	end
+	-- print("project_root = " .. vim.inspect(project_root))
 
 	session_dir = project_root .. "/.nvim-session/"
 	if DEBUG then
@@ -116,13 +119,8 @@ nvim_possession.setup({
 	-- ✅ Hook: Load Scope.nvim state after loading a session
 	post_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
-		if vim.fn.filereadable(session_file) == 0 and not require("nvim-possession").status() then
-			require("nvim-possession").new(session_name) -- Save session with "default" name
-			-- print("📂 Auto-created new session:", session_file)
-		else
-			if DEBUG then
-				print("📂 Loaded session:", session_file)
-			end
+		if DEBUG then
+			print("📂 Loaded session:", session_file)
 		end
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
@@ -132,6 +130,7 @@ nvim_possession.setup({
 	-- ✅ Hook: Save Scope.nvim state when saving a session
 	save_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
+		-- notify_debug("auto saving")
 
 		if DEBUG then
 			print("💾 Auto-saved session:", session_file)

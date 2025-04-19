@@ -322,7 +322,6 @@ require("lazy").setup({
 	"Wansmer/treesj",
 	"stevearc/conform.nvim",
 
-
 	{
 		"AckslD/nvim-neoclip.lua",
 		dependencies = { "kkharji/sqlite.lua", module = "sqlite" },
@@ -350,6 +349,23 @@ require("lazy").setup({
 	-- 		--   If not available, we use `mini` as the fallback
 	-- 		-- "rcarriga/nvim-notify",
 	-- 	},
+	-- },
+	-- {
+	-- 	"rcarriga/nvim-notify",
+	-- 	lazy = false,
+	-- 	config = function()
+	-- 		require("notify").setup({
+	-- 			stages = "fade",
+	-- 			render = "minimal", -- 👈 To avoid line splitting!
+	-- 			background_colour = "#ff5577", -- Catppuccin Mocha base
+	-- 			timeout = 3000,
+	-- 			max_width = 500,
+	-- 			merge_duplicates = 2,
+	-- 		})
+
+	-- 		-- Override vim.notify
+	-- 		vim.notify = require("notify")
+	-- 	end,
 	-- },
 }, {
 	rocks = {

@@ -170,7 +170,6 @@ end, opts("Move to last visible window"))
 keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
 keymap.set("n", "<leader>pc", function() require("nvim-possession").new() end, opts("📌create new session"))
 keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
-keymap.set("n", "<leader>pd", function() require("nvim-possession").delete() end, opts("📌delete selected session"))
 
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
@@ -948,21 +947,6 @@ keymap.set(
 keymap.set("n", "<leader>br", dap.clear_breakpoints, opts("Clear all breakpoints"))
 keymap.set("n", "<leader>ba", function() telescope.extensions.dap.list_breakpoints() end, opts("List all breakpoints (Telescope UI)"))
 
--- Debugging Execution Keybindings
-keymap.set("n", "<leader>dc", dap.continue, opts("--- Start/continue debugging session"))
-keymap.set("n", "<leader>dj", dap.step_over, opts("--- Step over (skip function calls)"))
-keymap.set("n", "<leader>dk", dap.step_into, opts("--- Step into function calls"))
-keymap.set("n", "<leader>do", dap.step_out, opts("--- Step out of current function"))
-keymap.set("n", "<leader>dp", dap.pause, opts("--- Pause program execution"))
--- Reverse Continue (Run backwards until a breakpoint)
-keymap.set("n", "<leader>db", dap.reverse_continue, opts("-- Reverse continue (run backward, previous breakpoint)"))
--- Reverse Step (Step back one line)
-keymap.set("n", "<leader>dBl", dap.step_back, opts("--Step backward (previous line)"))
--- Reverse Step Instruction (Step back one assembly instruction)
-
-keymap.set("n", "<leader>dC", dap.run_to_cursor, opts("Step to cursor"))
-keymap.set("n", "<leader>df", debug_next_function, opts("execute untill next function call"))
-
 -- Debugging Stop/Disconnect
 keymap.set("n", "<leader>dd", function()
 	dap.disconnect()
@@ -991,28 +975,46 @@ local dap_run = function()
 	dap.repl.open()
 
 	::evaluate::
-	print("\n")
 	local input_expr = vim.fn.input("Evaluate expression: ") -- Get input first
 	if input_expr and input_expr ~= "" then
 		local file_ext = _G.last_debugged_file or "" -- Use stored file extension
-		print("\nfiletype: " .. file_ext)
+		vim.notify("\nfiletype: " .. file_ext)
 		if file_ext == ".c" or file_ext == ".cpp" then
 			input_expr = "-exec " .. input_expr -- Prefix with "-exec" for GDB-based debuggers
 		end
-		print("running " .. input_expr)
+		vim.notify("running " .. input_expr)
 		dap.repl.execute(input_expr) -- Pass it to REPL
 		-- wont show the diff though?
 	end
 end
 
+-- Debugging Execution Keybindings
+keymap.set("n", "<leader>dc", dap.continue, opts("--- Start/continue debugging session"))
+keymap.set("n", "<leader>dj", dap.step_over, opts("--- Step over (skip function calls)"))
+keymap.set("n", "<leader>dh", dap.step_into, opts("--- Step into function calls"))
+keymap.set("n", "<leader>dl", dap.step_out, opts("--- Step out of current function"))
+
+keymap.set("n", "<leader>di", dap.up, opts("backtrace one function (backtrace down)"))
+keymap.set("n", "<leader>dk", dap.down, opts("retrace one function (backtrace up)"))
+
+keymap.set("n", "<leader>dp", dap.pause, opts("--- Pause program execution"))
+-- Reverse Continue (Run backwards until a breakpoint)
+keymap.set("n", "<leader>db", dap.reverse_continue, opts("-- Reverse continue (run backward, previous breakpoint)"))
+-- Reverse Step (Step back one line)
+keymap.set("n", "<leader>dBl", dap.step_back, opts("--Step backward (previous line)"))
+-- Reverse Step Instruction (Step back one assembly instruction)
+
+keymap.set("n", "<leader>dC", dap.run_to_cursor, opts("Step to cursor"))
+keymap.set("n", "<leader>df", debug_next_function, opts("execute untill next function call"))
+
 -- Debugging Tools
 keymap.set("n", "<leader>d.", function() dap.repl.toggle() end, opts("Toggle debugger REPL [Not Useful]"))
 keymap.set("n", "<leader>dr", dap_run, opts("Evaluate expression in REPL"))
-keymap.set("n", "<leader>dl", dap.run_last, opts("Re-run last debugging session"))
+keymap.set("n", "<leader>dL", dap.run_last, opts("Re-run last debugging session"))
 keymap.set("n", "<leader>dR", dap.restart, opts("Restart debugging session"))
 
-keymap.set("n", "<leader>di", widgets.hover, opts("Hover to inspect variable under cursor"))
-keymap.set("n", "<leader>du", dapui.toggle, opts("Toggle DAP UI"))
+keymap.set("n", "<leader>d$", widgets.hover, opts("Hover to inspect variable under cursor"))
+keymap.set("n", "<leader>da", dapui.toggle, opts("Toggle DAP UI"))
 
 keymap.set("n", "<leader>dv", function() widgets.centered_float(widgets.scopes) end, opts("Show debugging scopes (floating window)"))
 -- keymap.set("n", "<leader>da", function() widgets.centered_float(widgets.variables) end, opts("Show all variables (floating window)"))
@@ -1020,7 +1022,7 @@ keymap.set("n", "<leader>dS", function() widgets.centered_float(widgets.frames) 
 
 -- Telescope DAP Integrations
 keymap.set("n", "<leader>ds", function() telescope.extensions.dap.frames() end, opts("Show stack frames (Telescope UI)"))
-keymap.set("n", "<leader>dh", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
+keymap.set("n", "<leader>dH", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
 
 keymap.set("n", "<leader>de", function() builtin.diagnostics({ default_text = ":E:" }) end, opts("Show errors and diagnostics (Telescope UI)"))
 keymap.set("n", "<leader>dw", function() builtin.diagnostics({ default_text = ":W:" }) end, opts("Show Warning and diagnostics (Telescope UI)"))
@@ -1185,24 +1187,24 @@ vim.keymap.set("n", "<C-x>Z", focus_normal_win, opts("Move to normal split"))
 ------------------------------ NOTES --------------------------
 
 ---------------  ✍️ Markdown Preview Toggle
-keymap.set("n", "<leader>mt", ":MarkView Toggle<CR>", opts("Toggle Markdown Preview"))
-keymap.set("n", "<leader>ms", ":MarkView Start<CR>", opts("Start Markdown Preview"))
-keymap.set("n", "<leader>me", ":MarkView Enable<CR>", opts("Enable Markdown Preview Globally"))
-keymap.set("n", "<leader>md", ":MarkView Disable<CR>", opts("Disable Markdown Preview Globally"))
-keymap.set("n", "<leader>ma", ":MarkView attach<CR>", opts("Attach to Current Buffer"))
-keymap.set("n", "<leader>mx", ":MarkView detach<CR>", opts("Detach from Current Buffer"))
-keymap.set("n", "<leader>mp", ":MarkView Render<CR>", opts("Render Markdown Preview"))
-keymap.set("n", "<leader>mc", ":MarkView Clear<CR>", opts("Clear Markdown Preview"))
+keymap.set("n", "<leader>mt", ":Markview Toggle<CR>", opts("Toggle Markdown Preview"))
+keymap.set("n", "<leader>ms", ":Markview Start<CR>", opts("Start Markdown Preview"))
+keymap.set("n", "<leader>me", ":Markview Enable<CR>", opts("Enable Markdown Preview Globally"))
+keymap.set("n", "<leader>md", ":Markview Disable<CR>", opts("Disable Markdown Preview Globally"))
+keymap.set("n", "<leader>ma", ":Markview attach<CR>", opts("Attach to Current Buffer"))
+keymap.set("n", "<leader>mx", ":Markview detach<CR>", opts("Detach from Current Buffer"))
+keymap.set("n", "<leader>mp", ":Markview Render<CR>", opts("Render Markdown Preview"))
+keymap.set("n", "<leader>mc", ":Markview Clear<CR>", opts("Clear Markdown Preview"))
 
 -- 🔄 Split View Mode
-keymap.set("n", "<leader>mo", ":MarkView splitOpen<CR>", opts("Open Split View"))
-keymap.set("n", "<leader>mC", ":MarkView splitClose<CR>", opts("Close Split View"))
-keymap.set("n", "<leader>mT", ":MarkView splitToggle<CR>", opts("Toggle Split View"))
-keymap.set("n", "<leader>mr", ":MarkView splitRedraw<CR>", opts("Redraw Split View"))
+keymap.set("n", "<leader>mo", ":Markview splitOpen<CR>", opts("Open Split View"))
+keymap.set("n", "<leader>mC", ":Markview splitClose<CR>", opts("Close Split View"))
+keymap.set("n", "<leader>mT", ":Markview splitToggle<CR>", opts("Toggle Split View"))
+keymap.set("n", "<leader>mr", ":Markview splitRedraw<CR>", opts("Redraw Split View"))
 
 -- 🔍 Debugging / Logs
-keymap.set("n", "<leader>mtx", ":MarkView traceExport<CR>", opts("Export Trace Logs"))
-keymap.set("n", "<leader>mts", ":MarkView traceShow<CR>", opts("Show Trace Logs"))
+keymap.set("n", "<leader>mDx", ":MarkView traceExport<CR>", opts("Export Trace Logs"))
+keymap.set("n", "<leader>mDs", ":MarkView traceShow<CR>", opts("Show Trace Logs"))
 
 --------------- 📄 LaTeX (Vimtex)
 -- ✍️ VimTeX Keybindings (Explicit)
