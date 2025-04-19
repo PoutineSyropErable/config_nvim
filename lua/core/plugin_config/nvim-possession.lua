@@ -1,11 +1,5 @@
 --  Store session directory once when Neovim starts
 
-local function notify_debug(message)
-	local cmd = string.format("notify-send -t 5000 '[Neovim Debug]' '%s'", message)
-	os.execute(cmd) -- Send notification
-	print("🟢 Debug: " .. message) -- Also log to Neovim
-end
-
 local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
@@ -125,12 +119,13 @@ nvim_possession.setup({
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
 		load_tab_names()
+		vim.cmd([[AttachAllLSPs]])
 	end,
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session
 	save_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
-		-- notify_debug("auto saving")
+		-- general_utils_franck.send_notification("auto saving")
 
 		if DEBUG then
 			print("💾 Auto-saved session:", session_file)

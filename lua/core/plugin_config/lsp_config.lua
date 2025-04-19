@@ -93,6 +93,14 @@ lspconfig.lua_ls.setup({
 			},
 		},
 	},
+
+	on_attach = function(client, bufnr)
+		-- This function will be called when the LSP is fully initialized
+		general_utils_franck.send_notification("please work")
+		print("LSP " .. client.name .. " is attached!")
+		print("LSP " .. client.name .. vim.inspect(client.initialized))
+		-- You can perform additional actions here, for example, setting some custom configurations
+	end,
 })
 
 --------------------------------------- PYTHON ---------------------------------------
@@ -150,6 +158,8 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
 		_G.MyRootDir = client.config.root_dir
+		print("test")
+		general_utils_franck.send_notification("test")
 		-- print("Clangd root directory detected: " .. (root or "none"))
 	end,
 })

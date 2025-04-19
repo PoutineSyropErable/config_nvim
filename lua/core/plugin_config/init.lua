@@ -14,6 +14,7 @@ if PRE_CONFIG_FRANCK.useNvimJava then
 	require("core.plugin_config.nvim-java")
 end
 require("core.plugin_config.lsp_config")
+require("core.plugin_config.lsp_config_helper")
 require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
