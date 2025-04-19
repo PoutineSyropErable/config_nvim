@@ -119,7 +119,7 @@ nvim_possession.setup({
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
 		load_tab_names()
-		-- vim.cmd([[AttachAllLSPs]])
+		vim.cmd([[AttachAllLSPs]])
 	end,
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session

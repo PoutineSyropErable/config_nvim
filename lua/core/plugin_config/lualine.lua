@@ -61,4 +61,4 @@ require("lualine").setup({
 	},
 })
 
-vim.keymap.set("n", "<F12>", get_all_tab_names, { desc = "get tab names" })
+vim.keymap.set("n", "<leader>pn", get_all_tab_names, { desc = "get tab names" })

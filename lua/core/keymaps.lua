@@ -18,7 +18,23 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 local bufremove = require("mini.bufremove") -- Load once
 keymap.set("n", "<leader>wq", ":wa | qa<CR>") -- save and quit
 -- keymap.set("n", "<leader>qq", ":q!<CR>") -- quit without saving
-vim.keymap.set("n", "<leader>q", function() bufremove.delete(0, false) end, opts("Close current buffer"))
+local function close_buffer_or_tab()
+	local buf_count = #vim.fn.getbufinfo({ buflisted = 1 }) -- Get number of open buffers
+	local tab_count = vim.fn.tabpagenr("$") -- Get the number of tabs
+
+	-- If only one buffer is open, close the tab
+	if buf_count == 1 then
+		if tab_count == 1 then
+			vim.cmd("q") -- Quit the current tab (and vim if it's the last tab)
+		else
+			vim.cmd("tabclose") -- Close the current tab
+		end
+	else
+		bufremove.delete(0, false) -- Close the current buffer without saving
+	end
+end
+
+vim.keymap.set("n", "<leader>q", close_buffer_or_tab, opts("Close current buffer"))
 vim.keymap.set("n", "<leader>X", function() bufremove.delete(0, false) end, opts("Close current buffer"))
 keymap.set("n", "<leader>bd", ": bd!<CR>", opts(":bd close buffer"))
 keymap.set("n", "<leader>ww", ":wa<CR>") -- save
@@ -92,7 +108,7 @@ if has_bufferline then
 	local function rename_tab()
 		local new_buffer_name = vim.fn.input("Enter new tab name: ")
 		if new_buffer_name ~= "" then
-			bufferline.rename_tab({ new_buffer_name }) -- Pass as a table/array
+			require(bufferline).rename_tab({ new_buffer_name }) -- Pass as a table/array
 		else
 			print("❌ Tab rename canceled (empty input)")
 		end
@@ -170,6 +186,17 @@ end, opts("Move to last visible window"))
 keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
 keymap.set("n", "<leader>pc", function() require("nvim-possession").new() end, opts("📌create new session"))
 keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
+keymap.set("n", "<leader>pm", ":ScopeMoveBuf", opts("move current buffer to the tab nbr"))
+
+local function rename_tab()
+	local new_buffer_name = vim.fn.input("Enter new tab name: ")
+	if new_buffer_name ~= "" then
+		require("bufferline").rename_tab({ new_buffer_name }) -- Pass as a table/array
+	else
+		print("❌ Tab rename canceled (empty input)")
+	end
+end
+keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
 
 ----------------------------------------------- Flash keymaps
 local flash = require("flash")
