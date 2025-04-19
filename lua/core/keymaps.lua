@@ -301,9 +301,9 @@ local function telescope_cwd()
 	local tel_cwd = nil
 	if use_project_root then
 		tel_cwd = _G.general_utils_franck.find_project_root(false)
-		return tel_cwd
+	else
+		tel_cwd = vim.fn.getcwd()
 	end
-	tel_cwd = vim.fn.getcwd()
 	return tel_cwd
 end
 
@@ -545,7 +545,7 @@ end, opts("hover and switch"))
 
 -- LSP Actions
 keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
-keymap.set("n", "<leader>La", safe_lsp_call("code_action"), opts("Show available code actions"))
+keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
 
 -- LSP Definitions & References
 keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
@@ -1022,10 +1022,12 @@ keymap.set("n", "<leader>dS", function() widgets.centered_float(widgets.frames) 
 
 -- Telescope DAP Integrations
 keymap.set("n", "<leader>ds", function() telescope.extensions.dap.frames() end, opts("Show stack frames (Telescope UI)"))
-keymap.set("n", "<leader>dH", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
+keymap.set("n", "<leader>dD", function() telescope.extensions.dap.commands() end, opts("List DAP commands (Telescope UI)"))
 
-keymap.set("n", "<leader>de", function() builtin.diagnostics({ default_text = ":E:" }) end, opts("Show errors and diagnostics (Telescope UI)"))
+keymap.set("n", "<leader>de", function() builtin.diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
 keymap.set("n", "<leader>dw", function() builtin.diagnostics({ default_text = ":W:" }) end, opts("Show Warning and diagnostics (Telescope UI)"))
+keymap.set("n", "<leader>dH", function() builtin.diagnostics({ default_text = ":H:" }) end, opts("Show Hints and diagnostics (Telescope UI)"))
+
 keymap.set("n", "<leader>dm", function() telescope.extensions.dap.threads() end, opts("Show running threads (Telescope UI)"))
 
 -- Tests
@@ -1597,41 +1599,6 @@ select_and_write_function = function()
 			return true
 		end,
 	})
-end
-
-local function get_function_calls()
-	local parser = vim.treesitter.get_parser(0, "c") -- Use Treesitter for C
-	local tree = parser:parse()[1]
-	local root = tree:root()
-	local calls = {}
-
-	local function traverse(node)
-		if node:type() == "call_expression" then
-			local func_node = node:child(0) -- Function name
-			if func_node then
-				local func_name = vim.treesitter.get_node_text(func_node, 0)
-				local line, col, _ = node:start()
-				line = line + 1
-
-				-- Store function call information
-				table.insert(calls, { name = func_name, line = line, col = col })
-			end
-		end
-		-- Recursively check children
-		for child in node:iter_children() do
-			traverse(child)
-		end
-	end
-
-	traverse(root)
-
-	-- 🔹 Debugging Output: Print All Found Calls
-	print("📌 [DEBUG] Function Calls Found:")
-	for _, call in ipairs(calls) do
-		print("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
-	end
-
-	return calls
 end
 
 ---- Bind the functions to keymaps -----
