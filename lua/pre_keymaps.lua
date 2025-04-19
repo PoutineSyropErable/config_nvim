@@ -101,6 +101,7 @@ keymap.set("n", "«", "@", { noremap = true, silent = true })
 ------------------------------------------- REMAP of w,s for start of word
 -- Map `w` to move to the start of the next word
 keymap.set("n", "w", "w", { noremap = true, silent = true })
+keymap.set("n", "W", "W", { noremap = true, silent = true })
 -- Map `s` to move to the end of the previous word
 keymap.set("n", "s", "ge", { noremap = true, silent = true })
 keymap.set("n", "S", "gE", { noremap = true, silent = true })

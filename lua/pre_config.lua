@@ -137,11 +137,12 @@ _G.general_utils_franck = {}
 
 _G.general_utils_franck.find_project_root = function(debug)
 	local buffer_path = vim.fn.expand("%:p")
-	if buffer_path == "" then
-		buffer_path = vim.fn.getcwd()
-	end
-
 	local buffer_dir = vim.fn.fnamemodify(buffer_path, ":h")
+	buffer_dir = vim.fn.getcwd()
+
+	if debug then
+		print("buffer_dir =" .. vim.inspect(buffer_dir))
+	end
 	local script_path = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 
 	if vim.fn.filereadable(script_path) ~= 1 then
@@ -157,10 +158,12 @@ _G.general_utils_franck.find_project_root = function(debug)
 	if result.stderr and result.stderr ~= "" and debug then
 		local stderr_msg = "🔧 [C++ stderr]\n" .. result.stderr
 		vim.schedule(function() vim.notify(stderr_msg, vim.log.levels.DEBUG) end)
+		print(stderr_msg)
 	end
 
 	local root = vim.trim(result.stdout or "")
 	local code = result.code or 1
+	print("root =" .. vim.inspect(root))
 
 	if code == 1 then
 		if debug then

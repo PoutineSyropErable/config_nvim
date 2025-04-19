@@ -1,6 +1,16 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+local FIND_PRINT = false
+
+if FIND_PRINT then
+	local original_print = print
+	print = function(...)
+		original_print(...)
+		original_print(debug.traceback()) -- This prints the stack trace
+	end
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({

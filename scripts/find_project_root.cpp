@@ -12,7 +12,7 @@ const bool USE_GIT_ONLY = false;
 // List of project root markers
 const std::vector<std::string> ROOT_MARKERS = {
     ".git", ".hg", ".svn",
-    //"Makefile",
+    "Makefile",
     "CMakeLists.txt",
     "pyproject.toml", "Pipfile", "requirements.txt", "setup.py", "setup.cfg",
     "compile_commands.json", "meson.build", "configure.ac", "autogen.sh",
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 		if (VERBOSE) {
 			std::cerr << "❌ Error: The provided path does not exist: " << target_path.string() << std::endl;
 		}
-		return 1;
+		return 3;
 	}
 
 	// Resolve full path
