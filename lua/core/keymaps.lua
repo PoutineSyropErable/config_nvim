@@ -1702,13 +1702,19 @@ end
 
 function _G.general_utils_franck.cdHere()
 	local file_dir = vim.fn.expand("%:p:h") -- Get directory of current file
-	vim.cmd("tcd " .. file_dir)
-	vim.cmd("cd " .. file_dir)
-	tapi.tree.change_root(file_dir) -- Sync Nvim-Tree
-	print("Changed directory to: " .. file_dir)
+	local file_dir_realpath = vim.fn.fnamemodify(file_dir, ":p")
+	-- Change directory locally (for the current buffer only)
+	vim.cmd("tcd " .. file_dir_realpath) -- Change the tab local working directory
+	vim.cmd("lcd " .. file_dir_realpath) -- Change the local working directory for the current window
+	vim.cmd("cd " .. file_dir_realpath) -- Change the directory for the current buffer
+
+	tapi.tree.change_root(file_dir_realpath) -- Sync Nvim-Tree
+	print("Changed directory to: " .. file_dir_realpath)
 end
 
 keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
+
+vim.api.nvim_create_user_command("CdHere", general_utils_franck.cdHere, { desc = "Cd to current working directory" })
 
 keymap.set("n", "<leader>ni", _G.general_utils_franck.not_invert, opts("Invert true/false under cursor"))
 keymap.set("n", "<Leader>cf", _G.general_utils_franck.CopyFilePath, opts("Copy file path to clipboard"))
