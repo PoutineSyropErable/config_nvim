@@ -1701,8 +1701,13 @@ function _G.general_utils_franck.CopyDirPath()
 end
 
 function _G.general_utils_franck.cdHere()
-	local file_dir = vim.fn.expand("%:p:h") -- Get directory of current file
-	local file_dir_realpath = vim.fn.fnamemodify(file_dir, ":p")
+	-- Get the full path of the current file
+	local file_absolute_path = vim.fn.expand("%:p")
+	-- Resolve any symlinks in the path to get the real file path
+	local file_real_path = vim.fn.resolve(file_absolute_path)
+	-- Get the directory of the resolved file
+	local file_dir_realpath = vim.fn.fnamemodify(file_real_path, ":p:h")
+
 	-- Change directory locally (for the current buffer only)
 	vim.cmd("tcd " .. file_dir_realpath) -- Change the tab local working directory
 	vim.cmd("lcd " .. file_dir_realpath) -- Change the local working directory for the current window
