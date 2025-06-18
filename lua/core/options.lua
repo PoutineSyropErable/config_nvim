@@ -91,4 +91,8 @@ vim.cmd("set verbosefile=$HOME/.config/nvim_logs/nvim_log.lua")
 vim.opt.undofile = true -- Enable persistent undo
 vim.opt.undodir = vim.fn.stdpath("data") .. "/undo" -- Set undo directory
 
+vim.g.csv_no_progress = 1 -- Disable progress bar
+vim.g.csv_highlight_column = "y" -- Highlight current column
+vim.g.csv_highlight_row = "y" -- Enable row highlighting
+
 -- vim.cmd('set verbose=10')

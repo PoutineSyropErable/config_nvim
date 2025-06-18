@@ -46,7 +46,7 @@ keymap.set("v", "j", "h", opts("Move left (h mapped to j)"))
 keymap.set("v", "l", "l", opts("Move right (l remains l)"))
 keymap.set("v", "i", "k", opts("Move up (k mapped to i)"))
 keymap.set("v", "k", "j", opts("Move down (j mapped to k)"))
--- keymap.set("v", "h", "i", opts("Insert Mode remains unchanged")) -- Insert Mode remains unchanged
+keymap.set("v", "h", "i", opts("Insert Mode remains unchanged")) -- Insert Mode remains unchanged
 
 keymap.set("v", "J", "_", opts("Move to beginning of line"))
 keymap.set("v", "L", "$", opts("Move to end of line"))

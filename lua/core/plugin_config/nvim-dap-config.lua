@@ -36,10 +36,10 @@ dap.configurations.python = {
 			return vim.fn.exepath("python3") or "python"
 		end,
 
-		-- program = "${file}", -- Run the currently open file
+		program = "${file}", -- Run the currently open file
 		-- cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
-		cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
-		module = "303MUD.client_local",
+		-- cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
+		-- module = "303MUD.client_local",
 		-- module = "303MUD.client_remote",
 		args = arg_func,
 	},
@@ -460,8 +460,8 @@ end
 dap.adapters.cppdbg = {
 	id = "cppdbg",
 	type = "executable",
-	-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.24.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
-	command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.6-linux-x64/debugAdapters/bin/OpenDebugAD7",
+	command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.24.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
+	-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.6-linux-x64/debugAdapters/bin/OpenDebugAD7",
 	-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
 }
 

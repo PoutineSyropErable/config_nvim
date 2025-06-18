@@ -41,6 +41,7 @@ require("lazy").setup({
 		config = function() end, -- No extra config needed
 	},
 
+	"chrisbra/csv.vim",
 	"nvim-lualine/lualine.nvim",
 	-- "vim-airline/vim-airline",
 	-- "vim-airline/vim-airline-themes",

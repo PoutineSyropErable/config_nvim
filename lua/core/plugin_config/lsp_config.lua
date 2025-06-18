@@ -77,7 +77,13 @@ lspconfig.bashls.setup({
 })
 
 --------------------------------------- LUA ---------------------------------------
-require("neodev").setup({})
+require("neodev").setup({
+	override = function(root_dir, library)
+		library.enabled = true
+		library.plugins = true
+		library.runtime = true
+	end,
+})
 lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
@@ -148,7 +154,7 @@ lspconfig.clangd.setup({
 		"--log=verbose",
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
-	filetypes = { "c", "cpp", "objc", "objcpp", "x" },
+	filetypes = { "c", "cpp", "cl", "objc", "objcpp", "x" },
 	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
 	settings = {
 		clangd = {

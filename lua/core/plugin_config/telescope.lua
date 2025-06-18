@@ -27,6 +27,7 @@ telescope.setup({
 			follow = true, -- Follow symbolic links
 			attach_mappings = function(_, map)
 				map("i", "<C-n>", create_new_file)
+				-- C-v to open in a split
 				return true
 			end,
 		},
