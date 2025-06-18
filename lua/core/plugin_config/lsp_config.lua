@@ -2,6 +2,7 @@ require("mason-lspconfig").setup({
 	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
 	automatic_installation = true,
+	automatic_enable = true,
 })
 
 require("mason-tool-installer").setup({
@@ -56,7 +57,6 @@ vim.diagnostic.config({
 })
 
 ---------------------------------------- ASM -------------------------------------
-
 lspconfig.asm_lsp.setup({
 	cmd = { "asm-lsp" },
 	filetypes = { "asm", "s", "S" },
@@ -77,38 +77,33 @@ lspconfig.bashls.setup({
 })
 
 --------------------------------------- LUA ---------------------------------------
-require("neodev").setup({
-	override = function(root_dir, library)
-		library.enabled = true
-		library.plugins = true
-		library.runtime = true
-	end,
-})
-lspconfig.lua_ls.setup({
-	settings = {
-		Lua = {
-			telemetry = { enable = false }, -- Disable telemetry
-			diagnostics = {
-				globals = { "vim" },
-			},
-			workspace = {
-				library = {
-					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-					[vim.fn.stdpath("config") .. "/lua"] = true,
+-- Use lazydev
+if false then
+	lspconfig.lua_ls.setup({
+		settings = {
+			Lua = {
+				telemetry = { enable = false }, -- Disable telemetry
+				diagnostics = {
+					globals = { "vim" },
+				},
+				workspace = {
+					library = {
+						[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+						[vim.fn.stdpath("config") .. "/lua"] = true,
+					},
 				},
 			},
 		},
-	},
 
-	on_attach = function(client, bufnr)
-		-- This function will be called when the LSP is fully initialized
-		general_utils_franck.send_notification("please work")
-		print("LSP " .. client.name .. " is attached!")
-		print("LSP " .. client.name .. vim.inspect(client.initialized))
-		-- You can perform additional actions here, for example, setting some custom configurations
-	end,
-})
-
+		on_attach = function(client, bufnr)
+			-- This function will be called when the LSP is fully initialized
+			general_utils_franck.send_notification("please work")
+			print("LSP " .. client.name .. " is attached!")
+			print("LSP " .. client.name .. vim.inspect(client.initialized))
+			-- You can perform additional actions here, for example, setting some custom configurations
+		end,
+	})
+end
 --------------------------------------- PYTHON ---------------------------------------
 lspconfig.pyright.setup({
 
@@ -139,22 +134,48 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	vim.cmd("!pyright --verbose")
 end, {})
 
+------------------------------------------ Open CL -----------------------------
+lspconfig.opencl_ls.setup({
+	cmd = { "opencl-language-server" },
+	filetypes = { "opencl" },
+	root_dir = lspconfig.util.root_pattern(".git", ".asm-lsp.toml"),
+	capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, {
+		offsetEncoding = "utf-8",
+		positionEncodings = "utf-8",
+	}),
+	init_options = {
+		offsetEncoding = "utf-8", -- Some servers need this too
+	},
+})
+
+-- Not needed, or else it would add two clients
+
 --------------------------------------- C/C++ ---------------------------------------
 
 lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
 		"clangd",
-		"--offset-encoding=utf-16",
+		"--offset-encoding=utf-8",
 		"--background-index", -- Enable background indexing
 		"--clang-tidy", -- Enable clang-tidy diagnostics
 		"--completion-style=bundled", -- Style for autocompletion
 		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
+		"--query-driver=/opt/rocm/llvm/bin/*", -- Critical for ROCm OpenCL
+	},
+	init_options = {
+		clangdFileStatus = true,
+		fallbackFlags = {
+			"-I/opt/rocm/opencl/include", -- ROCm OpenCL headers
+			"-I/usr/include/clc", -- Generic OpenCL headers
+			"-cl-std=CL2.0", -- OpenCL version flag
+			"-xcl", -- Force OpenCL mode
+		},
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
-	filetypes = { "c", "cpp", "cl", "objc", "objcpp", "x" },
+	filetypes = { "c", "cpp", "opencl", "objc", "objcpp", "x" },
 	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
 	settings = {
 		clangd = {

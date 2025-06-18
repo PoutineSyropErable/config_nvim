@@ -26,8 +26,28 @@ _G.general_utils_franck = {}
 _G.general_utils_franck.send_notification = function(message)
 	local cmd = string.format("notify-send -t 5000 '[Neovim Debug]' '%s'", message)
 	os.execute(cmd) -- Send notification
-	print("🟢 Debug: " .. message) -- Also log to Neovim
+print("🟢 Debug: " .. message) -- Also log to Neovim
 end
+
+_G.PRINT_CUSTOM_DEBUG = false -- toggle debug output on/off
+
+local function print_custom(...)
+	if not _G.PRINT_CUSTOM_DEBUG then
+		return
+	end -- suppress if debug off
+
+	local args = { ... }
+	local parts = {}
+	for i, v in ipairs(args) do
+		parts[i] = tostring(v)
+	end
+	local msg = table.concat(parts, "\t")
+
+	-- Use vim.notify to show as notification or just silent log
+	vim.notify(msg, vim.log.levels.INFO)
+end
+
+_G.print_custom = print_custom
 
 _G.general_utils_franck.find_project_root = function(debug)
 	local buffer_path = vim.fn.expand("%:p")
@@ -35,7 +55,7 @@ _G.general_utils_franck.find_project_root = function(debug)
 	buffer_dir = vim.fn.getcwd()
 
 	if debug then
-		print("buffer_dir =" .. vim.inspect(buffer_dir))
+print(	"buffer_dir =" .. vim.inspect(buffer_dir))
 	end
 	local script_path = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 
@@ -53,12 +73,12 @@ _G.general_utils_franck.find_project_root = function(debug)
 	if result.stderr and result.stderr ~= "" and debug then
 		local stderr_msg = "🔧 [C++ stderr]\n" .. result.stderr
 		vim.schedule(function() vim.notify(stderr_msg, vim.log.levels.DEBUG) end)
-		print(stderr_msg)
+	print(stderr_msg)
 	end
 
 	local root = vim.trim(result.stdout or "")
 	local code = result.code or 1
-	print("root =" .. vim.inspect(root))
+print("root =" .. vim.inspect(root))
 
 	if code == 1 then
 		if debug then

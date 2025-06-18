@@ -199,7 +199,7 @@ function RunCurrentFile()
 		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
-		print("File type not supported for running with F4")
+	print("File type not supported for running with F4")
 	end
 end
 
@@ -223,10 +223,10 @@ local function run_do_all()
 		return
 	end
 
-	-- print("proj_root = " .. proj_root)
+	--"proj_root = " .. proj_root)
 
 	local all_cmd = "cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
-	print("all cmd = " .. all_cmd, vim.log.levels.INFO)
+print("all cmd = " .. all_cmd, vim.log.levels.INFO)
 
 	local output = vim.fn.system(all_cmd)
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)

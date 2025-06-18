@@ -9,8 +9,24 @@ require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	"tpope/vim-commentary",
 	"mattn/emmet-vim",
-	"nvim-tree/nvim-tree.lua",
-	"nvim-tree/nvim-web-devicons",
+	{
+		"nvim-tree/nvim-web-devicons",
+		opts = {
+			override = {
+				opencl = {
+					icon = "", -- or 🖥️ or anything you like
+					color = "#ff0065",
+					name = "OpenCL",
+				},
+				["cl"] = {
+					icon = "", -- Same icon as above
+					color = "#ff0065",
+					name = "OpenCL",
+				},
+			},
+		},
+	},
+	{ "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
 	"ellisonleao/gruvbox.nvim",
 	"dracula/vim",
 	"nvim-treesitter/nvim-treesitter",
@@ -247,9 +263,20 @@ require("lazy").setup({
 		},
 	},
 	-- Lazy.nvim
+	-- {
+	-- 	"folke/neodev.nvim",
+	-- 	opts = {}, -- No additional config needed
+	-- },
 	{
-		"folke/neodev.nvim",
-		opts = {}, -- No additional config needed
+		"folke/lazydev.nvim",
+		ft = "lua", -- only load on lua files
+		opts = {
+			library = {
+				-- See the configuration section for more details
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+			},
+		},
 	},
 	"williamboman/mason-lspconfig.nvim",
 	"WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -312,8 +339,8 @@ require("lazy").setup({
 
 	{
 		"goolord/alpha-nvim",
-		dependencies = { "echasnovski/mini.icons" },
-		-- dependencies = { 'nvim-tree/nvim-web-devicons' },
+		-- dependencies = { "echasnovski/mini.icons" },
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
 
 	-- Need to configure
@@ -368,6 +395,16 @@ require("lazy").setup({
 	-- 		vim.notify = require("notify")
 	-- 	end,
 	-- },
+
+	{
+		"echasnovski/mini.nvim",
+		version = false,
+		config = function()
+			require("mini.notify").setup()
+			vim.notify = require("mini.notify").make_notify()
+		end,
+	},
+	"nvim-pack/nvim-spectre",
 }, {
 	rocks = {
 		hererocks = true, -- Enables hererocks globally for all plugins

@@ -95,4 +95,10 @@ vim.g.csv_no_progress = 1 -- Disable progress bar
 vim.g.csv_highlight_column = "y" -- Highlight current column
 vim.g.csv_highlight_row = "y" -- Enable row highlighting
 
+vim.filetype.add({
+	extension = {
+		cl = "opencl", -- Force .cl files to use opencl filetype
+	},
+})
+
 -- vim.cmd('set verbose=10')

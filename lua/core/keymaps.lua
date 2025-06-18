@@ -1291,6 +1291,8 @@ keymap.set("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, 
 keymap.set("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true, desc = "Replace with confirmation" })
 keymap.set("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
 
+keymap.set("n", "<C-j>", ":lua require('spectre').open()<CR>", opts("search and replace functions"))
+
 -- Lua function for interactive replacement
 function ReplaceFrancois()
 	local search_pattern = "/home/francois"
