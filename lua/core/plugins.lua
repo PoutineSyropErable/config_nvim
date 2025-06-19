@@ -400,7 +400,9 @@ require("lazy").setup({
 		"echasnovski/mini.nvim",
 		version = false,
 		config = function()
-			require("mini.notify").setup()
+			require("mini.notify").setup({
+				history_length = 200,
+			})
 			vim.notify = require("mini.notify").make_notify()
 		end,
 	},

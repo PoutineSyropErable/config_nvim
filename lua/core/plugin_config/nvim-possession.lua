@@ -24,7 +24,7 @@ local function get_all_tab_names()
 end
 local function save_tab_names()
 	if not session_dir or not session_name then
-		print("❌ No valid session directory or name")
+	 _G.print_custom("❌ No valid session directory or name")
 		return
 	end
 
@@ -34,14 +34,14 @@ local function save_tab_names()
 
 	vim.fn.writefile({ json_data }, tab_names_file)
 	if DEBUG then
-		print("💾 Tab names saved to: " .. tab_names_file)
+	 _G.print_custom("💾 Tab names saved to: " .. tab_names_file)
 	end
 end
 
 local function load_tab_names()
 	if not session_dir or not session_name then
 		if DEBUG then
-			print("❌ No valid session directory or name")
+		 _G.print_custom("❌ No valid session directory or name")
 		end
 		return
 	end
@@ -50,7 +50,7 @@ local function load_tab_names()
 
 	if vim.fn.filereadable(tab_names_file) == 0 then
 		if DEBUG then
-			print("❌ No saved tab names found.")
+		 _G.print_custom("❌ No saved tab names found.")
 		end
 		return
 	end
@@ -66,24 +66,24 @@ local function load_tab_names()
 	end
 
 	if DEBUG then
-		print("✅ Tab names loaded from: " .. tab_names_file)
+	 _G.print_custom("✅ Tab names loaded from: " .. tab_names_file)
 	end
 end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
 	local project_root = general_utils_franck.find_project_root(false)
-	-- print("setting session dir")
+	-- _G.print_custom("setting session dir")
 	if project_root == nil then
-		-- print("is nill")
+		-- _G.print_custom("is nill")
 		session_dir = original_location
 		return original_location
 	end
-	-- print("project_root = " .. vim.inspect(project_root))
+	-- _G.print_custom("project_root = " .. vim.inspect(project_root))
 
 	session_dir = project_root .. "/.nvim-session/"
 	if DEBUG then
-		print("session dir is : " .. session_dir)
+	 _G.print_custom("session dir is : " .. session_dir)
 	end
 	vim.fn.mkdir(session_dir, "p")
 	return session_dir
@@ -114,7 +114,7 @@ nvim_possession.setup({
 	post_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		if DEBUG then
-			print("📂 Loaded session:", session_file)
+		 _G.print_custom("📂 Loaded session:", session_file)
 		end
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
@@ -128,7 +128,7 @@ nvim_possession.setup({
 		-- general_utils_franck.send_notification("auto saving")
 
 		if DEBUG then
-			print("💾 Auto-saved session:", session_file)
+		 _G.print_custom("💾 Auto-saved session:", session_file)
 		end
 		vim.cmd([[ScopeSaveState]]) -- Save Scope.nvim tab states
 		save_tab_names()
@@ -159,7 +159,7 @@ local function ensure_session_exists()
 		return
 	end
 	local session_file = session_dir .. session_name .. ".vim"
-	print("session file = " .. session_file)
+ _G.print_custom("session file = " .. session_file)
 	--
 	-- If no session exists, create "default" session
 	if vim.fn.filereadable(session_file) == 0 then

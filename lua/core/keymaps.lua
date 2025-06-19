@@ -98,7 +98,7 @@ local has_barbar, _ = pcall(require, "barbar")
 
 local function goto_buffer(_) end
 if has_bufferline then
-	-- print("Using Bufferline")
+	-- _G.print_custom("Using Bufferline")
 	-- Bufferline keymaps
 	keymap.set("n", "<C-n>", "<Cmd>BufferLineCycleNext<CR>", opts("Next buffer (Bufferline)"))
 	keymap.set("n", "<C-b>", "<Cmd>BufferLineCyclePrev<CR>", opts("Previous buffer (Bufferline)"))
@@ -110,14 +110,14 @@ if has_bufferline then
 		if new_buffer_name ~= "" then
 			require(bufferline).rename_tab({ new_buffer_name }) -- Pass as a table/array
 		else
-			print("❌ Tab rename canceled (empty input)")
+			_G.print_custom("❌ Tab rename canceled (empty input)")
 		end
 	end
 	keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
 
 	goto_buffer = function(buf_num) vim.cmd("BufferLineGoToBuffer " .. buf_num) end
 elseif has_barbar then
-	-- print("Using Barbar")
+	-- _G.print_custom("Using Barbar")
 	-- Barbar keymaps
 	keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
 	keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
@@ -126,7 +126,7 @@ elseif has_barbar then
 
 	goto_buffer = function(buf_num) vim.cmd("BufferGoto " .. buf_num) end
 else
-	print("Neither Bufferline nor Barbar is installed!")
+	_G.print_custom("Neither Bufferline nor Barbar is installed!")
 end
 
 --  <leader># leader# leadern <leader>n <leader><n>   (search strings)
@@ -163,7 +163,7 @@ local function move_to_window(index)
 	if windows[index] then
 		vim.api.nvim_set_current_win(windows[index]) -- Switch to the selected window
 	else
-		print("No window available for index " .. index)
+		_G.print_custom("No window available for index " .. index)
 	end
 end
 
@@ -178,7 +178,7 @@ keymap.set("n", "m0", function()
 	if #windows > 0 then
 		vim.api.nvim_set_current_win(windows[#windows]) -- Switch to last window
 	else
-		print("No visible windows to switch to")
+		_G.print_custom("No visible windows to switch to")
 	end
 end, opts("Move to last visible window"))
 
@@ -193,7 +193,7 @@ local function rename_tab()
 	if new_buffer_name ~= "" then
 		require("bufferline").rename_tab({ new_buffer_name }) -- Pass as a table/array
 	else
-		print("❌ Tab rename canceled (empty input)")
+		_G.print_custom("❌ Tab rename canceled (empty input)")
 	end
 end
 keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
@@ -383,7 +383,7 @@ local function safe_lsp_call(fn)
 		if vim.lsp.buf[fn] then
 			vim.lsp.buf[fn]()
 		else
-			print("LSP function '" .. fn .. "' not available")
+			_G.print_custom("LSP function '" .. fn .. "' not available")
 		end
 	end
 end
@@ -394,7 +394,7 @@ local function safe_telescope_call(fn)
 		if ok and telescope_builtin[fn] then
 			telescope_builtin[fn]()
 		else
-			print("Telescope function '" .. fn .. "' not available")
+			_G.print_custom("Telescope function '" .. fn .. "' not available")
 		end
 	end
 end
@@ -406,7 +406,7 @@ local function goto_current_function()
 
 	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
 		if not result then
-			print("No LSP symbols found.")
+			_G.print_custom("No LSP symbols found.")
 			return
 		end
 
@@ -445,23 +445,23 @@ local function goto_current_function()
 			local line_content = vim.api.nvim_buf_get_lines(0, target_line - 1, target_line, false)[1]
 
 			-- **🔹 Debugging output**
-			print("---- DEBUG INFO ----")
-			print("🔹 Full Line:", line_content)
-			print("🔹 LSP Start Character:", target_col)
+			_G.print_custom("---- DEBUG INFO ----")
+			_G.print_custom("🔹 Full Line:", line_content)
+			_G.print_custom("🔹 LSP Start Character:", target_col)
 
 			-- Attempt to extract function name from the line
 			local function_name = string.match(line_content, "([_%w]+)%s*%(")
 
 			if function_name then
 				local col = string.find(line_content, function_name) - 1
-				print("🔹 Detected Function Name:", function_name, "at column:", col)
+				_G.print_custom("🔹 Detected Function Name:", function_name, "at column:", col)
 				vim.api.nvim_win_set_cursor(0, { target_line, col })
 			else
-				print("❌ Function name not found using regex. Using fallback LSP position.")
+				_G.print_custom("❌ Function name not found using regex. Using fallback LSP position.")
 				vim.api.nvim_win_set_cursor(0, { target_line, target_col })
 			end
 		else
-			print("❌ No function found.")
+			_G.print_custom("❌ No function found.")
 		end
 	end)
 end
@@ -493,9 +493,9 @@ local function get_function_calls()
 	traverse(root)
 
 	-- 🔹 Debugging Output: Print All Found Calls
-	-- print("📌 [DEBUG] Function Calls Found:")
+	-- _G.print_custom("📌 [DEBUG] Function Calls Found:")
 	-- for _, call in ipairs(calls) do
-	-- 	print("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
+	--  _G.print_custom("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
 	-- end
 
 	return calls
@@ -504,7 +504,7 @@ end
 local function goto_next_function_call()
 	local calls = get_function_calls()
 	if #calls == 0 then
-		print("❌ No function calls found in this file.")
+		_G.print_custom("❌ No function calls found in this file.")
 		return nil
 	end
 
@@ -520,18 +520,18 @@ local function goto_next_function_call()
 	end
 
 	if next_call then
-		print("🔹 Jumping to function call:", next_call.name, "at line", next_call.line, "column", next_call.col)
+		_G.print_custom("🔹 Jumping to function call:", next_call.name, "at line", next_call.line, "column", next_call.col)
 		vim.api.nvim_win_set_cursor(0, { next_call.line, next_call.col })
 		return next_call
 	else
-		print("❌ No next function call found.")
+		_G.print_custom("❌ No next function call found.")
 	end
 end
 
 local function goto_previous_function_call()
 	local calls = get_function_calls()
 	if #calls == 0 then
-		print("❌ No function calls found in this file.")
+		_G.print_custom("❌ No function calls found in this file.")
 		return nil
 	end
 
@@ -548,11 +548,11 @@ local function goto_previous_function_call()
 	end
 
 	if prev_call then
-		print("🔹 Jumping to function call:", prev_call.name, "at line", prev_call.line, "column", prev_call.col)
+		_G.print_custom("🔹 Jumping to function call:", prev_call.name, "at line", prev_call.line, "column", prev_call.col)
 		vim.api.nvim_win_set_cursor(0, { prev_call.line, prev_call.col })
 		return prev_call
 	else
-		print("❌ No previous function call found.")
+		_G.print_custom("❌ No previous function call found.")
 	end
 end
 
@@ -606,9 +606,9 @@ keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), opts("Add w
 keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
 keymap.set("n", "<leader>Ll", function()
 	if vim.lsp.buf.list_workspace_folders then
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+		_G.print_custom(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	else
-		print("LSP function 'list_workspace_folders' not available")
+		_G.print_custom("LSP function 'list_workspace_folders' not available")
 	end
 end, opts("List workspace folders"))
 
@@ -623,7 +623,7 @@ keymap.set({ "n", "v" }, "<leader>Lf", function()
 	if vim.lsp.buf.format then
 		vim.lsp.buf.format({ async = true })
 	else
-		print("LSP function 'format' not available")
+		_G.print_custom("LSP function 'format' not available")
 	end
 end, opts("Format buffer using LSP"))
 
@@ -689,7 +689,7 @@ function ApplyDiffGet(version)
 			return
 		end
 	end
-	print("Output buffer not found!")
+	_G.print_custom("Output buffer not found!")
 end
 
 ----- Meld like hunk movement
@@ -716,7 +716,7 @@ local function pull_hunk(direction)
 	if source_buf then
 		vim.cmd("diffget " .. source_buf) -- Explicitly pull from the correct buffer
 	else
-		print("No adjacent buffer found to the " .. direction)
+		_G.print_custom("No adjacent buffer found to the " .. direction)
 	end
 end
 
@@ -749,7 +749,7 @@ local function push_hunk(direction)
 		vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer into this buffer
 		vim.api.nvim_set_current_win(current_win) -- Return to the original window
 	else
-		print("No adjacent window found to the " .. direction)
+		_G.print_custom("No adjacent window found to the " .. direction)
 	end
 end
 
@@ -819,7 +819,7 @@ if not use_git_conflict then
 			vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
 			vim.api.nvim_set_current_win(current_win) -- Return to original buffer
 		else
-			print("Output buffer not found!")
+			_G.print_custom("Output buffer not found!")
 		end
 	end
 
@@ -876,7 +876,7 @@ if not use_git_conflict then
 		elseif bufname:match("_REMOTE_") then
 			apply_hunk_to_all("REMOTE")
 		else
-			print("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
+			_G.print_custom("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
 		end
 	end
 
@@ -942,7 +942,7 @@ local widgets = require("dap.ui.widgets")
 local function debug_next_function()
 	local session = require("dap").session()
 	if not session then
-		print("❌ Debugger is not running!")
+		_G.print_custom("❌ Debugger is not running!")
 		return
 	end
 
@@ -950,7 +950,7 @@ local function debug_next_function()
 		-- Move to the next function call
 		local next_call = goto_next_function_call()
 		if not next_call then
-			print("❌ No next function call found.")
+			_G.print_custom("❌ No next function call found.")
 			return
 		end
 
@@ -958,7 +958,7 @@ local function debug_next_function()
 		-- dap.continue()
 		dap.run_to_cursor()
 	else
-		print("⏸ Debugger must be paused before running to the next function call!")
+		_G.print_custom("⏸ Debugger must be paused before running to the next function call!")
 	end
 end
 
@@ -1292,6 +1292,7 @@ keymap.set("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { nore
 keymap.set("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
 
 keymap.set("n", "<C-j>", ":lua require('spectre').open()<CR>", opts("search and replace functions"))
+vim.keymap.set("n", "<leader>nh", function() require("mini.notify").show_history() end, { desc = "Show mini.notify history" })
 
 -- Lua function for interactive replacement
 function ReplaceFrancois()
@@ -1422,7 +1423,7 @@ local function select_symbol(callback)
 	local symbols = get_symbols()
 
 	if #symbols == 0 then
-		print("No symbols found!")
+		_G.print_custom("No symbols found!")
 		return
 	end
 
@@ -1543,12 +1544,12 @@ function _G.debug_utils.write_function_debug()
 			local indent = get_indent()
 			local debug_code = string.format(
 				[[%sif DEBUG_:
-%s	print(f'type(%s) = {type(%s)}')
+%s _G.print_custom(f'type(%s) = {type(%s)}')
 %s	try:
-%s		print(f'np.shape(%s) = {np.shape(%s)}')
+%s	 _G.print_custom(f'np.shape(%s) = {np.shape(%s)}')
 %s	except Exception as e:
-%s		print('Some error about not having a shape:', e)
-%s	print(f'%s = \n{%s}\n')]],
+%s	 _G.print_custom('Some error about not having a shape:', e)
+%s _G.print_custom(f'%s = \n{%s}\n')]],
 				indent,
 				indent,
 				input,
@@ -1573,7 +1574,7 @@ local function select_symbol_and_jump()
 	local symbols = get_symbols()
 
 	if #symbols == 0 then
-		print("❌ No symbols found!")
+		_G.print_custom("❌ No symbols found!")
 		return
 	end
 
@@ -1617,7 +1618,7 @@ select_and_write_function = function()
 					local func_name_and_symbol_type = selection.ordinal or selection.display or "unknown"
 					-- local func_name = selection.display
 					local func_name = vim.split(func_name_and_symbol_type, "%s+")[1]
-					print("the function name is: \n" .. vim.inspect(func_name))
+					_G.print_custom("the function name is: \n" .. vim.inspect(func_name))
 					vim.api.nvim_put({ func_name .. "()" }, "", true, true)
 				end
 			end
@@ -1653,7 +1654,7 @@ function _G.general_utils_franck.not_invert()
 	if replacements[word] then
 		vim.cmd("normal! ciw" .. replacements[word])
 	else
-		print("NotInvert: No matching word to invert")
+		_G.print_custom("NotInvert: No matching word to invert")
 	end
 end
 
@@ -1661,7 +1662,7 @@ function _G.general_utils_franck.search_word(direction)
 	-- Get the word under the cursor
 	local word = vim.fn.expand("<cword>")
 	if word == nil or word == "" then
-		print("No word under cursor!")
+		_G.print_custom("No word under cursor!")
 		return
 	end
 
@@ -1672,14 +1673,14 @@ function _G.general_utils_franck.search_word(direction)
 	elseif direction == "prev" then
 		found = vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "bW") -- Case-sensitive backward search
 	else
-		print("Invalid direction: Use 'next' or 'prev'")
+		_G.print_custom("Invalid direction: Use 'next' or 'prev'")
 		return
 	end
 
 	if found ~= 0 then
-		print("Found word: " .. word)
+		_G.print_custom("Found word: " .. word)
 	else
-		print("Word not found: " .. word)
+		_G.print_custom("Word not found: " .. word)
 	end
 end
 
@@ -1692,14 +1693,14 @@ function _G.general_utils_franck.SearchPrevWord() _G.general_utils_franck.search
 function _G.general_utils_franck.CopyFilePath()
 	local path = vim.fn.expand("%:p") -- Get absolute file path
 	vim.fn.setreg("+", path) -- Copy to system clipboard
-	print("Copied file path: " .. path)
+	_G.print_custom("Copied file path: " .. path)
 end
 
 -- Function to copy the directory path
 function _G.general_utils_franck.CopyDirPath()
 	local dir = vim.fn.expand("%:p:h") -- Get directory path of current file
 	vim.fn.setreg("+", dir) -- Copy to system clipboard
-	print("Copied directory path: " .. dir)
+	_G.print_custom("Copied directory path: " .. dir)
 end
 
 function _G.general_utils_franck.cdHere()
@@ -1716,7 +1717,7 @@ function _G.general_utils_franck.cdHere()
 	vim.cmd("cd " .. file_dir_realpath) -- Change the directory for the current buffer
 
 	tapi.tree.change_root(file_dir_realpath) -- Sync Nvim-Tree
-	print("Changed directory to: " .. file_dir_realpath)
+	_G.print_custom("Changed directory to: " .. file_dir_realpath)
 end
 
 keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
@@ -1729,9 +1730,14 @@ keymap.set("n", "<Leader>cp", _G.general_utils_franck.CopyDirPath, opts("Copy di
 keymap.set("n", "<leader><Left>", _G.general_utils_franck.SearchPrevWord, opts("Search Previous occurance of this word"))
 keymap.set("n", "<leader><Right>", _G.general_utils_franck.SearchNextWord, opts("Search next occurance of this word"))
 
-keymap.set("n", "<leader>rd", function() print("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end, { desc = "Print LSP Root Directory" })
+keymap.set(
+	"n",
+	"<leader>rd",
+	function() _G.print_custom("LSP Root Directory: " .. (_G.MyRootDir or "Not detected")) end,
+	{ desc = "Print LSP Root Directory" }
+)
 
 ----------------------------------------------- END OF CONFIG FILE
 
--- print("Vim configuration reloaded")
+-- _G.print_custom("Vim configuration reloaded")
 --print(vim.env.TERM)

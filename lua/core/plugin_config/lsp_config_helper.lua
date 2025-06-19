@@ -83,7 +83,7 @@ local function try_attach_lsp_to_buffer(name, bufnr)
 	-- Check if the LSP client is already attached
 	for _, client in ipairs(clients) do
 		if client.name == name then
-			print("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
+		 _G.print_custom("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
 			return true
 		end
 	end
@@ -92,13 +92,13 @@ local function try_attach_lsp_to_buffer(name, bufnr)
 	for _, client in ipairs(vim.lsp.get_clients()) do
 		if client.name == name then
 			vim.lsp.buf_attach_client(bufnr, client.id)
-			print("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+		 _G.print_custom("✅ LSP " .. name .. " attached to buffer " .. bufnr)
 			return true
 		end
 	end
 
 	-- LSP is not initialized, start it
-	print("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
+ _G.print_custom("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
 	-- require("lspconfig")[name].setup({}) -- Start the LSP if not running
 	return false
 end
@@ -114,14 +114,14 @@ local function attach_lsp_to_buffer(name, bufnr)
 			return
 		end
 
-		print("Couldn't attach LSP. Attempt #" .. attempt)
+	 _G.print_custom("Couldn't attach LSP. Attempt #" .. attempt)
 
 		-- Retry after 1 second if max tries are not reached
 		if attempt < max_try then
 			attempt = attempt + 1
 			vim.defer_fn(try_attach, 1000) -- Retry after 1000 ms (1 second)
 		else
-			print("Couldn't attach LSP " .. name .. " to buffer")
+		 _G.print_custom("Couldn't attach LSP " .. name .. " to buffer")
 		end
 	end
 
@@ -135,17 +135,17 @@ local function attach_lsp_to_all_buffers()
 		local filetype = vim.api.nvim_buf_get_option(bufnr, "filetype")
 		-- If the filetype is empty, trigger filetype detection
 		if filetype == nil or filetype == "" then
-			print("Filetype is empty, detecting filetype for buffer: " .. vim.api.nvim_buf_get_name(bufnr))
+		 _G.print_custom("Filetype is empty, detecting filetype for buffer: " .. vim.api.nvim_buf_get_name(bufnr))
 			vim.cmd("filetype detect") -- Trigger filetype detection
 			filetype = vim.api.nvim_buf_get_option(bufnr, "filetype") -- Re-fetch the filetype after detection
 		end
 		local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":t")
 
 		if filetype == nil or filetype == "" then
-			print("Could not get filetype for " .. vim.inspect(bufnr) .. " with name " .. vim.inspect(filename))
+		 _G.print_custom("Could not get filetype for " .. vim.inspect(bufnr) .. " with name " .. vim.inspect(filename))
 			filetype = detect_filetype(bufnr)
 		else
-			print("The filetype detect worked")
+		 _G.print_custom("The filetype detect worked")
 		end
 
 		-- Check if there's a corresponding LSP for this filetype
@@ -154,7 +154,7 @@ local function attach_lsp_to_all_buffers()
 			-- Try to attach the LSP to the buffer
 			attach_lsp_to_buffer(lsp_name, bufnr)
 		else
-			print(
+		 _G.print_custom(
 				"No LSP for filetype " .. vim.inspect(filetype) .. " at bufnr: " .. vim.inspect(bufnr) .. " with filename: " .. vim.inspect(filename)
 			)
 		end

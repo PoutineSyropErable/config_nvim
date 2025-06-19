@@ -98,8 +98,8 @@ if false then
 		on_attach = function(client, bufnr)
 			-- This function will be called when the LSP is fully initialized
 			general_utils_franck.send_notification("please work")
-			print("LSP " .. client.name .. " is attached!")
-			print("LSP " .. client.name .. vim.inspect(client.initialized))
+		 _G.print_custom("LSP " .. client.name .. " is attached!")
+		 _G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
 			-- You can perform additional actions here, for example, setting some custom configurations
 		end,
 	})
@@ -126,7 +126,7 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	local clients = vim.lsp.get_clients()
 	for _, client in ipairs(clients) do
 		if client.name == "pyright" then
-			print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
+		 _G.print_custom("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
 		end
 	end
 
@@ -185,9 +185,9 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
 		_G.MyRootDir = client.config.root_dir
-		print("test")
+	 _G.print_custom("test")
 		general_utils_franck.send_notification("test")
-		-- print("Clangd root directory detected: " .. (root or "none"))
+		-- _G.print_custom("Clangd root directory detected: " .. (root or "none"))
 	end,
 })
 
@@ -261,7 +261,7 @@ if useJavaLspConfig then
 	end
 
 	debug_plugin = get_debug_plugin()
-	print("Java Debug Plugin Path:", debug_plugin)
+ _G.print_custom("Java Debug Plugin Path:", debug_plugin)
 
 	local general_utils = _G.general_utils_franck
 	if not general_utils then
@@ -306,7 +306,7 @@ if useJavaLspConfig then
 		on_attach = function(client, bufnr)
 			-- Update the global variable when the LSP attaches
 			_G.MyRootDir = client.config.root_dir
-			-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+			-- _G.print_custom("Java root directory detected: " .. (_G.MyRootDir or "none"))
 		end,
 	})
 end
@@ -328,7 +328,7 @@ lspconfig.tailwindcss.setup({})
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 	pattern = { "*.hl", "hypr*.conf" },
 	callback = function(event)
-		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
+		-- _G.print_custom(string.format("starting hyprls for %s", vim.inspect(event)))
 		vim.lsp.start({
 			name = "hyprlang",
 			cmd = { "hyprls" },
@@ -387,11 +387,11 @@ lspconfig.texlab.setup({
 	},
 	capabilities = lsp_defaults.capabilities,
 	on_attach = function(client, bufnr)
-		print("LaTeX File:", tex_file)
-		print("Aux Directory:", tex_output)
-		print("PDF Output Directory:", pdf_output_dir)
-		print("PDF File:", pdf_file)
-		print(
+	 _G.print_custom("LaTeX File:", tex_file)
+	 _G.print_custom("Aux Directory:", tex_output)
+	 _G.print_custom("PDF Output Directory:", pdf_output_dir)
+	 _G.print_custom("PDF File:", pdf_file)
+	 _G.print_custom(
 			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
 				.. tex_output
 				.. " -output-directory="
@@ -399,7 +399,7 @@ lspconfig.texlab.setup({
 				.. " "
 				.. tex_file
 		)
-		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
+	 _G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
 
@@ -419,13 +419,13 @@ vim.g.vimtex_compiler_latexmk = {
 -- vim.api.nvim_create_user_command("CheckLSP", function()
 -- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
 -- 	if #clients > 1 then
--- 		print("🚀 More than one LSP server is attached to this buffer:")
+-- 	 _G.print_custom("🚀 More than one LSP server is attached to this buffer:")
 -- 		for _, client in ipairs(clients) do
--- 			print(" - " .. client.name)
+-- 		 _G.print_custom(" - " .. client.name)
 -- 		end
 -- 	elseif #clients == 1 then
--- 		print("✅ Only one LSP server is attached: " .. clients[1].name)
+-- 	 _G.print_custom("✅ Only one LSP server is attached: " .. clients[1].name)
 -- 	else
--- 		print("❌ No LSP servers attached to this buffer")
+-- 	 _G.print_custom("❌ No LSP servers attached to this buffer")
 -- 	end
 -- end, {})

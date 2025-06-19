@@ -53,7 +53,7 @@ telescope.setup({
 							local file_dir = vim.fn.fnamemodify(entry.path, ":h") -- Get directory of selected file
 							vim.cmd("tcd " .. vim.fn.fnameescape(file_dir)) -- Change tab-local directory
 							tapi.tree.change_root(file_dir) -- Sync Nvim-Tree
-							print("Telescope: Changed tab directory to: " .. file_dir)
+						 _G.print_custom("Telescope: Changed tab directory to: " .. file_dir)
 						end
 
 						actions.select_default(prompt_bufnr) -- Open file

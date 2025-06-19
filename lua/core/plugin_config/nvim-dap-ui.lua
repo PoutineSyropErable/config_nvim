@@ -66,7 +66,7 @@ vim.api.nvim_create_autocmd("BufWinLeave", {
 	callback = function()
 		local dap_repl = require("dap.repl")
 		if dap_repl then
-			print("[DAP] Closing REPL...")
+		 _G.print_custom("[DAP] Closing REPL...")
 			pcall(dap_repl.close) -- Ensure it doesn't crash if nil
 		end
 	end,

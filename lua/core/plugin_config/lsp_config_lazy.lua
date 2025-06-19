@@ -68,9 +68,9 @@ local function create_find_root_dir_function(patterns, fallback)
 		local root = root_dir_fn(fname)
 		if not root and fallback then
 			root = vim.fn.getcwd()
-			print("⚠️ No root directory detected, falling back to CWD: " .. root)
+		 _G.print_custom("⚠️ No root directory detected, falling back to CWD: " .. root)
 		else
-			print("✅ Root directory detected: " .. (root or "None"))
+		 _G.print_custom("✅ Root directory detected: " .. (root or "None"))
 		end
 		return root
 	end
@@ -96,16 +96,16 @@ local lua_setup_dict = {}
 local neodev_setup_dict = {}
 
 local lua_pre_setup = function()
-	print("Running lua pre setup (Inside the function)")
+ _G.print_custom("Running lua pre setup (Inside the function)")
 	require("neodev").setup(neodev_setup_dict)
 
 	-- Modify the existing global setup_dict instead of overwriting it
 	lua_setup_dict.root_dir = create_find_root_dir_function({ ".git", ".luarc.json", ".luarc.jsonc" }, true)
 	lua_setup_dict.on_attach = function(client, bufnr)
-		print("✅ LSP " .. client.name .. " attached to buffer " .. bufnr)
+	 _G.print_custom("✅ LSP " .. client.name .. " attached to buffer " .. bufnr)
 		--
 	end
-	lua_setup_dict.on_initialized = function(client) print("LSP " .. vim.inspect(client.name) .. " is ready!") end
+	lua_setup_dict.on_initialized = function(client) _G.print_custom("LSP " .. vim.inspect(client.name) .. " is ready!") end
 	lua_setup_dict.filetypes = { "lua" }
 	lua_setup_dict.settings = {
 		Lua = {
@@ -147,7 +147,7 @@ local python_post_setup = function()
 		local clients = vim.lsp.get_active_clients()
 		for _, client in ipairs(clients) do
 			if client.name == "pyright" then
-				print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
+			 _G.print_custom("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
 			end
 		end
 
@@ -190,7 +190,7 @@ local c_pre_setup = function()
 		on_attach = function(client, bufnr)
 			local root = client.config.root_dir
 			_G.MyRootDir = client.config.root_dir
-			-- print("Clangd root directory detected: " .. (root or "none"))
+			-- _G.print_custom("Clangd root directory detected: " .. (root or "none"))
 		end,
 	}
 end
@@ -270,7 +270,7 @@ local java_pre_setup = function()
 		end
 
 		local debug_plugin = get_debug_plugin()
-		print("Java Debug Plugin Path:", debug_plugin)
+	 _G.print_custom("Java Debug Plugin Path:", debug_plugin)
 
 		local general_utils = _G.general_utils_franck
 		if not general_utils then
@@ -315,7 +315,7 @@ local java_pre_setup = function()
 			on_attach = function(client, bufnr)
 				-- Update the global variable when the LSP attaches
 				_G.MyRootDir = client.config.root_dir
-				-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+				-- _G.print_custom("Java root directory detected: " .. (_G.MyRootDir or "none"))
 			end,
 		}
 	end
@@ -372,11 +372,11 @@ local texlab_pre_setup = function()
 		},
 		capabilities = lsp_defaults.capabilities,
 		on_attach = function(client, bufnr)
-			print("LaTeX File:", tex_file)
-			print("Aux Directory:", tex_output)
-			print("PDF Output Directory:", pdf_output_dir)
-			print("PDF File:", pdf_file)
-			print(
+		 _G.print_custom("LaTeX File:", tex_file)
+		 _G.print_custom("Aux Directory:", tex_output)
+		 _G.print_custom("PDF Output Directory:", pdf_output_dir)
+		 _G.print_custom("PDF File:", pdf_file)
+		 _G.print_custom(
 				"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
 					.. tex_output
 					.. " -output-directory="
@@ -384,7 +384,7 @@ local texlab_pre_setup = function()
 					.. " "
 					.. tex_file
 			)
-			print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
+		 _G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 		end,
 	}
 end
@@ -406,14 +406,14 @@ local texlab_post_setup = function()
 	-- vim.api.nvim_create_user_command("CheckLSP", function()
 	-- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
 	-- 	if #clients > 1 then
-	-- 		print("🚀 More than one LSP server is attached to this buffer:")
+	-- 	 _G.print_custom("🚀 More than one LSP server is attached to this buffer:")
 	-- 		for _, client in ipairs(clients) do
-	-- 			print(" - " .. client.name)
+	-- 		 _G.print_custom(" - " .. client.name)
 	-- 		end
 	-- 	elseif #clients == 1 then
-	-- 		print("✅ Only one LSP server is attached: " .. clients[1].name)
+	-- 	 _G.print_custom("✅ Only one LSP server is attached: " .. clients[1].name)
 	-- 	else
-	-- 		print("❌ No LSP servers attached to this buffer")
+	-- 	 _G.print_custom("❌ No LSP servers attached to this buffer")
 	-- 	end
 	-- end, {})
 end
@@ -464,7 +464,7 @@ local function try_attach_lsp_to_buffer(name)
 	-- Check if the LSP client is already attached
 	for _, client in ipairs(clients) do
 		if client.name == name then
-			print("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
+		 _G.print_custom("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
 			return true
 		end
 	end
@@ -473,12 +473,12 @@ local function try_attach_lsp_to_buffer(name)
 	for _, client in ipairs(vim.lsp.get_clients()) do
 		if client.name == name then
 			vim.lsp.buf_attach_client(bufnr, client.id)
-			print("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+		 _G.print_custom("✅ LSP " .. name .. " attached to buffer " .. bufnr)
 			return false
 		end
 	end
 
-	print("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
+ _G.print_custom("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
 	return false
 end
 
@@ -493,14 +493,14 @@ local function attach_lsp_to_buffer(name)
 			return
 		end
 
-		print("Couldn't attach LSP. Attempt #" .. attempt)
+	 _G.print_custom("Couldn't attach LSP. Attempt #" .. attempt)
 
 		-- Retry after 1 second if max tries are not reached
 		if attempt < max_try then
 			attempt = attempt + 1
 			vim.defer_fn(try_attach, 1000) -- Retry after 1000 ms (1 second)
 		else
-			print("Couldn't attach LSP " .. name .. " to buffer")
+		 _G.print_custom("Couldn't attach LSP " .. name .. " to buffer")
 		end
 	end
 
@@ -523,11 +523,11 @@ end
 --- @param post_setup function|nil: (Optional) A function that runs after setting up the LSP.
 ---                                 Useful for defining user commands or further customization.
 local function setup_lsp(name, setup_dict, pre_setup, post_setup)
-	print("🔍 Setting up LSP: " .. name)
+ _G.print_custom("🔍 Setting up LSP: " .. name)
 
 	-- Ensure setup_dict is valid
 	if not setup_dict then
-		print("⚠️ Error: LSP setup_dict is nil for " .. name)
+	 _G.print_custom("⚠️ Error: LSP setup_dict is nil for " .. name)
 		return
 	end
 
@@ -535,7 +535,7 @@ local function setup_lsp(name, setup_dict, pre_setup, post_setup)
 
 	-- If root_dir is missing, run pre_setup() to initialize it
 	if not setup_dict.root_dir and pre_setup then
-		print("⚠️ No root_dir detected, running pre_setup() for " .. name)
+	 _G.print_custom("⚠️ No root_dir detected, running pre_setup() for " .. name)
 		pre_setup()
 	end
 
@@ -544,7 +544,7 @@ local function setup_lsp(name, setup_dict, pre_setup, post_setup)
 	if setup_dict.root_dir then
 		if type(setup_dict.root_dir) == "function" then
 			root_dir = setup_dict.root_dir(bufname)
-			print("🔄 root_dir function evaluated for " .. name .. ": " .. (root_dir or "nil"))
+		 _G.print_custom("🔄 root_dir function evaluated for " .. name .. ": " .. (root_dir or "nil"))
 		else
 			root_dir = setup_dict.root_dir
 		end
@@ -552,16 +552,16 @@ local function setup_lsp(name, setup_dict, pre_setup, post_setup)
 
 	-- Fallback to `getcwd()` if `root_dir` is still nil
 	if not root_dir or root_dir == "" then
-		print("⚠️ root_dir is still nil, falling back to CWD")
+	 _G.print_custom("⚠️ root_dir is still nil, falling back to CWD")
 		root_dir = vim.fn.getcwd()
 	end
 
-	print("✅ Final root_dir for " .. name .. ": " .. root_dir)
+ _G.print_custom("✅ Final root_dir for " .. name .. ": " .. root_dir)
 
 	-- Prevent re-setup if already initialized
 	initialized_lsps[name] = initialized_lsps[name] or {}
 	if initialized_lsps[name][root_dir] then
-		print("ℹ️ LSP " .. name .. " already initialized for " .. root_dir)
+	 _G.print_custom("ℹ️ LSP " .. name .. " already initialized for " .. root_dir)
 
 		-- ⚠️ Manually attach LSP to the buffer if setup already happened
 		--   Race Conditions? What if it's not setup yet.
@@ -573,14 +573,14 @@ local function setup_lsp(name, setup_dict, pre_setup, post_setup)
 
 	-- Ensure `on_attach` is always set
 	setup_dict.on_attach = function(client, bufnr)
-		print("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+	 _G.print_custom("✅ LSP " .. name .. " attached to buffer " .. bufnr)
 		if post_setup then
 			post_setup()
 		end
 	end
 
 	-- Debugging: Print full setup dictionary
-	print("🔍 Setting up LSP: " .. name .. " with config: " .. vim.inspect(setup_dict))
+ _G.print_custom("🔍 Setting up LSP: " .. name .. " with config: " .. vim.inspect(setup_dict))
 
 	-- Setup the LSP (This will also start it)
 	lspconfig[name].setup(setup_dict)

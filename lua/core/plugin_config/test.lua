@@ -26,4 +26,4 @@ local get_debug_plugin = function()
 end
 
 debug_plugin = get_debug_plugin()
-print("Java Debug Plugin Path:", debug_plugin)
+ _G.print_custom("Java Debug Plugin Path:", debug_plugin)

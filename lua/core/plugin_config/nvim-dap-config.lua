@@ -330,7 +330,7 @@ local function custom_make()
 		if data and show_build_output then
 			for _, line in ipairs(data) do
 				if line ~= "" then
-					print("[BUILD OUTPUT] " .. line)
+				 _G.print_custom("[BUILD OUTPUT] " .. line)
 				end
 			end
 		end

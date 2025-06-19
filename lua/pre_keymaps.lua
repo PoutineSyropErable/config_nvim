@@ -7,7 +7,7 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 local function notify_debug(message)
 	local cmd = string.format("notify-send '[Neovim Debug]' '%s'", message)
 	os.execute(cmd) -- Send notification
-	print("🟢 Debug: " .. message) -- Also log to Neovim
+	_G.print_custom("🟢 Debug: " .. message) -- Also log to Neovim
 end
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
@@ -199,7 +199,7 @@ function RunCurrentFile()
 		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
-	print("File type not supported for running with F4")
+	 _G.print_custom("File type not supported for running with F4")
 	end
 end
 
@@ -226,7 +226,7 @@ local function run_do_all()
 	--"proj_root = " .. proj_root)
 
 	local all_cmd = "cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
-print("all cmd = " .. all_cmd, vim.log.levels.INFO)
+ _G.print_custom("all cmd = " .. all_cmd, vim.log.levels.INFO)
 
 	local output = vim.fn.system(all_cmd)
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
@@ -254,16 +254,16 @@ keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 local toggle_invisible_char = function()
 	vim.opt.list = not vim.opt.list:get()
-	print("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
+ _G.print_custom("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
 end
 
 local toggle_linting = function()
 	if vim.g.linting_enabled then
 		vim.diagnostic.enable()
-		print("🔍 Linting Enabled")
+	 _G.print_custom("🔍 Linting Enabled")
 	else
 		vim.diagnostic.enable(false)
-		print("🚫 Linting Disabled")
+	 _G.print_custom("🚫 Linting Disabled")
 	end
 	vim.g.linting_enabled = not vim.g.linting_enabled
 end
@@ -288,7 +288,7 @@ end
 local function get_current_tab_name()
 	local tabnr = vim.api.nvim_get_current_tabpage()
 	local tab_name = get_tab_name(tabnr)
-	print("Current Tab Name: " .. tab_name)
+ _G.print_custom("Current Tab Name: " .. tab_name)
 end
 
 keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
