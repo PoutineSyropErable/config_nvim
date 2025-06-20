@@ -407,6 +407,9 @@ require("lazy").setup({
 		end,
 	},
 	"nvim-pack/nvim-spectre",
+	{ "HawkinsT/pathfinder.nvim" },
+	"andymass/vim-matchup",
+	-- ^^ For file search
 }, {
 	rocks = {
 		hererocks = true, -- Enables hererocks globally for all plugins

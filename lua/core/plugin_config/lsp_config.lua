@@ -98,8 +98,8 @@ if false then
 		on_attach = function(client, bufnr)
 			-- This function will be called when the LSP is fully initialized
 			general_utils_franck.send_notification("please work")
-		 _G.print_custom("LSP " .. client.name .. " is attached!")
-		 _G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
+			_G.print_custom("LSP " .. client.name .. " is attached!")
+			_G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
 			-- You can perform additional actions here, for example, setting some custom configurations
 		end,
 	})
@@ -126,7 +126,7 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	local clients = vim.lsp.get_clients()
 	for _, client in ipairs(clients) do
 		if client.name == "pyright" then
-		 _G.print_custom("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
+			_G.print_custom("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
 		end
 	end
 
@@ -175,7 +175,7 @@ lspconfig.clangd.setup({
 		},
 	},
 	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
-	filetypes = { "c", "cpp", "opencl", "objc", "objcpp", "x" },
+	filetypes = { "c", "cpp", "objc", "objcpp", "x", "opencl" },
 	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
 	settings = {
 		clangd = {
@@ -185,7 +185,7 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
 		_G.MyRootDir = client.config.root_dir
-	 _G.print_custom("test")
+		_G.print_custom("test")
 		general_utils_franck.send_notification("test")
 		-- _G.print_custom("Clangd root directory detected: " .. (root or "none"))
 	end,
@@ -261,7 +261,7 @@ if useJavaLspConfig then
 	end
 
 	debug_plugin = get_debug_plugin()
- _G.print_custom("Java Debug Plugin Path:", debug_plugin)
+	_G.print_custom("Java Debug Plugin Path:", debug_plugin)
 
 	local general_utils = _G.general_utils_franck
 	if not general_utils then
@@ -387,11 +387,11 @@ lspconfig.texlab.setup({
 	},
 	capabilities = lsp_defaults.capabilities,
 	on_attach = function(client, bufnr)
-	 _G.print_custom("LaTeX File:", tex_file)
-	 _G.print_custom("Aux Directory:", tex_output)
-	 _G.print_custom("PDF Output Directory:", pdf_output_dir)
-	 _G.print_custom("PDF File:", pdf_file)
-	 _G.print_custom(
+		_G.print_custom("LaTeX File:", tex_file)
+		_G.print_custom("Aux Directory:", tex_output)
+		_G.print_custom("PDF Output Directory:", pdf_output_dir)
+		_G.print_custom("PDF File:", pdf_file)
+		_G.print_custom(
 			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
 				.. tex_output
 				.. " -output-directory="
@@ -399,7 +399,7 @@ lspconfig.texlab.setup({
 				.. " "
 				.. tex_file
 		)
-	 _G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
+		_G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
 

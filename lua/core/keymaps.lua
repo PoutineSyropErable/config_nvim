@@ -393,8 +393,10 @@ local function safe_telescope_call(fn)
 		local ok, telescope_builtin = pcall(require, "telescope.builtin")
 		if ok and telescope_builtin[fn] then
 			telescope_builtin[fn]()
+			return 0
 		else
 			_G.print_custom("Telescope function '" .. fn .. "' not available")
+			return 1
 		end
 	end
 end
@@ -574,6 +576,15 @@ end, opts("hover and switch"))
 keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
 keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
 
+----- Pathfinder goto files
+local pathfinder = require("pathfinder")
+--("$HOME/some file with space.txt")
+-- $HOME/.zshrc
+
+keymap.set("n", "gf", pathfinder.gf, opts("Enhanced go to file"))
+keymap.set("n", "gF", pathfinder.gF, opts("Enhanced Go to file with line"))
+keymap.set("n", "gx", pathfinder.gx, opts("Enhanced Go to file with line"))
+
 -- LSP Definitions & References
 keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
 keymap.set("n", "gj", vim.lsp.buf.definition, opts("Go to definition (No telescope)"))
@@ -581,7 +592,6 @@ keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
 keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
 keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
 
-keymap.set("n", "gf", goto_current_function, opts("Go to current function"))
 keymap.set("n", "gh", goto_current_function, opts("Go to current function"))
 keymap.set("n", "gs", goto_next_function_call, opts("Go to next function"))
 keymap.set("n", "gn", goto_next_function_call, opts("Go to next function"))
@@ -640,39 +650,39 @@ keymap.set("n", "<leader>lg", ":LazyGit<CR>", { desc = "Open LazyGit" })
 keymap.set("n", "<leader>u", function() require("undotree").toggle() end, opts("Toggle undo tree"))
 
 -- Git History (Telescope)
-keymap.set("n", "<leader>gC", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
-keymap.set("n", "<leader>gb", builtin.git_bcommits, { desc = "Search Buffer Commits (Telescope)" })
+keymap.set("n", "<leader>GC", builtin.git_commits, { desc = "Search Git Commits (Telescope)" })
+keymap.set("n", "<leader>Gb", builtin.git_bcommits, { desc = "Search Buffer Commits (Telescope)" })
 
 -- Git Status (Fugitive)
-keymap.set("n", "<leader>gf", ":Git<CR>", { desc = "Git status (Fugitive)" })
+keymap.set("n", "<leader>Gf", ":Git<CR>", { desc = "Git status (Fugitive)" })
 
 -- Git Mergetool
-keymap.set("n", "<leader>gm", ":Gvdiffsplit!<CR>", { desc = "Open Git Mergetool" })
+keymap.set("n", "<leader>Gm", ":Gvdiffsplit!<CR>", { desc = "Open Git Mergetool" })
 
 -- Reset file to Git index version
-keymap.set("n", "<leader>gr", ":Gread<CR>", { desc = "Reset file to index version" })
+keymap.set("n", "<leader>Gr", ":Gread<CR>", { desc = "Reset file to index version" })
 
 -- Stage current file
-keymap.set("n", "<leader>gs", ":Gwrite<CR>", { desc = "Stage current file" })
+keymap.set("n", "<leader>Gs", ":Gwrite<CR>", { desc = "Stage current file" })
 
 -- Git Add All
-keymap.set("n", "<leader>ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
+keymap.set("n", "<leader>Ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
 -- Git commit
-keymap.set("n", "<leader>gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
+keymap.set("n", "<leader>Gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
 -- Git Push Current Branch
-vim.keymap.set("n", "<leader>gp", function()
+vim.keymap.set("n", "<leader>Gp", function()
 	local branch = vim.fn.system("git branch --show-current"):gsub("\n", "")
 	vim.cmd("Git push origin " .. branch)
 end, { desc = "Push current branch to remote" })
 
 -- Git log
-keymap.set("n", "<leader>gl", ":Git log --oneline<CR>", { desc = "Show Git log" })
+keymap.set("n", "<leader>Gl", ":Git log --oneline<CR>", { desc = "Show Git log" })
 
 -- Git blame (Avoids `<leader>gb` conflict)
-keymap.set("n", "<leader>gB", ":Git blame<CR>", { desc = "Git blame (Fugitive)" })
+keymap.set("n", "<leader>GB", ":Git blame<CR>", { desc = "Git blame (Fugitive)" })
 
 local git_branches = function() require("neogit").open({ "branch" }) end
-keymap.set("n", "<leader>gg", git_branches, opts("Git branches side"))
+keymap.set("n", "<leader>Gg", git_branches, opts("Git branches side"))
 
 ---------------------------------------------- Diff keymaps
 function ApplyDiffGet(version)
@@ -1544,12 +1554,12 @@ function _G.debug_utils.write_function_debug()
 			local indent = get_indent()
 			local debug_code = string.format(
 				[[%sif DEBUG_:
-%s _G.print_custom(f'type(%s) = {type(%s)}')
+%s print(f'type(%s) = {type(%s)}')
 %s	try:
-%s	 _G.print_custom(f'np.shape(%s) = {np.shape(%s)}')
+%s	 print(f'np.shape(%s) = {np.shape(%s)}')
 %s	except Exception as e:
-%s	 _G.print_custom('Some error about not having a shape:', e)
-%s _G.print_custom(f'%s = \n{%s}\n')]],
+%s	 print('Some error about not having a shape:', e)
+%s 	 print(f'%s = \n{%s}\n')]],
 				indent,
 				indent,
 				input,

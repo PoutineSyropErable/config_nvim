@@ -32,6 +32,7 @@ end
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.undotree")
+require("core.plugin_config.pathfinder")
 require("core.plugin_config.toggleterm")
 require("core.plugin_config.markview")
 require("core.plugin_config.image")
