@@ -1,14 +1,17 @@
--- Detect if the OS is Linux
 local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 
 local get_buffer_plugins = require("buffer_manager")
 local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
+
+local lol
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-	"tpope/vim-commentary",
-	"mattn/emmet-vim",
+	{
+		"numToStr/Comment.nvim",
+		config = function() require("Comment").setup() end,
+	},
 	{
 		"nvim-tree/nvim-web-devicons",
 		opts = {
@@ -27,16 +30,45 @@ require("lazy").setup({
 		},
 	},
 	{ "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
-	"ellisonleao/gruvbox.nvim",
-	"dracula/vim",
+	-- "ellisonleao/gruvbox.nvim",
+	-- "dracula/vim",
+
+	{
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.4", -- Specific version/tag for stable release
+		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
+	},
+
+	-- UI Select extension
+	{
+		"nvim-telescope/telescope-ui-select.nvim",
+		after = "telescope.nvim", -- Load after telescope.nvim
+	},
+
+	{
+		"nvim-telescope/telescope-file-browser.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+	},
+
+	-- fzf-native extension (requires building with 'make')
+	{
+		"nvim-telescope/telescope-fzf-native.nvim",
+		build = "make", -- Ensure it's compiled
+		after = "telescope.nvim", -- Load after telescope.nvim
+	},
 	"nvim-treesitter/nvim-treesitter",
-	"vim-test/vim-test",
+	{
+		"echasnovski/mini.bufremove",
+		version = false,
+		config = function() end, -- No extra config needed
+	},
 	buffer_plugin,
 	-- {
 	-- 	"Shatur/neovim-session-manager",
 	-- 	dependencies = { "nvim-lua/plenary.nvim" },
 	-- },
 
+	"andymass/vim-matchup", -- better %
 	{
 		-- "gennaro-tedesco/nvim-possession",
 		"PoutineSyropErable/nvim-possession",
@@ -51,17 +83,9 @@ require("lazy").setup({
 		},
 		config = true,
 	},
-	{
-		"echasnovski/mini.bufremove",
-		version = false,
-		config = function() end, -- No extra config needed
-	},
 
 	"chrisbra/csv.vim",
 	"nvim-lualine/lualine.nvim",
-	-- "vim-airline/vim-airline",
-	-- "vim-airline/vim-airline-themes",
-	-- "itchyny/lightline.vim",
 
 	-- DAP core and UI setup
 	{
@@ -105,7 +129,7 @@ require("lazy").setup({
 
 	"brenoprata10/nvim-highlight-colors",
 
-	"uga-rosa/ccc.nvim",
+	"uga-rosa/ccc.nvim", -- color picker
 	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
@@ -134,10 +158,6 @@ require("lazy").setup({
 	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 
 	-------------------------------- 	END OF TERMINAL ----------------------------
-	{
-		"numToStr/Comment.nvim",
-		config = function() require("Comment").setup() end,
-	},
 
 	{
 		"ThePrimeagen/harpoon",
@@ -235,6 +255,7 @@ require("lazy").setup({
 	-- "mfussenegger/nvim-lint",
 
 	-- {
+	-- linting nicer message on multi lines
 	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
 	-- 	config = function()
 	-- 		require("lsp_lines").setup()
@@ -247,7 +268,7 @@ require("lazy").setup({
 
 	"clangd/clangd",
 	"Civitasv/cmake-tools.nvim",
-	"elkowar/yuck.vim",
+	"elkowar/yuck.vim", -- eww filetype support
 	-- "gpanders/nvim-parinfer",
 	-- coc.nvm and my lsp seems to be going against each other, so i won't use it
 
@@ -262,10 +283,6 @@ require("lazy").setup({
 		},
 	},
 	-- Lazy.nvim
-	-- {
-	-- 	"folke/neodev.nvim",
-	-- 	opts = {}, -- No additional config needed
-	-- },
 	{
 		"folke/lazydev.nvim",
 		ft = "lua", -- only load on lua files
@@ -281,11 +298,6 @@ require("lazy").setup({
 	"WhoIsSethDaniel/mason-tool-installer.nvim",
 
 	"neovim/nvim-lspconfig",
-
-	{
-		"vinnymeller/swagger-preview.nvim",
-		run = "npm install -g swagger-ui-watcher",
-	},
 
 	-- ✍️ Markdown Support
 	{
@@ -313,30 +325,6 @@ require("lazy").setup({
 	-- this should be the right one
 
 	{
-		"nvim-telescope/telescope.nvim",
-		tag = "0.1.4", -- Specific version/tag for stable release
-		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
-	},
-
-	-- UI Select extension
-	{
-		"nvim-telescope/telescope-ui-select.nvim",
-		after = "telescope.nvim", -- Load after telescope.nvim
-	},
-
-	{
-		"nvim-telescope/telescope-file-browser.nvim",
-		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
-	},
-
-	-- fzf-native extension (requires building with 'make')
-	{
-		"nvim-telescope/telescope-fzf-native.nvim",
-		build = "make", -- Ensure it's compiled
-		after = "telescope.nvim", -- Load after telescope.nvim
-	},
-
-	{
 		"goolord/alpha-nvim",
 		-- dependencies = { "echasnovski/mini.icons" },
 		dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -361,40 +349,6 @@ require("lazy").setup({
 		dependencies = "kevinhwang91/promise-async",
 	},
 
-	-- Noice breaks my print test
-	-- {
-	-- 	"folke/noice.nvim",
-	-- 	event = "VeryLazy",
-	-- 	opts = {
-	-- 		-- add any options here
-	-- 	},
-	-- 	dependencies = {
-	-- 		-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-	-- 		"MunifTanjim/nui.nvim",
-	-- 		-- OPTIONAL:
-	-- 		--   `nvim-notify` is only needed, if you want to use the notification view.
-	-- 		--   If not available, we use `mini` as the fallback
-	-- 		-- "rcarriga/nvim-notify",
-	-- 	},
-	-- },
-	-- {
-	-- 	"rcarriga/nvim-notify",
-	-- 	lazy = false,
-	-- 	config = function()
-	-- 		require("notify").setup({
-	-- 			stages = "fade",
-	-- 			render = "minimal", -- 👈 To avoid line splitting!
-	-- 			background_colour = "#ff5577", -- Catppuccin Mocha base
-	-- 			timeout = 3000,
-	-- 			max_width = 500,
-	-- 			merge_duplicates = 2,
-	-- 		})
-
-	-- 		-- Override vim.notify
-	-- 		vim.notify = require("notify")
-	-- 	end,
-	-- },
-
 	{
 		"echasnovski/mini.nvim",
 		version = false,
@@ -407,8 +361,8 @@ require("lazy").setup({
 	},
 	"nvim-pack/nvim-spectre",
 	{ "HawkinsT/pathfinder.nvim" },
-	"andymass/vim-matchup",
 	-- ^^ For file search
+	"vim-test/vim-test",
 }, {
 	rocks = {
 		hererocks = true, -- Enables hererocks globally for all plugins

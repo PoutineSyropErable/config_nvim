@@ -41,7 +41,6 @@ require("core.plugin_config.mini_surround")
 require("core.plugin_config.gitsigns")
 require("core.plugin_config.tressj")
 
-require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
@@ -51,6 +50,7 @@ require("core.plugin_config.bufferline")
 
 require("core.plugin_config.nvim-possession")
 require("core.plugin_config.nvim-ufo")
+require("core.plugin_config.color_picker_ccc")
 
 ------ ##### DEACTIVATED ##### -------
 
