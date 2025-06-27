@@ -317,7 +317,7 @@ local function all_workspace_symbols()
 end
 
 -- Toggle flag to switch between project root and current file's directory
-local use_project_root = true
+local use_project_root = false
 
 local function toggle_find_files()
 	use_project_root = not use_project_root
