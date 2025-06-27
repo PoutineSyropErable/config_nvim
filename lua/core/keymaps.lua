@@ -1134,11 +1134,11 @@ keymap.set("n", "<leader>tr", function() bottom_right_float:toggle() end, opts("
 
 keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
 keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
-keymap.set("t", "qq", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
+keymap.set("t", "QQ", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
 
 vim.api.nvim_create_autocmd("TermOpen", {
 	pattern = "*",
-	callback = function() vim.keymap.set("n", "qq", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
+	callback = function() vim.keymap.set("n", "QQ", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
 })
 
 ---------------------------------------------- Terminal File Manager -----------------------------------

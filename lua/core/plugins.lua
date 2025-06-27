@@ -90,12 +90,6 @@ require("lazy").setup({
 	-- BASH DAP support?
 	"bash-lsp/bash-language-server",
 
-	-- Terminal file managers (lf)
-	{
-		"rolv-apneseth/tfm.nvim",
-		lazy = false, -- Load the plugin immediately
-	},
-
 	"psf/black",
 
 	"preservim/vimux",
@@ -122,6 +116,11 @@ require("lazy").setup({
 
 	-------------------------------- 	START OF TERMINAL ----------------------------
 
+	-- Terminal file managers (lf)
+	{
+		"rolv-apneseth/tfm.nvim",
+		lazy = false, -- Load the plugin immediately
+	},
 	-- It just works vv
 	"voldikss/vim-floaterm",
 	{
