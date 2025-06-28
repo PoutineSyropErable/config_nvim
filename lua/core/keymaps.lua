@@ -911,13 +911,13 @@ end
 local ufo = require("ufo")
 
 -- Open/Close All Folds
-keymap.set("n", "<leader>zR", ufo.openAllFolds, { desc = "Open all folds" })
-keymap.set("n", "<leader>zM", ufo.closeAllFolds, { desc = "Close all folds" })
+keymap.set("n", "<leader>zE", ufo.openAllFolds, { desc = "Open all folds" })
+keymap.set("n", "<leader>zQ", ufo.closeAllFolds, { desc = "Close all folds" })
 
 -- Open/Close Fold Under Cursor
-keymap.set("n", "<leader>zr", function() ufo.openFoldsExceptKinds({}) end, { desc = "Open fold under cursor" })
+keymap.set("n", "<leader>ze", function() ufo.openFoldsExceptKinds({}) end, { desc = "Open fold under cursor" })
 
-keymap.set("n", "<leader>zm", function() ufo.closeFoldsWith(1) end, { desc = "Close fold under cursor" })
+keymap.set("n", "<leader>zq", function() ufo.closeFoldsWith(1) end, { desc = "Close fold under cursor" })
 
 -- Peek Folded Lines
 keymap.set("n", "<leader>zK", function()
@@ -928,9 +928,9 @@ keymap.set("n", "<leader>zK", function()
 end, { desc = "Peek Fold" })
 
 -- Jump to Next/Previous Closed Fold
-keymap.set("n", "<leader>zn", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W") end, { desc = "Jump to next closed fold" })
+keymap.set("n", "<leader>zb", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "W") end, { desc = "Jump to next closed fold" })
 
-keymap.set("n", "<leader>zp", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW") end, { desc = "Jump to previous closed fold" })
+keymap.set("n", "<leader>zn", function() vim.fn.search("^\\zs.\\{-}\\ze\\n\\%($\\|\\s\\{2,}\\)", "bW") end, { desc = "Jump to previous closed fold" })
 
 -------------------------------------------------------Filetype-specific keymaps
 -- from https://github.com/bcampolo/nvim-starter-kit/blob/python/.config/nvim/lua/core/keymaps.lua
@@ -1180,27 +1180,27 @@ if is_windows then
 	keymap.set("", "<C-w><Right>", ":wincmd l<CR>")
 else
 	-- Linux-specific keymaps (using nvim-tmux navigator)
-	keymap.set("", "<C-s>j", nvim_tmux_nav.NvimTmuxNavigateLeft)
-	keymap.set("", "<C-s>k", nvim_tmux_nav.NvimTmuxNavigateDown)
-	keymap.set("", "<C-s>i", nvim_tmux_nav.NvimTmuxNavigateUp)
-	keymap.set("", "<C-s>l", nvim_tmux_nav.NvimTmuxNavigateRight)
-	keymap.set("", "<C-s>,", nvim_tmux_nav.NvimTmuxNavigateLastActive)
-	keymap.set("", "<C-s>Space", nvim_tmux_nav.NvimTmuxNavigateNext)
+	keymap.set("", "<C-s>j", Nvim_tmux_nav.NvimTmuxNavigateLeft)
+	keymap.set("", "<C-s>k", Nvim_tmux_nav.NvimTmuxNavigateDown)
+	keymap.set("", "<C-s>i", Nvim_tmux_nav.NvimTmuxNavigateUp)
+	keymap.set("", "<C-s>l", Nvim_tmux_nav.NvimTmuxNavigateRight)
+	keymap.set("", "<C-s>,", Nvim_tmux_nav.NvimTmuxNavigateLastActive)
+	keymap.set("", "<C-s>Space", Nvim_tmux_nav.NvimTmuxNavigateNext)
 
-	keymap.set("", "<C-s><Left>", nvim_tmux_nav.NvimTmuxNavigateLeft)
-	keymap.set("", "<C-s><Down>", nvim_tmux_nav.NvimTmuxNavigateDown)
-	keymap.set("", "<C-s><Up>", nvim_tmux_nav.NvimTmuxNavigateUp)
-	keymap.set("", "<C-s><Right>", nvim_tmux_nav.NvimTmuxNavigateRight)
+	keymap.set("", "<C-s><Left>", Nvim_tmux_nav.NvimTmuxNavigateLeft)
+	keymap.set("", "<C-s><Down>", Nvim_tmux_nav.NvimTmuxNavigateDown)
+	keymap.set("", "<C-s><Up>", Nvim_tmux_nav.NvimTmuxNavigateUp)
+	keymap.set("", "<C-s><Right>", Nvim_tmux_nav.NvimTmuxNavigateRight)
 
-	keymap.set("", "<C-w>j", nvim_tmux_nav.NvimTmuxNavigateLeft)
-	keymap.set("", "<C-w>k", nvim_tmux_nav.NvimTmuxNavigateDown)
-	keymap.set("", "<C-w>i", nvim_tmux_nav.NvimTmuxNavigateUp)
-	keymap.set("", "<C-w>l", nvim_tmux_nav.NvimTmuxNavigateRight)
+	keymap.set("", "<C-w>j", Nvim_tmux_nav.NvimTmuxNavigateLeft)
+	keymap.set("", "<C-w>k", Nvim_tmux_nav.NvimTmuxNavigateDown)
+	keymap.set("", "<C-w>i", Nvim_tmux_nav.NvimTmuxNavigateUp)
+	keymap.set("", "<C-w>l", Nvim_tmux_nav.NvimTmuxNavigateRight)
 
-	keymap.set("", "<C-w><Left>", nvim_tmux_nav.NvimTmuxNavigateLeft)
-	keymap.set("", "<C-w><Down>", nvim_tmux_nav.NvimTmuxNavigateDown)
-	keymap.set("", "<C-w><Up>", nvim_tmux_nav.NvimTmuxNavigateUp)
-	keymap.set("", "<C-w><Right>", nvim_tmux_nav.NvimTmuxNavigateRight)
+	keymap.set("", "<C-w><Left>", Nvim_tmux_nav.NvimTmuxNavigateLeft)
+	keymap.set("", "<C-w><Down>", Nvim_tmux_nav.NvimTmuxNavigateDown)
+	keymap.set("", "<C-w><Up>", Nvim_tmux_nav.NvimTmuxNavigateUp)
+	keymap.set("", "<C-w><Right>", Nvim_tmux_nav.NvimTmuxNavigateRight)
 end
 
 local function focus_floating_win()

@@ -3,7 +3,6 @@ local is_linux = vim.loop.os_uname().sysname ~= "Windows_NT"
 local get_buffer_plugins = require("buffer_manager")
 local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 
-local lol
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
@@ -145,15 +144,15 @@ require("lazy").setup({
 		"rolv-apneseth/tfm.nvim",
 		lazy = false, -- Load the plugin immediately
 	},
-	-- It just works vv
-	"voldikss/vim-floaterm",
-	{
-		"lukas-reineke/indent-blankline.nvim",
-		main = "ibl",
-		---@module "ibl"
-		---@type ibl.config
-		opts = {},
-	},
+	-- -- It just works vv
+	-- "voldikss/vim-floaterm",
+	-- {
+	-- 	"lukas-reineke/indent-blankline.nvim",
+	-- 	main = "ibl",
+	-- 	---@module "ibl"
+	-- 	---@type ibl.config
+	-- 	opts = {},
+	-- },
 
 	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 
@@ -173,14 +172,13 @@ require("lazy").setup({
 			and {
 				"alexghergh/nvim-tmux-navigation",
 				config = function()
-					nvim_tmux_nav = require("nvim-tmux-navigation")
-					nvim_tmux_nav.setup({
+					Nvim_tmux_nav = require("nvim-tmux-navigation")
+					Nvim_tmux_nav.setup({
 						disable_when_zoomed = true, -- defaults to false
 					})
 				end,
 			}
 		or nil, -- Use `nil` if the condition is false to skip loading
-	"TamaMcGlinn/quickfixdd",
 	"szw/vim-maximizer",
 
 	{
@@ -254,8 +252,8 @@ require("lazy").setup({
 	"saadparwaiz1/cmp_luasnip",
 	-- "mfussenegger/nvim-lint",
 
-	-- {
 	-- linting nicer message on multi lines
+	-- {
 	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
 	-- 	config = function()
 	-- 		require("lsp_lines").setup()
@@ -363,6 +361,21 @@ require("lazy").setup({
 	{ "HawkinsT/pathfinder.nvim" },
 	-- ^^ For file search
 	"vim-test/vim-test",
+
+	-- lazy.nvim
+	{
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		opts = {
+			-- add any options here
+		},
+		dependencies = {
+			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+			"MunifTanjim/nui.nvim",
+		},
+	},
+
+	--
 }, {
 	rocks = {
 		hererocks = true, -- Enables hererocks globally for all plugins
