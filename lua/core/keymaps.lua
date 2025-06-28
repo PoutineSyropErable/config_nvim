@@ -667,6 +667,15 @@ keymap.set("n", "<leader>Gs", ":Gwrite<CR>", { desc = "Stage current file" })
 
 -- Git Add All
 keymap.set("n", "<leader>Ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
+keymap.set("n", "<leader>GA", function()
+	local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+	if vim.v.shell_error ~= 0 or git_root == nil or git_root == "" then
+		vim.notify("Not inside a Git repository", vim.log.levels.ERROR)
+		return
+	end
+	vim.cmd("!cd " .. git_root .. " && git add .")
+end, { desc = "Stage all changes (git add . from root)" })
+
 -- Git commit
 keymap.set("n", "<leader>Gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })
 -- Git Push Current Branch
@@ -1128,9 +1137,36 @@ local bottom_left_float = Terminal:new({
 	hidden = true,
 })
 
-keymap.set("n", "<leader>tb", function() bottom_right_float:toggle() end, opts("Floating Bottom-Left Terminal"))
-keymap.set("n", "<leader>tz", function() bottom_left_float:toggle() end, opts("Floating Bottom-Left Terminal"))
-keymap.set("n", "<leader>tr", function() bottom_right_float:toggle() end, opts("Floating Bottom-Left Terminal"))
+local top_right_float = Terminal:new({
+	direction = "float",
+	float_opts = {
+		border = "rounded",
+		width = math.floor(vim.o.columns * 0.45),
+		height = math.floor(vim.o.lines * 0.45),
+		row = 0, -- Top of the screen
+		col = math.floor(vim.o.columns * 0.55), -- Right side
+	},
+	hidden = true,
+})
+
+local top_left_float = Terminal:new({
+	direction = "float",
+	float_opts = {
+		border = "rounded",
+		width = math.floor(vim.o.columns * 0.45),
+		height = math.floor(vim.o.lines * 0.45),
+		row = 0, -- Top of the screen
+		col = 0, -- Left side
+	},
+	hidden = true,
+})
+
+keymap.set("n", "<leader>tl", function() bottom_right_float:toggle() end, opts("Floating Bottom-Right Terminal"))
+keymap.set("n", "<leader>tj", function() bottom_left_float:toggle() end, opts("Floating Bottom-Left Terminal"))
+keymap.set("n", "<leader>to", function() top_right_float:toggle() end, opts("Floating Top-Right Terminal"))
+keymap.set("n", "<leader>tu", function() top_left_float:toggle() end, opts("Floating Top-Left Terminal"))
+
+keymap.set("n", "<leader>tb", function() bottom_right_float:toggle() end, opts("Floating Bottom-Right Terminal"))
 
 keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
 keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
