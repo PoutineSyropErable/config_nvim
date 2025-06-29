@@ -559,7 +559,7 @@ local function goto_previous_function_call()
 end
 
 -- LSP Hover
-keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
+-- keymap.set("n", "$", vim.lsp.buf.hover, opts("Hover Information"))
 -- keymap.set("n", "<C-d>", function() vim.lsp.util.scroll(4) end, opts("Scroll down on hover"))
 -- keymap.set("n", "<C-e>", function() vim.lsp.util.scroll(-4) end, opts("Scroll up on however"))
 vim.keymap.set("n", "¢", function()
@@ -573,12 +573,19 @@ vim.keymap.set("n", "¢", function()
 end, opts("hover and switch"))
 
 -- LSP Actions
-keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
-keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
 keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, { desc = "Manually trigger linting" })
-require("lspsaga")
-keymap.set("n", "<Leader>Lo", "<cmd>")
-keymap.set("n", "<leader>Lh", "<cmd>Lspsaga hover_doc<CR>", opts("Hover Information"))
+keymap.set("n", "<leader>Lr", "<cmd>Lspsaga rename<CR>", opts("Rename symbol in all occurrences"))
+keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
+keymap.set("n", "<leader>LC", "<cmd>Lspsaga code_action<CR>", opts("Show available code actions"))
+keymap.set("n", "$", "<cmd>Lspsaga hover_doc<CR>", opts("Hover Information"))
+keymap.set("n", "<Leader>Lo", "<cmd>Lspsaga outline<CR>", opts("Show Outline"))
+keymap.set("n", "<Leader>o", "<cmd>Lspsaga outline<CR>", opts("Show Outline"))
+keymap.set("n", "<leader>Lb", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Ln", "<cmd>Lspsaga diagnostic_jump_next<CR>", opts("Go to next diagnostic"))
+keymap.set("n", "<Leader>Lf", "<cmd>Lspsaga finder<CR>", opts("Show Outline"))
+
+keymap.set("n", "$", "<cmd>Lspsaga hover_doc<CR>", opts("Hover Information"))
+keymap.set("n", "<Leader>Lo", "<cmd>Lspsaga outline<CR>")
 
 ----- Pathfinder goto files
 local pathfinder = require("pathfinder")
@@ -640,13 +647,14 @@ keymap.set("n", "<leader>LL", function()
 end, opts("List workspace folders"))
 
 -- Diagnostics
-keymap.set("n", "<leader>Ld", vim.diagnostic.open_float, opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
-keymap.set("n", "<leader>LD", safe_lsp_call("diagnostic.open_float"), opts("Show diagnostic in floating window")) -- Changed from `<leader>Ll`
-keymap.set("n", "<leader>Lp", safe_lsp_call("diagnostic.goto_prev"), opts("Go to previous diagnostic"))
-keymap.set("n", "<leader>Ln", safe_lsp_call("diagnostic.goto_next"), opts("Go to next diagnostic"))
+
+keymap.set("n", "<leader>Ld", "<cmd>Lspsaga show_line_diagnostics<CR>", opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>LD", "<cmd>Lspsaga show_workspace_diagnostics<CR>", opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Lb", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Ln", "<cmd>Lspsaga diagnostic_jump_next<CR>", opts("Go to next diagnostic"))
 
 -- Auto Formatting
-keymap.set({ "n", "v" }, "<leader>Lf", function()
+keymap.set({ "n", "v" }, "<leader>LF", function()
 	if vim.lsp.buf.format then
 		vim.lsp.buf.format({ async = true })
 	else
@@ -684,14 +692,7 @@ keymap.set("n", "<leader>Gs", ":Gwrite<CR>", { desc = "Stage current file" })
 
 -- Git Add All
 keymap.set("n", "<leader>Ga", ":Git add .<CR>", { desc = "Stage all changes (git add .)" })
-keymap.set("n", "<leader>GA", function()
-	local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-	if vim.v.shell_error ~= 0 or git_root == nil or git_root == "" then
-		vim.notify("Not inside a Git repository", vim.log.levels.ERROR)
-		return
-	end
-	vim.cmd("!cd " .. git_root .. " && git add .")
-end, { desc = "Stage all changes (git add . from root)" })
+keymap.set("n", "<leader>GA", ":Git add --all<CR>", { desc = "Stage all changes (git add --all)" })
 
 -- Git commit
 keymap.set("n", "<leader>Gc", ":Git commit<CR>", { desc = "Git commit (Fugitive)" })

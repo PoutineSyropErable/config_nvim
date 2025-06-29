@@ -152,15 +152,15 @@ require("lazy").setup({
 	-- coc.nvm and my lsp seems to be going against each other, so i won't use it
 
 	"mfussenegger/nvim-lint",
-	{
-
-		"kosayoda/nvim-lightbulb",
-		event = "LspAttach",
-		opts = {
-			sign = { enabled = false },
-			virtual_text = { enabled = false },
-		},
-	},
+	-- {
+	--
+	-- 	"kosayoda/nvim-lightbulb",
+	-- 	event = "LspAttach",
+	-- 	opts = {
+	-- 		sign = { enabled = false },
+	-- 		virtual_text = { enabled = false },
+	-- 	},
+	-- },
 
 	-- linting nicer message on multi lines
 	-- {

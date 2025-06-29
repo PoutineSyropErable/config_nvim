@@ -55,6 +55,8 @@ vim.diagnostic.config({
 	severity_sort = true,
 })
 
+-- vim.diagnostic.config({ virtual_text = false })
+
 _G.MyRootDir = nil -- Global variable to hold the root directory
 
 ---------------------------------------- ASM -------------------------------------

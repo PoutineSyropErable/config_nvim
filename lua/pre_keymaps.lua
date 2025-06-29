@@ -21,8 +21,8 @@ keymap.set("i", "JL", "<Esc>", opts("Exit Insert Mode"))
 keymap.set("v", "jl", "<Esc>", opts("Exit Visual Mode"))
 keymap.set("v", "JL", "<Esc>", opts("Exit Visual Mode"))
 
--- Map Enter in normal mode to add a new line
-keymap.set("n", "<CR>", "o<Esc>", opts("Open a new line"))
+-- Map Enter in normal mode to add a new line (This breaks enter on a lot of things)
+-- keymap.set("n", "<CR>", "o<Esc>", opts("Open a new line"))
 
 ---------------------------------------------------------REGULAR NAVIGATION
 ---------------------- remap of movement keys and insert, add start/end of line support
@@ -199,7 +199,7 @@ function RunCurrentFile()
 		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
-	 _G.print_custom("File type not supported for running with F4")
+		_G.print_custom("File type not supported for running with F4")
 	end
 end
 
@@ -226,7 +226,7 @@ local function run_do_all()
 	--"proj_root = " .. proj_root)
 
 	local all_cmd = "cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
- _G.print_custom("all cmd = " .. all_cmd, vim.log.levels.INFO)
+	_G.print_custom("all cmd = " .. all_cmd, vim.log.levels.INFO)
 
 	local output = vim.fn.system(all_cmd)
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
@@ -254,16 +254,16 @@ keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 
 local toggle_invisible_char = function()
 	vim.opt.list = not vim.opt.list:get()
- _G.print_custom("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
+	_G.print_custom("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
 end
 
 local toggle_linting = function()
 	if vim.g.linting_enabled then
 		vim.diagnostic.enable()
-	 _G.print_custom("🔍 Linting Enabled")
+		_G.print_custom("🔍 Linting Enabled")
 	else
 		vim.diagnostic.enable(false)
-	 _G.print_custom("🚫 Linting Disabled")
+		_G.print_custom("🚫 Linting Disabled")
 	end
 	vim.g.linting_enabled = not vim.g.linting_enabled
 end
@@ -278,7 +278,7 @@ keymap.set("n", "<leader>.c", ":AnsiEsc<CR>", opts("Toggle ANSI escape highlight
 keymap.set("n", "<leader>.h", ":lua require('nvim-highlight-colors').toggle()<CR>", opts("Toggle ANSI color parsing"))
 
 keymap.set("n", "<leader>.i", toggle_invisible_char, opts("Toggle invisible characters"))
-keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint"))
+keymap.set("n", "<leader>.l", toggle_linting, opts("Toggle Lint and diagnostic"))
 
 local function get_tab_name(tabnr)
 	local ok, name = pcall(vim.api.nvim_tabpage_get_var, tabnr, "name")
@@ -288,7 +288,7 @@ end
 local function get_current_tab_name()
 	local tabnr = vim.api.nvim_get_current_tabpage()
 	local tab_name = get_tab_name(tabnr)
- _G.print_custom("Current Tab Name: " .. tab_name)
+	_G.print_custom("Current Tab Name: " .. tab_name)
 end
 
 keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
