@@ -603,6 +603,19 @@ keymap.set("n", "ge", vim.lsp.buf.incoming_calls, opts("Incoming calls (lsp buff
 keymap.set("n", "gy", vim.lsp.buf.outgoing_calls, opts("Outcoming calls (lsp buff)"))
 keymap.set("n", "gw", function() builtin.live_grep({ default_text = vim.fn.expand("<cword>") }) end, opts("Live grep current word"))
 
+vim.keymap.set(
+	"n",
+	"gl",
+	function()
+		vim.diagnostic.open_float({
+			border = "rounded",
+			max_width = 120,
+			header = "Diagnostics:",
+			focusable = true,
+		})
+	end
+)
+
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "java",
 	callback = function() vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Go to definition (No telescope)")) end,

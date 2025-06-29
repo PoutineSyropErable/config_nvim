@@ -269,7 +269,7 @@ require("lazy").setup({
 		event = "LspAttach",
 		opts = {
 			sign = { enabled = false },
-			virtual_text = { enabled = true },
+			virtual_text = { enabled = false },
 		},
 	},
 	"mfussenegger/nvim-lint",
@@ -277,6 +277,7 @@ require("lazy").setup({
 	-- linting nicer message on multi lines
 	-- {
 	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+	-- 	-- "ErichDonGubler/lsp_lines",
 	-- 	config = function()
 	-- 		require("lsp_lines").setup()
 	-- 		vim.diagnostic.config({

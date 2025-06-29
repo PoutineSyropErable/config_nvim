@@ -16,52 +16,40 @@ require("mason-tool-installer").setup({
 	},
 })
 
-require("lint").linters_by_ft = {
-	python = { "pylint" }, -- Primary linter
-	c = { "clangtidy" },
-	cpp = { "clangtidy" },
-}
-
 require("mason-lspconfig").setup({
 	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
 	automatic_installation = true,
 	automatic_enable = false,
+	-- automatic enable will double these lsps
 })
 
 local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+require("lint").linters_by_ft = {
+	python = { "pylint" }, -- Primary linter
+	-- clangtidy is already a flag from clangd
+}
+
 -- Run pylint on save
 vim.api.nvim_create_autocmd({ "BufWritePost" }, {
 	callback = function() require("lint").try_lint() end,
 })
 
--- vim.diagnostic.config({
--- 	virtual_text = {
--- 		spacing = 4,
--- 		prefix = "■", -- or "■", or "" for no symbol
--- 	},
--- 	signs = true,
--- 	underline = true,
--- 	update_in_insert = false,
--- 	severity_sort = true,
--- })
+vim.diagnostic.config({
+	virtual_text = {
+		spacing = 4,
+		prefix = "■", -- or "■", or "" for no symbol
+	},
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+})
 
 _G.MyRootDir = nil -- Global variable to hold the root directory
-
--- "chktex" installation guide -- Linter for LaTeX
--- Get chktex by compiling it, figure it out lol.
--- (http://git.savannah.nongnu.org/cgit/chktex.git)
--- download, extract, cd
--- /autogen.sh
---./configure --prefix=/usr/local^J
---make -j$(nproc)^J
---sudo make install^J
---echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
---echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
--- chatgpt to I.T./Debug/Make it work
 
 ---------------------------------------- ASM -------------------------------------
 lspconfig.asm_lsp.setup({
@@ -166,6 +154,7 @@ lspconfig.clangd.setup({
 		"--offset-encoding=utf-8",
 		"--background-index", -- Enable background indexing
 		"--clang-tidy", -- Enable clang-tidy diagnostics
+		"--clang-tidy-checks=modernize-*,bugprone-*", -- Optional: Focus checks
 		"--completion-style=bundled", -- Style for autocompletion
 		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
@@ -432,3 +421,15 @@ vim.g.vimtex_compiler_latexmk = {
 -- 	 _G.print_custom("❌ No LSP servers attached to this buffer")
 -- 	end
 -- end, {})
+
+-- "chktex" installation guide -- Linter for LaTeX
+-- Get chktex by compiling it, figure it out lol.
+-- (http://git.savannah.nongnu.org/cgit/chktex.git)
+-- download, extract, cd
+-- /autogen.sh
+--./configure --prefix=/usr/local^J
+--make -j$(nproc)^J
+--sudo make install^J
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
+-- chatgpt to I.T./Debug/Make it work
