@@ -17,7 +17,7 @@ require("mason-tool-installer").setup({
 })
 
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
+	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "jdtls" },
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
 	automatic_installation = true,
 	automatic_enable = false,
@@ -154,8 +154,8 @@ lspconfig.clangd.setup({
 		"--offset-encoding=utf-8",
 		"--background-index", -- Enable background indexing
 		"--clang-tidy", -- Enable clang-tidy diagnostics
-		"--clang-tidy-checks=modernize-*,bugprone-*", -- Optional: Focus checks
-		"--completion-style=bundled", -- Style for autocompletion
+		"--completion-style=disabled", -- Shows full signatures
+		"--function-arg-placeholders=0", -- Displays parameter names
 		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",

@@ -82,6 +82,7 @@ require("lazy").setup({
 		},
 		config = true,
 	},
+	{ "tiagovla/scope.nvim", config = true },
 
 	"chrisbra/csv.vim",
 	"nvim-lualine/lualine.nvim",
@@ -240,13 +241,13 @@ require("lazy").setup({
 	"szw/vim-maximizer",
 	"folke/which-key.nvim",
 	"stevearc/oil.nvim",
-	-- completion
+
+	--------------- completion
 	"hrsh7th/nvim-cmp",
 	"hrsh7th/cmp-nvim-lsp",
 	"L3MON4D3/LuaSnip",
 	"rafamadriz/friendly-snippets",
 	"hrsh7th/cmp-buffer",
-	{ "tiagovla/scope.nvim", config = true },
 	"hrsh7th/cmp-path",
 	"hrsh7th/cmp-cmdline",
 	"saadparwaiz1/cmp_luasnip",
