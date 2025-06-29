@@ -386,6 +386,7 @@ require("lazy").setup({
 	-- ^^ For file search
 	"vim-test/vim-test",
 
+	"MunifTanjim/nui.nvim",
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
