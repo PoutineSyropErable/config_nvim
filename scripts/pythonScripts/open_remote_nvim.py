@@ -36,7 +36,7 @@ def open_nvim(files: List[str], remote_session_name: str = DEFAULT_RSM):
     ]
 
     # Start Neovim (blocking, but it will allow other threads to run)
-    print(f"Neovim started with socket: /tmp/nvim_session_socket_{remote_session_name}")
+    print(f"Neovim started with socket: {socket}")
 
     # Run Neovim (non-blocking)
 

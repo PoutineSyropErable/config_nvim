@@ -9,7 +9,6 @@ require("core.plugin_config.telescope")
 require("core.plugin_config.neoclip")
 require("core.plugin_config.terminal_file_manager")
 
-require("core.plugin_config.mason")
 if PRE_CONFIG_FRANCK.useNvimJava then
 	require("core.plugin_config.nvim-java")
 end

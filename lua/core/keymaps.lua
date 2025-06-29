@@ -575,6 +575,7 @@ end, opts("hover and switch"))
 -- LSP Actions
 keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
 keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
+keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, { desc = "Manually trigger linting" })
 
 ----- Pathfinder goto files
 local pathfinder = require("pathfinder")
@@ -614,7 +615,7 @@ keymap.set("n", "<leader>Ls", safe_lsp_call("signature_help"), opts("Show functi
 -- Workspace Folder Management
 keymap.set("n", "<leader>LA", safe_lsp_call("add_workspace_folder"), opts("Add workspace folder"))
 keymap.set("n", "<leader>LR", safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
-keymap.set("n", "<leader>Ll", function()
+keymap.set("n", "<leader>LL", function()
 	if vim.lsp.buf.list_workspace_folders then
 		_G.print_custom(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 	else
@@ -1090,22 +1091,22 @@ keymap.set("n", "<leader>dTm", function()
 end)
 
 ----------------------------------------------------- Terminal (PICK ONE) ---------------------------
--------- Float Term: --------
-keymap.set(
-	"n",
-	"<leader>tm",
-	"<cmd>:FloatermNew --height=0.8 --width=0.9 --wintype=float --name=floaterm1 --position=center --autoclose=2<CR>",
-	{ desc = "Open FloatTerm" }
-)
 
-keymap.set("n", "<leader>tp", "<cmd>FloatermPrev<CR>")
-keymap.set("n", "<leader>tn", "<cmd>FloatermNext<CR>")
-
+---------------------------------------------- Terminal File Manager -----------------------------------
+-- tfm_keymaps.lua
+local tfm = require("tfm")
+vim.keymap.set("n", "<leader>rr", tfm.open, opts("TFM"))
+vim.keymap.set("n", "<leader>rv", function() tfm.open(nil, tfm.OPEN_MODE.split) end, opts("TFM - horizontal split"))
+vim.keymap.set("n", "<leader>rh", function() tfm.open(nil, tfm.OPEN_MODE.vsplit) end, opts("TFM - vertical split"))
+vim.keymap.set("n", "<leader>rt", function() tfm.open(nil, tfm.OPEN_MODE.tabedit) end, opts("TFM - new tab"))
 -------- ToggleTerm: ---------
+
 local Terminal = require("toggleterm.terminal").Terminal
 
 -- Toggle floating terminal
 keymap.set("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", opts("Floating Terminal"))
+-- <C-t>
+-- "$HOME/.config/nvim/lua/core/plugin_config/toggleterm.lua"
 
 -- Toggle horizontal split terminal
 keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", opts("Horizontal Terminal"))
@@ -1113,60 +1114,60 @@ keymap.set("n", "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", opts("
 -- Toggle vertical split terminal
 keymap.set("n", "<leader>th", "<cmd>ToggleTerm direction=vertical<CR>", opts("Vertical Terminal"))
 
-local bottom_right_float = Terminal:new({
+local float_term = Terminal:new({
 	direction = "float",
-	float_opts = {
-		border = "rounded", -- Rounded border for aesthetics
-		width = math.floor(vim.o.columns * 0.45), -- 40% of screen width
-		height = math.floor(vim.o.lines * 0.45), -- 40% of screen height
-		row = math.floor(vim.o.lines * 0.55), -- Start at 60% down (bottom)
-		col = math.floor(vim.o.columns * 0.55), -- Start at 60% across (right)
-	},
 	hidden = true,
-})
-
-local bottom_left_float = Terminal:new({
-	direction = "float",
-	float_opts = {
-		border = "rounded", -- Rounded border for aesthetics
-		width = math.floor(vim.o.columns * 0.45), -- 40% of screen width
-		height = math.floor(vim.o.lines * 0.45), -- 40% of screen height
-		row = math.floor(vim.o.lines * 0.55), -- Start at 60% down (bottom)
-		col = math.floor(vim.o.columns * 0), -- Start at 60% across (right)
-	},
-	hidden = true,
-})
-
-local top_right_float = Terminal:new({
-	direction = "float",
 	float_opts = {
 		border = "rounded",
 		width = math.floor(vim.o.columns * 0.45),
 		height = math.floor(vim.o.lines * 0.45),
-		row = 0, -- Top of the screen
-		col = math.floor(vim.o.columns * 0.55), -- Right side
+		row = 0,
+		col = 0,
 	},
-	hidden = true,
 })
 
-local top_left_float = Terminal:new({
-	direction = "float",
-	float_opts = {
+local function reposition_terminal(term, opts)
+	term.float_opts = vim.tbl_deep_extend("force", term.float_opts or {}, opts)
+	if term:is_open() then
+		term:close()
+		vim.defer_fn(function() term:open() end, 10) -- small delay to ensure reopen
+	else
+		term:open()
+	end
+end
+
+local function move_float_terminal(position)
+	local cols = vim.o.columns
+	local lines = vim.o.lines
+
+	local positions = {
+		topleft = { row = 0, col = 0 },
+		topright = { row = 0, col = math.floor(cols * 0.55) },
+		bottomleft = { row = math.floor(lines * 0.55), col = 0 },
+		bottomright = { row = math.floor(lines * 0.55), col = math.floor(cols * 0.55) },
+	}
+
+	local pos = positions[position]
+	if not pos then
+		vim.notify("Invalid terminal position: " .. position, vim.log.levels.ERROR)
+		return
+	end
+
+	reposition_terminal(float_term, {
+		width = math.floor(cols * 0.45),
+		height = math.floor(lines * 0.45),
 		border = "rounded",
-		width = math.floor(vim.o.columns * 0.45),
-		height = math.floor(vim.o.lines * 0.45),
-		row = 0, -- Top of the screen
-		col = 0, -- Left side
-	},
-	hidden = true,
-})
+		row = pos.row,
+		col = pos.col,
+	})
+end
 
-keymap.set("n", "<leader>tl", function() bottom_right_float:toggle() end, opts("Floating Bottom-Right Terminal"))
-keymap.set("n", "<leader>tj", function() bottom_left_float:toggle() end, opts("Floating Bottom-Left Terminal"))
-keymap.set("n", "<leader>to", function() top_right_float:toggle() end, opts("Floating Top-Right Terminal"))
-keymap.set("n", "<leader>tu", function() top_left_float:toggle() end, opts("Floating Top-Left Terminal"))
+vim.keymap.set("n", "<leader>tu", function() move_float_terminal("topleft") end, { desc = "Float Terminal Top Left" })
+vim.keymap.set("n", "<leader>to", function() move_float_terminal("topright") end, { desc = "Float Terminal Top Right" })
+vim.keymap.set("n", "<leader>tj", function() move_float_terminal("bottomleft") end, { desc = "Float Terminal Bottom Left" })
+vim.keymap.set("n", "<leader>tl", function() move_float_terminal("bottomright") end, { desc = "Float Terminal Bottom Right" })
 
-keymap.set("n", "<leader>tb", function() bottom_right_float:toggle() end, opts("Floating Bottom-Right Terminal"))
+vim.keymap.set("n", "<leader>tb", function() move_float_terminal("bottomright") end, { desc = "Float Terminal Bottom Right" })
 
 keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
 keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
@@ -1177,16 +1178,7 @@ vim.api.nvim_create_autocmd("TermOpen", {
 	callback = function() vim.keymap.set("n", "QQ", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
 })
 
----------------------------------------------- Terminal File Manager -----------------------------------
--- tfm_keymaps.lua
-local tfm = require("tfm")
-vim.keymap.set("n", "<leader>rr", tfm.open, opts("TFM"))
-vim.keymap.set("n", "<leader>rv", function() tfm.open(nil, tfm.OPEN_MODE.split) end, opts("TFM - horizontal split"))
-vim.keymap.set("n", "<leader>rh", function() tfm.open(nil, tfm.OPEN_MODE.vsplit) end, opts("TFM - vertical split"))
-vim.keymap.set("n", "<leader>rt", function() tfm.open(nil, tfm.OPEN_MODE.tabedit) end, opts("TFM - new tab"))
-
 --------------------------------------Tmux
-
 -- Detect the OS
 local uname = vim.loop.os_uname()
 local is_windows = uname.sysname == "Windows_NT"

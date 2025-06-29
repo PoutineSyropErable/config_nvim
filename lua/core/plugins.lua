@@ -250,7 +250,29 @@ require("lazy").setup({
 	"hrsh7th/cmp-path",
 	"hrsh7th/cmp-cmdline",
 	"saadparwaiz1/cmp_luasnip",
-	-- "mfussenegger/nvim-lint",
+
+	{
+		"glepnir/lspsaga.nvim",
+		event = "LspAttach",
+		opts = {
+			code_action = {
+				keys = {
+					quit = "<ESC>",
+					exec = "<CR>",
+				},
+			},
+		},
+	},
+	{
+
+		"kosayoda/nvim-lightbulb",
+		event = "LspAttach",
+		opts = {
+			sign = { enabled = false },
+			virtual_text = { enabled = true },
+		},
+	},
+	"mfussenegger/nvim-lint",
 
 	-- linting nicer message on multi lines
 	-- {

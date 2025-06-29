@@ -1,60 +1,67 @@
+require("mason").setup()
+
+require("mason-tool-installer").setup({
+	ensure_installed = {
+		"black", -- Python Formatter
+		"isort", -- Import sorter
+		"pylint", -- Python Linter (keep this)
+		"debugpy", -- Python Debugger
+
+		"clang-format", -- C auto formatter
+
+		"texlab", -- Latex LSP
+		"latexindent", -- LaTex autoformatter
+
+		"prettier", -- json and other web
+	},
+})
+
+require("lint").linters_by_ft = {
+	python = { "pylint" }, -- Primary linter
+	c = { "clangtidy" },
+	cpp = { "clangtidy" },
+}
+
 require("mason-lspconfig").setup({
 	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
 	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
 	automatic_installation = true,
-	automatic_enable = true,
-})
-
-require("mason-tool-installer").setup({
-
-	ensure_installed = {
-		"black",
-		"debugpy",
-		"flake8",
-		"isort",
-		"mypy",
-		"pylint",
-		"ruff",
-
-		"prettier",
-		"clangd",
-		"clang-format",
-		-- "clang-tidy",
-
-		"texlab", -- lsp parser
-
-		-- "chktex", -- Linter for LaTeX
-		-- Get chktex by compiling it, figure it out lol.
-		-- (http://git.savannah.nongnu.org/cgit/chktex.git)
-		-- download, extract, cd
-		-- /autogen.sh
-		--./configure --prefix=/usr/local^J
-		--make -j$(nproc)^J
-		--sudo make install^J
-		--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
-		--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
-		-- chatgpt to I.T./Debug/Make it work
-
-		"latexindent", -- Formatter for LaTeX
-	},
+	automatic_enable = false,
 })
 
 local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
-_G.MyRootDir = nil -- Global variable to hold the root directory
-
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
-vim.diagnostic.config({
-	virtual_text = {
-		spacing = 4,
-		prefix = "■", -- or "■", or "" for no symbol
-	},
-	signs = true,
-	underline = true,
-	update_in_insert = false,
-	severity_sort = true,
+-- Run pylint on save
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+	callback = function() require("lint").try_lint() end,
 })
+
+-- vim.diagnostic.config({
+-- 	virtual_text = {
+-- 		spacing = 4,
+-- 		prefix = "■", -- or "■", or "" for no symbol
+-- 	},
+-- 	signs = true,
+-- 	underline = true,
+-- 	update_in_insert = false,
+-- 	severity_sort = true,
+-- })
+
+_G.MyRootDir = nil -- Global variable to hold the root directory
+
+-- "chktex" installation guide -- Linter for LaTeX
+-- Get chktex by compiling it, figure it out lol.
+-- (http://git.savannah.nongnu.org/cgit/chktex.git)
+-- download, extract, cd
+-- /autogen.sh
+--./configure --prefix=/usr/local^J
+--make -j$(nproc)^J
+--sudo make install^J
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
+-- chatgpt to I.T./Debug/Make it work
 
 ---------------------------------------- ASM -------------------------------------
 lspconfig.asm_lsp.setup({
@@ -218,10 +225,6 @@ lspconfig.rust_analyzer.setup({
 	on_attach = function(client, bufnr)
 		-- Keymaps specific to Rust LSP
 		_G.MyRootDir = client.config.root_dir
-		local opts = { buffer = bufnr }
-		-- vim.keymap.set("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-		-- vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-		-- vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
 	end,
 })
 
