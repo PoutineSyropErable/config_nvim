@@ -28,9 +28,8 @@ require("lazy").setup({
 			},
 		},
 	},
+
 	{ "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
-	-- "ellisonleao/gruvbox.nvim",
-	-- "dracula/vim",
 
 	{
 		"nvim-telescope/telescope.nvim",
@@ -62,12 +61,16 @@ require("lazy").setup({
 		config = function() end, -- No extra config needed
 	},
 	buffer_plugin,
-	-- {
-	-- 	"Shatur/neovim-session-manager",
-	-- 	dependencies = { "nvim-lua/plenary.nvim" },
-	-- },
 
 	"andymass/vim-matchup", -- better %
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		config = true,
+		-- use opts = {} for passing setup options
+		-- this is equivalent to setup({}) function
+		-- makes ( auto write ()
+	},
 	{
 		-- "gennaro-tedesco/nvim-possession",
 		"PoutineSyropErable/nvim-possession",
@@ -87,7 +90,70 @@ require("lazy").setup({
 	"chrisbra/csv.vim",
 	"nvim-lualine/lualine.nvim",
 
-	-- DAP core and UI setup
+	--------------- completion
+	"hrsh7th/nvim-cmp",
+	"hrsh7th/cmp-nvim-lsp",
+	"L3MON4D3/LuaSnip",
+	"rafamadriz/friendly-snippets",
+	"hrsh7th/cmp-buffer",
+	"hrsh7th/cmp-path",
+	"hrsh7th/cmp-cmdline",
+	"saadparwaiz1/cmp_luasnip",
+
+	----------------- LSP
+
+	-- "jayp0521/mason-null-ls.nvim",
+	"williamboman/mason.nvim",
+	"jay-babu/mason-nvim-dap.nvim",
+	"williamboman/mason-lspconfig.nvim",
+	"WhoIsSethDaniel/mason-tool-installer.nvim",
+	"neovim/nvim-lspconfig",
+	"stevearc/conform.nvim", -- autoformatting
+
+	{
+		"glepnir/lspsaga.nvim",
+		event = "LspAttach",
+		opts = {
+			code_action = {
+				keys = {
+					quit = "<ESC>",
+					exec = "<CR>",
+				},
+			},
+		},
+	},
+
+	"bash-lsp/bash-language-server",
+	"psf/black",
+	"clangd/clangd",
+	"Civitasv/cmake-tools.nvim",
+	"elkowar/yuck.vim", -- eww filetype support
+	-- "gpanders/nvim-parinfer",
+	-- coc.nvm and my lsp seems to be going against each other, so i won't use it
+
+	"mfussenegger/nvim-lint",
+	{
+
+		"kosayoda/nvim-lightbulb",
+		event = "LspAttach",
+		opts = {
+			sign = { enabled = false },
+			virtual_text = { enabled = false },
+		},
+	},
+
+	-- linting nicer message on multi lines
+	-- {
+	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+	-- 	-- "ErichDonGubler/lsp_lines",
+	-- 	config = function()
+	-- 		require("lsp_lines").setup()
+	-- 		vim.diagnostic.config({
+	-- 			virtual_text = false,
+	-- 			virtual_lines = true,
+	-- 		})
+	-- 	end,
+	-- },
 	{
 		"mfussenegger/nvim-dap", -- Main nvim-dap plugin
 		dependencies = {
@@ -108,16 +174,27 @@ require("lazy").setup({
 		ft = { "python" }, -- Only load when editing Python files
 	},
 
+	--- Neovim + Lua LSP support
+	{
+		"folke/lazydev.nvim",
+		ft = "lua", -- only load on lua files
+		opts = {
+			library = {
+				-- See the configuration section for more details
+				-- Load luvit types when the `vim.uv` word is found
+				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+			},
+		},
+	},
+
+	-- DAP core and UI setup
+
 	------- Java Support -----
 	PRE_CONFIG_FRANCK.jdtls,
 	PRE_CONFIG_FRANCK.java,
 	-- BASH DAP support?
-	"bash-lsp/bash-language-server",
-
-	"psf/black",
 
 	"preservim/vimux",
-	"norcalli/nvim-colorizer.lua",
 	{
 		"powerman/vim-plugin-AnsiEsc",
 		config = function()
@@ -127,16 +204,11 @@ require("lazy").setup({
 		end,
 	},
 
+	"norcalli/nvim-colorizer.lua",
+	-- "ellisonleao/gruvbox.nvim",
+	-- "dracula/vim",
 	"brenoprata10/nvim-highlight-colors",
-
 	"uga-rosa/ccc.nvim", -- color picker
-	{
-		"windwp/nvim-autopairs",
-		event = "InsertEnter",
-		config = true,
-		-- use opts = {} for passing setup options
-		-- this is equivalent to setup({}) function
-	},
 
 	-------------------------------- 	START OF TERMINAL ----------------------------
 
@@ -151,13 +223,13 @@ require("lazy").setup({
 	{ "akinsho/toggleterm.nvim", version = "*", config = true },
 
 	-------------------------------- 	END OF TERMINAL ----------------------------
-	-- {
-	-- 	"lukas-reineke/indent-blankline.nvim",
-	-- 	main = "ibl",
-	-- 	---@module "ibl"
-	-- 	---@type ibl.config
-	-- 	opts = {},
-	-- },
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		---@module "ibl"
+		---@type ibl.config
+		opts = {},
+	},
 
 	{
 		"ThePrimeagen/harpoon",
@@ -180,7 +252,6 @@ require("lazy").setup({
 				end,
 			}
 		or nil, -- Use `nil` if the condition is false to skip loading
-	"szw/vim-maximizer",
 
 	{
 		"jiaoshijie/undotree",
@@ -242,85 +313,6 @@ require("lazy").setup({
 	"folke/which-key.nvim",
 	"stevearc/oil.nvim",
 
-	--------------- completion
-	"hrsh7th/nvim-cmp",
-	"hrsh7th/cmp-nvim-lsp",
-	"L3MON4D3/LuaSnip",
-	"rafamadriz/friendly-snippets",
-	"hrsh7th/cmp-buffer",
-	"hrsh7th/cmp-path",
-	"hrsh7th/cmp-cmdline",
-	"saadparwaiz1/cmp_luasnip",
-
-	{
-		"glepnir/lspsaga.nvim",
-		event = "LspAttach",
-		opts = {
-			code_action = {
-				keys = {
-					quit = "<ESC>",
-					exec = "<CR>",
-				},
-			},
-		},
-	},
-	{
-
-		"kosayoda/nvim-lightbulb",
-		event = "LspAttach",
-		opts = {
-			sign = { enabled = false },
-			virtual_text = { enabled = false },
-		},
-	},
-	"mfussenegger/nvim-lint",
-
-	-- linting nicer message on multi lines
-	-- {
-	-- 	"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
-	-- 	-- "ErichDonGubler/lsp_lines",
-	-- 	config = function()
-	-- 		require("lsp_lines").setup()
-	-- 		vim.diagnostic.config({
-	-- 			virtual_text = false,
-	-- 			virtual_lines = true,
-	-- 		})
-	-- 	end,
-	-- },
-
-	"clangd/clangd",
-	"Civitasv/cmake-tools.nvim",
-	"elkowar/yuck.vim", -- eww filetype support
-	-- "gpanders/nvim-parinfer",
-	-- coc.nvm and my lsp seems to be going against each other, so i won't use it
-
-	-- "jayp0521/mason-null-ls.nvim",
-	{
-		"williamboman/mason.nvim",
-		opts = {
-			ensure_installed = {
-				"pyright",
-				"clangd",
-			},
-		},
-	},
-	-- Lazy.nvim
-	{
-		"folke/lazydev.nvim",
-		ft = "lua", -- only load on lua files
-		opts = {
-			library = {
-				-- See the configuration section for more details
-				-- Load luvit types when the `vim.uv` word is found
-				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
-			},
-		},
-	},
-	"williamboman/mason-lspconfig.nvim",
-	"WhoIsSethDaniel/mason-tool-installer.nvim",
-
-	"neovim/nvim-lspconfig",
-
 	-- ✍️ Markdown Support
 	{
 		"OXY2DEV/markview.nvim",
@@ -357,7 +349,6 @@ require("lazy").setup({
 	"abecodes/tabout.nvim",
 	"echasnovski/mini.surround",
 	"Wansmer/treesj",
-	"stevearc/conform.nvim",
 
 	{
 		"AckslD/nvim-neoclip.lua",
@@ -386,7 +377,6 @@ require("lazy").setup({
 	-- ^^ For file search
 	"vim-test/vim-test",
 
-	-- lazy.nvim
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",

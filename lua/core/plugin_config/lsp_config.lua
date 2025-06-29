@@ -28,6 +28,12 @@ local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
 lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
 
+local capabilities = vim.tbl_deep_extend(
+	"force",
+	require("lspconfig").clangd.document_config.default_config.capabilities,
+	require("cmp_nvim_lsp").default_capabilities()
+)
+
 require("lint").linters_by_ft = {
 	python = { "pylint" }, -- Primary linter
 	-- clangtidy is already a flag from clangd
@@ -151,18 +157,21 @@ lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
 		"clangd",
-		"--offset-encoding=utf-8",
+		-- "--offset-encoding=utf-8",
 		"--background-index", -- Enable background indexing
 		"--clang-tidy", -- Enable clang-tidy diagnostics
-		"--completion-style=disabled", -- Shows full signatures
-		"--function-arg-placeholders=0", -- Displays parameter names
+		"--completion-style=detailed", -- Shows full signatures
+		"--function-arg-placeholders", -- Displays parameter names
 		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
 		"--query-driver=/opt/rocm/llvm/bin/*", -- Critical for ROCm OpenCL
+		"--fallback-style=llvm",
 	},
 	init_options = {
 		clangdFileStatus = true,
+		usePlaceholders = true,
+		completeUnimported = true,
 		fallbackFlags = {
 			"-I/opt/rocm/opencl/include", -- ROCm OpenCL headers
 			"-I/usr/include/clc", -- Generic OpenCL headers

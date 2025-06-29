@@ -1,6 +1,10 @@
 local dap = require("dap")
 -- dap.set_log_level("DEBUG")
 
+require("mason-nvim-dap").setup({
+	ensure_installed = { "codelldb" },
+})
+
 local function debug_log(func_name, ...)
 	local args = table.concat({ ... }, ", ")
 	vim.notify("[DEBUG] Called: " .. func_name .. " with args: " .. args)
@@ -330,7 +334,7 @@ local function custom_make()
 		if data and show_build_output then
 			for _, line in ipairs(data) do
 				if line ~= "" then
-				 _G.print_custom("[BUILD OUTPUT] " .. line)
+					_G.print_custom("[BUILD OUTPUT] " .. line)
 				end
 			end
 		end
