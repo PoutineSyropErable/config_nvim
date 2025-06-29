@@ -110,16 +110,25 @@ require("lazy").setup({
 	"neovim/nvim-lspconfig",
 	"stevearc/conform.nvim", -- autoformatting
 
+	-- {
+	-- 	"glepnir/lspsaga.nvim",
+	-- 	event = "LspAttach",
+	-- 	opts = {
+	-- 		code_action = {
+	-- 			keys = {
+	-- 				quit = "<ESC>",
+	-- 				exec = "<CR>",
+	-- 			},
+	-- 		},
+	-- 	},
+	-- },
+
 	{
-		"glepnir/lspsaga.nvim",
-		event = "LspAttach",
-		opts = {
-			code_action = {
-				keys = {
-					quit = "<ESC>",
-					exec = "<CR>",
-				},
-			},
+		"nvimdev/lspsaga.nvim",
+		config = function() require("lspsaga").setup({}) end,
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter", -- optional
+			"nvim-tree/nvim-web-devicons", -- optional
 		},
 	},
 

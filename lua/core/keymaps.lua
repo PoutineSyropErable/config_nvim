@@ -576,6 +576,9 @@ end, opts("hover and switch"))
 keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol in all occurrences"))
 keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
 keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, { desc = "Manually trigger linting" })
+require("lspsaga")
+keymap.set("n", "<Leader>Lo", "<cmd>")
+keymap.set("n", "<leader>Lh", "<cmd>Lspsaga hover_doc<CR>", opts("Hover Information"))
 
 ----- Pathfinder goto files
 local pathfinder = require("pathfinder")
