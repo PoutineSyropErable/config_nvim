@@ -79,32 +79,30 @@ lspconfig.bashls.setup({
 
 --------------------------------------- LUA ---------------------------------------
 -- Use lazydev
-if false then
-	lspconfig.lua_ls.setup({
-		settings = {
-			Lua = {
-				telemetry = { enable = false }, -- Disable telemetry
-				diagnostics = {
-					globals = { "vim" },
-				},
-				workspace = {
-					library = {
-						[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-						[vim.fn.stdpath("config") .. "/lua"] = true,
-					},
+lspconfig.lua_ls.setup({
+	settings = {
+		Lua = {
+			telemetry = { enable = false }, -- Disable telemetry
+			diagnostics = {
+				globals = { "vim" },
+			},
+			workspace = {
+				library = {
+					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+					[vim.fn.stdpath("config") .. "/lua"] = true,
 				},
 			},
 		},
+	},
 
-		on_attach = function(client, bufnr)
-			-- This function will be called when the LSP is fully initialized
-			general_utils_franck.send_notification("please work")
-			_G.print_custom("LSP " .. client.name .. " is attached!")
-			_G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
-			-- You can perform additional actions here, for example, setting some custom configurations
-		end,
-	})
-end
+	on_attach = function(client, bufnr)
+		-- This function will be called when the LSP is fully initialized
+		general_utils_franck.send_notification("please work")
+		_G.print_custom("LSP " .. client.name .. " is attached!")
+		_G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
+		-- You can perform additional actions here, for example, setting some custom configurations
+	end,
+})
 --------------------------------------- PYTHON ---------------------------------------
 lspconfig.pyright.setup({
 
