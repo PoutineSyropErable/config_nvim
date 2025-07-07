@@ -93,8 +93,11 @@ keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer"))
 keymap.set("n", "<leader>bj", "<Cmd>BufferPrevious<CR>", opts("Previous buffer"))
 keymap.set("n", "<leader>bk", "<Cmd>BufferNext<CR>", opts("Next buffer"))
 
-local has_bufferline, _ = pcall(require, "bufferline")
-local has_barbar, _ = pcall(require, "barbar")
+-- local has_bufferline, _ = pcall(require, "bufferline")
+-- local has_barbar, _ = pcall(require, "barbar")
+
+local has_bufferline = PRE_CONFIG_FRANCK.use_bufferline
+local has_barbar = not has_bufferline
 
 local function goto_buffer(_) end
 if has_bufferline then
@@ -574,7 +577,8 @@ end, opts("hover and switch"))
 
 -- LSP Actions
 keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, { desc = "Manually trigger linting" })
-keymap.set("n", "<leader>Lr", "<cmd>Lspsaga rename<CR>", opts("Rename symbol in all occurrences"))
+-- keymap.set("n", "<leader>Lr", "<cmd>Lspsaga rename<CR>", opts("Rename symbol in all occurrences"))
+keymap.set("n", "<leader>Lr", safe_lsp_call("rename"), opts("Rename symbol"))
 keymap.set("n", "<leader>Lc", safe_lsp_call("code_action"), opts("Show available code actions"))
 keymap.set("n", "<leader>LC", "<cmd>Lspsaga code_action<CR>", opts("Show available code actions"))
 keymap.set("n", "$", "<cmd>Lspsaga hover_doc<CR>", opts("Hover Information"))
@@ -1186,7 +1190,7 @@ vim.keymap.set("n", "<leader>tl", function() move_float_terminal("bottomright") 
 
 vim.keymap.set("n", "<leader>tb", function() move_float_terminal("bottomright") end, { desc = "Float Terminal Bottom Right" })
 
-keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
+-- keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
 keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
 keymap.set("t", "QQ", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
 
@@ -1346,7 +1350,23 @@ keymap.set("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, 
 keymap.set("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true, desc = "Replace with confirmation" })
 keymap.set("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
 
+vim.api.nvim_create_autocmd("User", {
+	pattern = "LazyDone",
+	callback = function()
+		vim.keymap.del("n", "<Leader>rwp")
+		vim.keymap.del("n", "<Plug>RestoreWinPosn")
+	end,
+})
+
 keymap.set("n", "<C-j>", ":lua require('spectre').open()<CR>", opts("search and replace functions"))
+vim.keymap.set("n", "<leader>rw", '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', {
+	desc = "Search current word",
+})
+vim.keymap.set("v", "<leader>rw", '<esc><cmd>lua require("spectre").open_visual()<CR>', {
+	desc = "Search current word",
+})
+keymap.set("n", "<leader>W", ":lua require('spectre').open()<CR>", opts("search and replace functions"))
+-- leader>W for word operation.
 vim.keymap.set("n", "<leader>nh", function() require("mini.notify").show_history() end, { desc = "Show mini.notify history" })
 
 -- Lua function for interactive replacement
@@ -1549,7 +1569,7 @@ function _G.debug_utils.write_function_numpy()
 			local indent = get_indent()
 			local debug_code = string.format(
 				[[%sprint(f'np.shape(%s) = {np.shape(%s)}')
-%sprint(f'%s = {%s}')]],
+%sprint(f'%s = \n{%s}\n')]],
 				indent,
 				input,
 				input,
@@ -1582,12 +1602,23 @@ function _G.debug_utils.write_function_np_newline()
 	end)
 end
 
--- Print variable value on a new line for better readability.
+-- Insert a multi-line Python f-string print: print(f'var = \n{var}\n')
 function _G.debug_utils.write_function_newline()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
-			vim.api.nvim_put({ indent .. string.format("print(f'%s = \n{%s}\n')", input, input) }, "l", true, true)
+			local print_statement = string.format("%sprint(f'%s = \\n{%s}\\n')", indent, input, input)
+			vim.api.nvim_put({ print_statement }, "l", true, true)
+		end
+	end)
+end
+
+function _G.debug_utils.write_function_newline()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local print_statement = string.format("%sprint(f'%s = \\n{%s}\\n')", indent, input, input)
+			vim.api.nvim_put({ print_statement }, "l", true, true)
 		end
 	end)
 end

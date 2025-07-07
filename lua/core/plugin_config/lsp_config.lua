@@ -35,7 +35,7 @@ local capabilities = vim.tbl_deep_extend(
 )
 
 require("lint").linters_by_ft = {
-	python = { "pylint" }, -- Primary linter
+	-- python = { "pylint" }, -- Primary linter
 	-- clangtidy is already a flag from clangd
 }
 
@@ -190,9 +190,8 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
 		_G.MyRootDir = client.config.root_dir
-		_G.print_custom("test")
-		general_utils_franck.send_notification("test")
-		-- _G.print_custom("Clangd root directory detected: " .. (root or "none"))
+		general_utils_franck.send_notification("attaching clangd")
+		_G.print_custom("Clangd root directory detected: " .. (root or "none"))
 	end,
 })
 

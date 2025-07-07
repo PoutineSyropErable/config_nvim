@@ -6,7 +6,6 @@ local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	{
 		"numToStr/Comment.nvim",
 		config = function() require("Comment").setup() end,
@@ -61,6 +60,7 @@ require("lazy").setup({
 		config = function() end, -- No extra config needed
 	},
 	buffer_plugin,
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 
 	"andymass/vim-matchup", -- better %
 	{
@@ -87,7 +87,7 @@ require("lazy").setup({
 	},
 	{ "tiagovla/scope.nvim", config = true },
 
-	"chrisbra/csv.vim",
+	-- "chrisbra/csv.vim",
 	"nvim-lualine/lualine.nvim",
 
 	--------------- completion
@@ -204,12 +204,26 @@ require("lazy").setup({
 	-- BASH DAP support?
 
 	"preservim/vimux",
+	-- {
+	-- 	"powerman/vim-plugin-AnsiEsc",
+	-- 	config = function()
+	-- 		vim.cmd([[
+	--            let g:AnsiEsc_Enabled = 1
+	--        ]])
+	-- 	end,
+	-- },
+
 	{
-		"powerman/vim-plugin-AnsiEsc",
+		"m00qek/baleia.nvim",
+		version = "*",
 		config = function()
-			vim.cmd([[
-            let g:AnsiEsc_Enabled = 1
-        ]])
+			vim.g.baleia = require("baleia").setup({})
+
+			-- Command to colorize the current buffer
+			vim.api.nvim_create_user_command("BaleiaColorize", function() vim.g.baleia.once(vim.api.nvim_get_current_buf()) end, { bang = true })
+
+			-- Command to show logs
+			vim.api.nvim_create_user_command("BaleiaLogs", vim.g.baleia.logger.show, { bang = true })
 		end,
 	},
 
@@ -434,6 +448,19 @@ require("lazy").setup({
 				},
 			},
 		},
+	},
+
+	{
+		"emmanueltouzery/decisive.nvim",
+		ft = { "csv" },
+		lazy = true,
+		config = function()
+			require("decisive").setup({})
+			vim.keymap.set("n", "<leader>csa", ":lua require('decisive').align_csv({})<cr>", { desc = "Align CSV", silent = true })
+			vim.keymap.set("n", "<leader>csc", ":lua require('decisive').align_csv_clear({})<cr>", { desc = "Align CSV clear", silent = true })
+			vim.keymap.set("n", "[c", ":lua require('decisive').align_csv_prev_col()<cr>", { desc = "Align CSV prev col", silent = true })
+			vim.keymap.set("n", "]c", ":lua require('decisive').align_csv_next_col()<cr>", { desc = "Align CSV next col", silent = true })
+		end,
 	},
 
 	--

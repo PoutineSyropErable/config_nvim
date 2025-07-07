@@ -45,12 +45,16 @@ require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
 require("core.plugin_config.lualine")
-require("core.plugin_config.bufferline")
--- require("core.plugin_config.barbar")
+if _G.PRE_CONFIG_FRANCK.use_bufferline then
+	require("core.plugin_config.bufferline")
+else
+	require("core.plugin_config.barbar")
+end
 
 require("core.plugin_config.nvim-possession")
 require("core.plugin_config.nvim-ufo")
 require("core.plugin_config.color_picker_ccc")
+require("core.plugin_config.spectre")
 
 ------ ##### DEACTIVATED ##### -------
 
