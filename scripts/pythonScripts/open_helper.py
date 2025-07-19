@@ -7,7 +7,7 @@ from typing import List, Callable
 from time import sleep
 
 
-from helper import StdPrinter, clean_output
+from helper import StdPrinter, clean_output, INFORM_MESSAGE
 
 
 def attach_lsp_to_all_buffers(socket, printNotQueue=False, output_queue: Queue[str] = Queue()) -> None:
@@ -20,7 +20,8 @@ def attach_lsp_to_all_buffers(socket, printNotQueue=False, output_queue: Queue[s
         else:
             output_queue.put(message)
 
-    printf(f"Attaching all LSPs to buffers in session with socket: {socket}")
+    if INFORM_MESSAGE:
+        printf(f"Attaching all LSPs to buffers in session with socket: {socket}")
 
     command = [
         "nvim",
@@ -37,7 +38,8 @@ def attach_lsp_to_all_buffers(socket, printNotQueue=False, output_queue: Queue[s
 
         # Check the process return code
         if result.returncode == 0:
-            printf(f"Successfully attached all LSPs to buffers with socket: {socket}")
+            if INFORM_MESSAGE:
+                printf(f"Successfully attached all LSPs to buffers with socket: {socket}")
         else:
             printf(f"Error running Neovim: {result.returncode}")
 

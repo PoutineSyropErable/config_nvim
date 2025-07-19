@@ -5,6 +5,9 @@ import re
 from send_notification import send_notification, write_to_file
 
 
+INFORM_MESSAGE = False
+
+
 def return_only_ascii(string):
     return "".join([x for x in string if x.isascii()])
 

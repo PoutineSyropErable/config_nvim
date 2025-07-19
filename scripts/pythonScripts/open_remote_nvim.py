@@ -12,7 +12,7 @@ from time import sleep
 
 from root_utils import FsDirPathStr, FsFilePathStr, get_session_file
 
-from send_to_nvim import DEFAULT_RSM, send_to_nvim
+from send_to_nvim import DEFAULT_RSM, HELP_IF_1, INFORM_MESSAGE, send_to_nvim
 from send_notification import send_notification
 from helper import StdPrinter, clean_output
 from open_helper import delay_action, attach_lsp_to_all_buffers
@@ -35,8 +35,9 @@ def open_nvim(files: List[str], remote_session_name: str = DEFAULT_RSM):
         f"autocmd VimEnter * NvimPossessionLoadOrCreate {remote_session_name}",
     ]
 
-    # Start Neovim (blocking, but it will allow other threads to run)
-    print(f"Neovim started with socket: {socket}")
+    if INFORM_MESSAGE:
+        # Start Neovim (blocking, but it will allow other threads to run)
+        print(f"Neovim started with socket: {socket}")
 
     # Run Neovim (non-blocking)
 
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # If no arguments are passed, print the usage
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 and HELP_IF_1:
         print("No files provided. Opening Neovim with default session... And showing help message in case")
         parser.print_help()
 

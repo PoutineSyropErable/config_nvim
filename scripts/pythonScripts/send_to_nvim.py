@@ -12,9 +12,10 @@ import re
 
 from send_notification import send_notification
 from root_utils import FsFilePathStr, FsDirPathStr
-from helper import StdPrinter, clean_output
+from helper import StdPrinter, clean_output, INFORM_MESSAGE
 
 DEFAULT_RSM = "default"  # Default session name
+HELP_IF_1 = False
 
 
 def send_to_nvim(
@@ -49,7 +50,8 @@ def send_to_nvim(
         for command, file in zip(commands, files):
             # Run the command to open the first file
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            printf(f"Sent {file} to Neovim instance at socket: {socket}")
+            if INFORM_MESSAGE:
+                printf(f"Sent {file} to Neovim instance at socket: {socket}")
 
             StdPrinter.print_result(printf, result)
 

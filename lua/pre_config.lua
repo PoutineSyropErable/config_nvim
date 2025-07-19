@@ -1,9 +1,9 @@
 -- Ensure PRE_CONFIG_FRANCK exists
 _G.PRE_CONFIG_FRANCK = {}
-PRE_CONFIG_FRANCK.use_bufferline = true
+PRE_CONFIG_FRANCK.use_bufferline = false
 
 -- Java
-PRE_CONFIG_FRANCK.useJavaLspConfig = true
+PRE_CONFIG_FRANCK.useJavaLspConfig = false
 PRE_CONFIG_FRANCK.useMyJavaDap = true
 PRE_CONFIG_FRANCK.useNvimJdtls = false
 PRE_CONFIG_FRANCK.useNvimJava = false
@@ -78,7 +78,7 @@ _G.general_utils_franck.find_project_root = function(debug)
 
 	local root = vim.trim(result.stdout or "")
 	local code = result.code or 1
-	_G.print_custom("root =" .. vim.inspect(root))
+	_G.print_custom("fpr: root =" .. vim.inspect(root))
 
 	if code == 1 then
 		if debug then

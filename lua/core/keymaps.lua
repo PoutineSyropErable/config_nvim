@@ -125,7 +125,7 @@ elseif has_barbar then
 	keymap.set("n", "<C-n>", "<Cmd>BufferNext<CR>", opts("Next buffer (Barbar)"))
 	keymap.set("n", "<C-b>", "<Cmd>BufferPrevious<CR>", opts("Previous buffer (Barbar)"))
 	keymap.set("n", "<leader>B", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
-	keymap.set("n", "<leader>N", "<Cmd>BufferMovePrevious<CR>", opts("Move buffer left (Barbar)"))
+	keymap.set("n", "<leader>N", "<Cmd>BufferMoveNext<CR>", opts("Move buffer left (Barbar)"))
 
 	goto_buffer = function(buf_num) vim.cmd("BufferGoto " .. buf_num) end
 else
@@ -652,8 +652,8 @@ end, opts("List workspace folders"))
 
 -- Diagnostics
 
-keymap.set("n", "<leader>Ld", "<cmd>Lspsaga show_line_diagnostics<CR>", opts("Go to previous diagnostic"))
-keymap.set("n", "<leader>LD", "<cmd>Lspsaga show_workspace_diagnostics<CR>", opts("Go to previous diagnostic"))
+keymap.set("n", "<leader>Ld", "<cmd>Lspsaga show_line_diagnostics<CR>", opts("Show line diagnostic"))
+keymap.set("n", "<leader>LD", "<cmd>Lspsaga show_workspace_diagnostics<CR>", opts("Show Workspace diagnostic"))
 keymap.set("n", "<leader>Lb", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opts("Go to previous diagnostic"))
 keymap.set("n", "<leader>Ln", "<cmd>Lspsaga diagnostic_jump_next<CR>", opts("Go to next diagnostic"))
 
@@ -1582,6 +1582,26 @@ function _G.debug_utils.write_function_numpy()
 	end)
 end
 
+-- Function to write debug prints for max, mean, std dev of a variable
+function _G.debug_utils.write_function_stats()
+	get_variable_name(function(input)
+		if input and input ~= "" then
+			local indent = get_indent()
+			local debug_code = string.format(
+				[[%sprint(f"max(%s) = {np.max(%s)}, mean(%s) = {np.mean(%s)}, std(%s) = {np.std(%s)}")]],
+				indent,
+				input,
+				input,
+				input,
+				input,
+				input,
+				input
+			)
+			vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
+		end
+	end)
+end
+
 -- Write function for NumPy variables to print shape and value (new line version).
 function _G.debug_utils.write_function_np_newline()
 	get_variable_name(function(input)
@@ -1598,17 +1618,6 @@ function _G.debug_utils.write_function_np_newline()
 				input
 			)
 			vim.api.nvim_put(vim.split(debug_code, "\n"), "l", true, true)
-		end
-	end)
-end
-
--- Insert a multi-line Python f-string print: print(f'var = \n{var}\n')
-function _G.debug_utils.write_function_newline()
-	get_variable_name(function(input)
-		if input and input ~= "" then
-			local indent = get_indent()
-			local print_statement = string.format("%sprint(f'%s = \\n{%s}\\n')", indent, input, input)
-			vim.api.nvim_put({ print_statement }, "l", true, true)
 		end
 	end)
 end
@@ -1723,6 +1732,7 @@ keymap.set("n", "<leader>wfn", _G.debug_utils.write_function_numpy, opts("Write 
 keymap.set("n", "<leader>wfN", _G.debug_utils.write_function_np_newline, opts("Write Function Numpy NewLine"))
 keymap.set("n", "<leader>wfl", _G.debug_utils.write_function_newline, opts("Write Function NewLine"))
 keymap.set("n", "<leader>wfd", _G.debug_utils.write_function_debug, opts("Write Function Debug"))
+keymap.set("n", "<leader>wfS", _G.debug_utils.write_function_stats, opts("Write Function Stats"))
 
 keymap.set("n", "<leader>ss", get_function_calls, opts("jump to selected symbols"))
 keymap.set("n", "<leader>ef", select_and_write_function, opts("select and write function"))
@@ -1790,20 +1800,35 @@ function _G.general_utils_franck.CopyDirPath()
 end
 
 function _G.general_utils_franck.cdHere()
-	-- Get the full path of the current file
-	local file_absolute_path = vim.fn.expand("%:p")
-	-- Resolve any symlinks in the path to get the real file path
-	local file_real_path = vim.fn.resolve(file_absolute_path)
-	-- Get the directory of the resolved file
-	local file_dir_realpath = vim.fn.fnamemodify(file_real_path, ":p:h")
+	local file_path = vim.fn.expand("%:p")
+	local dir_to_cd = nil
 
-	-- Change directory locally (for the current buffer only)
-	vim.cmd("tcd " .. file_dir_realpath) -- Change the tab local working directory
-	vim.cmd("lcd " .. file_dir_realpath) -- Change the local working directory for the current window
-	vim.cmd("cd " .. file_dir_realpath) -- Change the directory for the current buffer
+	if file_path ~= "" then
+		-- Buffer has a file loaded, cd to its parent dir
+		dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(file_path), ":p:h")
+	else
+		-- No file in buffer; check if first CLI argument is a dir
+		local first_arg = vim.fn.argv(0)
+		if first_arg ~= "" and vim.fn.isdirectory(first_arg) == 1 then
+			dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(first_arg), ":p")
+		end
+	end
 
-	tapi.tree.change_root(file_dir_realpath) -- Sync Nvim-Tree
-	_G.print_custom("Changed directory to: " .. file_dir_realpath)
+	if not dir_to_cd or vim.fn.isdirectory(dir_to_cd) == 0 then
+		-- No valid dir to cd to
+		return
+	end
+
+	local escaped_dir = vim.fn.fnameescape(dir_to_cd)
+	vim.cmd("tcd " .. escaped_dir)
+	vim.cmd("lcd " .. escaped_dir)
+	vim.cmd("cd " .. escaped_dir)
+
+	if tapi and tapi.tree and tapi.tree.change_root then
+		tapi.tree.change_root(dir_to_cd) -- Sync Nvim-Tree, if available
+	end
+
+	_G.print_custom("Changed directory to: " .. dir_to_cd)
 end
 
 keymap.set("n", "<leader>cd", _G.general_utils_franck.cdHere, opts("cd to current dir (in tabs)"))
