@@ -146,8 +146,60 @@ keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
 -- Keymap for closing the current tab using Ctrl+w X
 keymap.set("n", "<C-w>d", ":close<CR>", opts("Close window"))
 
+-- See <leader>pm to move buf by itself.
+local function scope_move_and_focus(tab_index)
+	local buf = vim.api.nvim_get_current_buf()
+
+	-- Step 1: Move buffer to target tab
+	vim.cmd("ScopeMoveBuf " .. tab_index)
+
+	-- Step 2: Switch to that tab
+	vim.cmd(tab_index .. "tabnext")
+
+	-- Step 3: Focus the buffer we just moved (in case it's not shown)
+	local wins = vim.api.nvim_tabpage_list_wins(0)
+	local focused = false
+	for _, win in ipairs(wins) do
+		if vim.api.nvim_win_get_buf(win) == buf then
+			vim.api.nvim_set_current_win(win)
+			focused = true
+			break
+		end
+	end
+
+	-- If buffer wasn't in any window (rare), open it manually
+	if not focused then
+		vim.cmd("buffer " .. buf)
+	end
+end
+
+local number_to_shifted_symbol = {
+	[1] = "!",
+	[2] = '"',
+	[3] = "#",
+	[4] = "$",
+	[5] = "%",
+	[6] = "&",
+	[7] = "'",
+	[8] = "(",
+	[9] = ")",
+	[10] = ")",
+}
+
+for i = 1, 9 do
+	vim.keymap.set("n", "<leader>s" .. i, function() scope_move_and_focus(i) end, { desc = "Send + switch to tab " .. i })
+end
+
+for i, symbol in pairs(number_to_shifted_symbol) do
+	vim.keymap.set("n", "<C-w>" .. symbol, function() scope_move_and_focus(i) end, { desc = "Send + switch to tab " .. i .. " (Hypr-style)" })
+end
+
+for i = 1, 9 do
+	vim.keymap.set("n", "<C-w>" .. i, i .. "gt", { desc = "Go to tab " .. i })
+end
+
 -- Keymap for saving all
-keymap.set("n", "<C-w>s", ":wa<CR>", opts("Save all files"))
+keymap.set("n", "<C-w>S", ":wa<CR>", opts("Save all files"))
 keymap.set("", "<C-S>", ":w<CR>", opts("Save file"))
 keymap.set("", "<C-s>s", ":w<CR>", opts("Save file"))
 
