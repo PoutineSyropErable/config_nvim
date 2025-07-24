@@ -1168,6 +1168,7 @@ end)
 ---------------------------------------------- Terminal File Manager -----------------------------------
 -- tfm_keymaps.lua
 local tfm = require("tfm")
+vim.keymap.set("n", "<leader>lf", tfm.open, opts("Open lf (file manager)"))
 vim.keymap.set("n", "<leader>rr", tfm.open, opts("TFM"))
 vim.keymap.set("n", "<leader>rv", function() tfm.open(nil, tfm.OPEN_MODE.split) end, opts("TFM - horizontal split"))
 vim.keymap.set("n", "<leader>rh", function() tfm.open(nil, tfm.OPEN_MODE.vsplit) end, opts("TFM - vertical split"))
@@ -1243,13 +1244,14 @@ vim.keymap.set("n", "<leader>tl", function() move_float_terminal("bottomright") 
 vim.keymap.set("n", "<leader>tb", function() move_float_terminal("bottomright") end, { desc = "Float Terminal Bottom Right" })
 
 -- keymap.set("t", "<Esc>", "<C-\\><C-n>", opts("Make escape work"))
-keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = escape"))
-keymap.set("t", "QQ", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
+-- keymap.set("t", "q", "<Esc>", opts("make q leave lf. this fucks cli typing"))
+-- keymap.set("t", "QQ", [[<C-\><C-n>:q<CR>]], opts("Leave the terminal"))
+keymap.set("t", "jk", "<C-\\><C-n>", opts("make jk = go to normal mode"))
 
-vim.api.nvim_create_autocmd("TermOpen", {
-	pattern = "*",
-	callback = function() vim.keymap.set("n", "QQ", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
-})
+-- vim.api.nvim_create_autocmd("TermOpen", {
+-- 	pattern = "*",
+-- 	callback = function() vim.keymap.set("n", "QQ", ":bd!<CR>", { noremap = true, silent = true, buffer = 0, desc = "Leave the terminal" }) end,
+-- })
 
 --------------------------------------Tmux
 -- Detect the OS
