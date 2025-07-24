@@ -7,10 +7,10 @@ Example of the things you can toggle (a terminal, a file manager tree, and a und
 ![Screenshots example of toggle-able](./screenshots.png)
 
 Example of autocompletion
-![Example of autocomplete](./auto_complete.png)
+![Example of autocomplete](./zzz_auto_complete.png)
 
 Example of a debugger
-![Example of Debugger](./debugger.png)
+![Example of Debugger](./zz_debugger.png)
 
 # Installation
 
