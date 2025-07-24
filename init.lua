@@ -12,7 +12,10 @@ if FIND_PRINT then
 end
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+-- ~/.local/share/nvim .. / lazy/lazy.nvim 
+-- ~/.local/share/nvim/lazy/lazy.nvim
 if not vim.loop.fs_stat(lazypath) then
+-- if lazy_path doesn't exist. git clone there
 	vim.fn.system({
 		"git",
 		"clone",
@@ -22,16 +25,16 @@ if not vim.loop.fs_stat(lazypath) then
 		lazypath,
 	})
 end
+-- Add lazy.nvim to runtime path
 vim.opt.rtp:prepend(lazypath)
 
-require("pre_keymaps")
-require("pre_config") -- The config before the plugins loading
-require("core.options") --filetype association here
--- require("core.plugins") -- lazy load here
--- require("core.plugin_config")
--- require("core.keymaps")
--- require("pre_keymaps") -- need a repeat in case plugins default cahnged it
--- require("core.plugin_config.noice")
+require("_before.pre_keymaps")
+require("_before.pre_config")
+require("_before.options")
+require("core.lazy") -- lazy load here
+-- require("z_after.something")
+
+
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number
