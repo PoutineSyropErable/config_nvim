@@ -1,3 +1,4 @@
+local hl = "core.plugins_lazy.helper.lsp"
 return {
 	"neovim/nvim-lspconfig",
 	event = { "BufReadPre", "BufNewFile" },
@@ -29,6 +30,86 @@ return {
 			"<leader>Lc",
 			function() vim.lsp.buf.code_action() end,
 			desc = "Show code actions",
+		},
+		{
+			"gd",
+			function() require(hl).safe_telescope_call("lsp_definitions") end,
+			desc = "goto definition",
+		},
+		{
+			"gD",
+			function() require(hl).safe_lsp_call("declaration") end,
+			desc = "Show code actions",
+		},
+		{
+			"gj",
+			function()
+				if vim.lsp.buf.definition then
+					vim.lsp.buf.definition()
+				else
+					vim.notify("definition not supported by attached LSP", vim.log.levels.WARN)
+				end
+			end,
+			desc = "Go to definition (No telescope)",
+		},
+		{
+			"gI",
+			function() require("hl").safe_telescope_call("lsp_implementations") end,
+			desc = "Find implementations",
+		},
+		{
+			"gr",
+			function() require(hl).safe_telescope_call("lsp_references") end,
+			desc = "LSP Reference (Telescope)",
+		},
+
+		{
+			"gh",
+			function() require(hl).goto_current_function() end,
+			desc = "Go to current function",
+		},
+		{
+			"gn",
+			function() require(hl).goto_next_function_call() end,
+			desc = "Go to next function call",
+		},
+		{
+			"gN",
+			function() require(hl).goto_previous_function_call() end,
+			desc = "Go to previous function call",
+		},
+
+		{
+			"gi",
+			function() require("hl").safe_telescope_call("lsp_incoming_calls") end,
+			desc = "Incoming calls (Telescope)",
+		},
+		{
+			"go",
+			function() require("hl").safe_telescope_call("lsp_outgoing_calls") end,
+			desc = "Outgoing calls (Telescope)",
+		},
+		{
+			"ge",
+			function()
+				if vim.lsp.buf.incoming_calls then
+					vim.lsp.buf.incoming_calls()
+				else
+					vim.notify("incoming_calls not supported by attached LSP", vim.log.levels.WARN)
+				end
+			end,
+			desc = "Incoming calls (LSP buffer)",
+		},
+		{
+			"gy",
+			function()
+				if vim.lsp.buf.outgoing_calls then
+					vim.lsp.buf.outgoing_calls()
+				else
+					vim.notify("outgoing_calls not supported by attached LSP", vim.log.levels.WARN)
+				end
+			end,
+			desc = "Outgoing calls (LSP buffer)",
 		},
 	},
 
@@ -151,6 +232,19 @@ return {
 			update_in_insert = false,
 			severity_sort = true,
 		})
+
+		vim.keymap.set(
+			"n",
+			"gl",
+			function()
+				vim.diagnostic.open_float({
+					border = "rounded",
+					max_width = 120,
+					header = "Diagnostics:",
+					focusable = true,
+				})
+			end
+		)
 
 		-- Autoload language LSPs
 		require("core.lsps")

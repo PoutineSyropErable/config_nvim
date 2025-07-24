@@ -106,4 +106,58 @@ function M.find_project_root(debug)
 	return root
 end
 
+function M.SearchNextWord() M.search_word("next") end
+
+function M.SearchPrevWord() M.search_word("prev") end
+
+function M.CopyFilePath()
+	local path = vim.fn.expand("%:p") -- Get absolute file path
+	vim.fn.setreg("+", path) -- Copy to system clipboard
+	M.print_custom("Copied file path: " .. path)
+end
+
+function M.CopyDirPath()
+	local dir = vim.fn.expand("%:p:h") -- Get directory path of current file
+	vim.fn.setreg("+", dir) -- Copy to system clipboard
+	M.print_custom("Copied directory path: " .. dir)
+end
+
+function M.cdHere()
+	local file_path = vim.fn.expand("%:p")
+	local dir_to_cd = nil
+
+	if file_path ~= "" then
+		-- Buffer has a file loaded, cd to its parent dir
+		dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(file_path), ":p:h")
+	else
+		-- No file in buffer; check if first CLI argument is a dir
+		local first_arg = vim.fn.argv(0)
+		if first_arg ~= "" and vim.fn.isdirectory(first_arg) == 1 then
+			dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(first_arg), ":p")
+		end
+	end
+
+	if not dir_to_cd or vim.fn.isdirectory(dir_to_cd) == 0 then
+		-- No valid dir to cd to
+		return
+	end
+
+	local escaped_dir = vim.fn.fnameescape(dir_to_cd)
+	vim.cmd("tcd " .. escaped_dir)
+	vim.cmd("lcd " .. escaped_dir)
+	vim.cmd("cd " .. escaped_dir)
+
+	if tapi and tapi.tree and tapi.tree.change_root then
+		tapi.tree.change_root(dir_to_cd) -- Sync Nvim-Tree, if available
+	end
+
+	M.print_custom("Changed directory to: " .. dir_to_cd)
+end
+
+-- placeholder for your search_word function, define it here or require if external
+function M.search_word(direction)
+	-- Implement or require your search_word functionality
+	print("Search word: " .. tostring(direction))
+end
+
 return M

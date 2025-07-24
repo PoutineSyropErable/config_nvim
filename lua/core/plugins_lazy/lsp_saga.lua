@@ -36,11 +36,12 @@ return {
 			"<cmd>Lspsaga diagnostic_jump_next<CR>",
 			desc = "Next diagnostic",
 		},
-		{
-			"<Leader>Lf",
-			"<cmd>Lspsaga finder<CR>",
-			desc = "Find symbol references/defs",
-		},
+		{ "<Leader>Lf", "<cmd>Lspsaga finder<CR>", desc = "Find symbol references/defs" },
+
+		{ "<leader>Ld", "<cmd>Lspsaga show_line_diagnostics<CR>", desc = "Show line diagnostic" },
+		{ "<leader>LD", "<cmd>Lspsaga show_workspace_diagnostics<CR>", desc = "Show Workspace diagnostic" },
+		{ "<leader>Lb", "<cmd>Lspsaga diagnostic_jump_prev<CR>", desc = "Go to previous diagnostic" },
+		{ "<leader>Ln", "<cmd>Lspsaga diagnostic_jump_next<CR>", desc = "Go to next diagnostic" },
 	},
 	config = function()
 		require("lspsaga").setup({

@@ -70,12 +70,14 @@ return {
 			"nvim-telescope/telescope-ui-select.nvim",
 			"nvim-telescope/telescope-file-browser.nvim",
 			"AckslD/nvim-neoclip.lua",
-			"ghillb/cybu.nvim", -- if you want scope extension (or remove if not needed)
-			"tiagovla/scope.nvim",
-			"nvim-tree/nvim-tree.lua",
+			"nvim-treesitter/nvim-treesitter",
 
 			"mfussenegger/nvim-dap",
 			"nvim-telescope/telescope-dap.nvim",
+
+			"nvim-tree/nvim-tree.lua",
+			"tiagovla/scope.nvim",
+			"ghillb/cybu.nvim", -- if you want scope extension (or remove if not needed)
 		},
 		config = function()
 			local telescope = require("telescope")

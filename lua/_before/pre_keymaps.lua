@@ -289,3 +289,44 @@ local function get_current_tab_name()
 end
 
 keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
+
+keymap.set("n", "<leader>fH", ":nohlsearch<CR>") -- No description needed for raw command
+
+-- Jump List Navigation
+keymap.set("n", "<C-o>", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<C-p>", "<C-i>", opts("Jump Forward in Jump List"))
+keymap.set("n", "<leader>jb", "<C-o>", opts("Jump Backward in Jump List"))
+keymap.set("n", "<leader>jf", "<C-i>", opts("Jump Forward in Jump List"))
+
+function Replace_with_input()
+	local old_char = vim.fn.input("Replace character: ")
+	local new_char = vim.fn.input("Replace with: ")
+	if old_char ~= "" and new_char ~= "" then
+		vim.cmd(string.format("%%s/%s/%s/g", old_char, new_char))
+	end
+end
+
+function Replace_with_confirmation()
+	local old_char = vim.fn.input("Replace character: ")
+	local new_char = vim.fn.input("Replace with: ")
+	if old_char ~= "" and new_char ~= "" then
+		-- Execute substitution with confirmation for each match
+		vim.cmd(string.format("%%s/%s/%s/gc", old_char, new_char))
+	end
+end
+
+keymap.set("n", "<C-g>", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-h>", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true })
+keymap.set("n", "<leader>rc", "<Cmd>lua Replace_with_confirmation()<CR>", { noremap = true, silent = true, desc = "Replace with confirmation" })
+keymap.set("n", "<leader>ry", "<Cmd>lua Replace_with_input()<CR>", { noremap = true, silent = true, desc = "Replace with input" })
+
+local gu_path = "_before.general_utils"
+
+keymap.set("n", "<leader>ni", function() require(gu_path).not_invert() end, opts("Invert true/false under cursor"))
+keymap.set("n", "<Leader>cf", function() require(gu_path).CopyFilePath() end, opts("Copy file path to clipboard"))
+keymap.set("n", "<Leader>cp", function() require(gu_path).CopyDirPath() end, opts("Copy directory path to clipboard"))
+
+keymap.set("n", "<leader><Left>", function() require(gu_path).SearchPrevWord() end, opts("Search Previous occurance of this word"))
+keymap.set("n", "<leader><Right>", function() require(gu_path).SearchNextWord() end, opts("Search Next occurance of this word"))
+
+vim.api.nvim_create_user_command("CdHere", function() require(gu_path).cdHere() end, { desc = "Cd to current working directory" })
