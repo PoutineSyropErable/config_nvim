@@ -4,11 +4,8 @@ local keymap = vim.keymap
 -- makes keymap seting easier
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
-local function notify_debug(message)
-	local cmd = string.format("notify-send '[Neovim Debug]' '%s'", message)
-	os.execute(cmd) -- Send notification
-	_G.print_custom("🟢 Debug: " .. message) -- Also log to Neovim
-end
+notify_debug = require("_before.general_utils").send_notification
+print_custom = require("_before.general_utils").print_custom
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
 keymap.set("i", "jk", "<Esc>", opts("Exit Insert Mode"))

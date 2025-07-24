@@ -12,10 +12,10 @@ if FIND_PRINT then
 end
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
--- ~/.local/share/nvim .. / lazy/lazy.nvim 
+-- ~/.local/share/nvim .. / lazy/lazy.nvim
 -- ~/.local/share/nvim/lazy/lazy.nvim
 if not vim.loop.fs_stat(lazypath) then
--- if lazy_path doesn't exist. git clone there
+	-- if lazy_path doesn't exist. git clone there
 	vim.fn.system({
 		"git",
 		"clone",
@@ -33,8 +33,6 @@ require("_before.pre_config")
 require("_before.options")
 require("core.lazy") -- lazy load here
 -- require("z_after.something")
-
-
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number
