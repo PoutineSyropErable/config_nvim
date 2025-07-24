@@ -13,6 +13,25 @@ return {
 		"hrsh7th/cmp-cmdline",
 		-- "j-hui/fidget.nvim",
 	},
+
+	keys = {
+		{
+			"<leader>Ll",
+			function() require("lint").try_lint() end,
+			desc = "Manually trigger linting",
+		},
+		{
+			"<leader>Lr",
+			function() vim.lsp.buf.rename() end,
+			desc = "Rename symbol",
+		},
+		{
+			"<leader>Lc",
+			function() vim.lsp.buf.code_action() end,
+			desc = "Show code actions",
+		},
+	},
+
 	config = function()
 		require("mason").setup()
 		require("mason-lspconfig").setup()

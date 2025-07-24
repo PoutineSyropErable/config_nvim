@@ -32,6 +32,7 @@ require("_before.pre_keymaps")
 require("_before.pre_config")
 require("_before.options")
 require("core.lazy") -- lazy load here
+require("core.lazy_keymaps")
 -- require("z_after.something")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers

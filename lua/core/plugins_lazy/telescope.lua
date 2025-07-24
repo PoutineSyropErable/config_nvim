@@ -1,15 +1,66 @@
+local hp = "core.plugins_lazy.helper.telescope"
+
 return {
 	{
 		"nvim-telescope/telescope.nvim",
 		lazy = true,
 		cmd = "Telescope", -- load on Telescope command
 		keys = {
-			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
-			{ "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
-			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-			{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Tags" },
+			{
+				"<leader>ff",
+				function() require(hp).find_files() end,
+				desc = "Find Files",
+			},
+
+			{
+				"<leader>ft",
+				function() require("core.plugins_lazy.helper.telescope").toggle_find_files() end,
+				desc = "Toggle Find Files (Project Root / CWD)",
+			},
+
+			{
+				"<leader>fg",
+				function() require(hp).live_grep() end,
+				desc = "Live grep",
+			},
+			{
+				"<leader>fw",
+				function() require(hp).live_grep_current_word() end,
+				desc = "Live grep current word",
+			},
+			{
+				"gw",
+				function() require(hp).live_grep_current_word() end,
+				desc = "Live grep current word",
+			},
+
+			{
+				"<leader>fs",
+				function() require("core.plugins_lazy.helper.lsp").all_document_symbols() end,
+				desc = "All Variable/Symbols Information (Document)",
+			},
+			{
+				"<leader>fS",
+				function() require("core.plugins_lazy.helper.lsp").all_workspace_symbols() end,
+				desc = "All Variable/Symbols Information (Workspace)",
+			},
+			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
+
 			{ "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Fuzzy Find in Buffer" },
+			{ "<leader>fG", "<cmd>Telescope grep_string", desc = "grep string" },
+
 			{ "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recently Used Files" },
+			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+
+			{ "<leader>fB", "<cmd>Telescope file_browser<CR>", desc = "File Browser" },
+			{ "<leader><leader>", "<cmd>Telescope file_browser<CR>", desc = "File Browser" },
+			{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help Tags" },
+			{ "<leader>fi", "<cmd>Telescope lsp_incoming_calls<CR>", desc = "Incoming Calls" },
+			{ "<leader>fm", "<cmd>Telescope treesitter default_text=:method:<CR>", desc = "Find Methods" },
+			{ "<leader>fF", "<cmd>Telescope treesitter default_text=:function:<CR>", desc = "Find Functions" },
+			{ "<leader>fn", "<cmd>Telescope neoclip<CR>", desc = "Telescope Neoclip" },
+			{ "<leader>fr", "<cmd>lua select_and_write_function()<CR>", desc = "Select and Write Function" },
+			{ "<leader>fc", "<cmd>Telescope colorscheme<CR>", desc = "Change Color Scheme" },
 			-- Add more keybinds as needed
 		},
 		dependencies = {
@@ -116,6 +167,11 @@ return {
 
 			-- Enable zoxide integration for directory navigation
 			vim.g.zoxide_use_select = true
+
+			--- special keymaps ---
+			local th = require(hp)
+			local function opts(desc) return { noremap = true, silent = true, desc = desc } end
+			local keymap = vim.keymap
 		end,
 	},
 }

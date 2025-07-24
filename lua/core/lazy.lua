@@ -4,8 +4,20 @@ require("lazy").setup({
 	{ import = "core.plugins_lazy" },
 
 	-- Add individual plugins or configs inline
+	"folke/which-key.nvim",
 	{
-		"numToStr/Comment.nvim",
-		config = function() require("Comment").setup() end,
+		"echasnovski/mini.bufremove",
+		lazy = true,
+		enabled = true, -- Optional, for conditional toggling
+		version = false,
+	},
+	{ "HawkinsT/pathfinder.nvim", lazy = true },
+	{
+		"AckslD/nvim-neoclip.lua",
+		dependencies = {
+			{ "nvim-telescope/telescope.nvim" },
+		},
+		config = function() require("neoclip").setup() end,
+		lazy = true,
 	},
 })
