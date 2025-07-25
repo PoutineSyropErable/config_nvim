@@ -33,7 +33,7 @@ function M.goto_current_function()
 
 	vim.lsp.buf_request(0, "textDocument/documentSymbol", params, function(_, result)
 		if not result then
-			_G.print_custom("No LSP symbols found.")
+			gu.print_custom("No LSP symbols found.")
 			return
 		end
 
@@ -72,23 +72,23 @@ function M.goto_current_function()
 			local line_content = vim.api.nvim_buf_get_lines(0, target_line - 1, target_line, false)[1]
 
 			-- **🔹 Debugging output**
-			_G.print_custom("---- DEBUG INFO ----")
-			_G.print_custom("🔹 Full Line:", line_content)
-			_G.print_custom("🔹 LSP Start Character:", target_col)
+			gu.print_custom("---- DEBUG INFO ----")
+			gu.print_custom("🔹 Full Line:", line_content)
+			gu.print_custom("🔹 LSP Start Character:", target_col)
 
 			-- Attempt to extract function name from the line
 			local function_name = string.match(line_content, "([_%w]+)%s*%(")
 
 			if function_name then
 				local col = string.find(line_content, function_name) - 1
-				_G.print_custom("🔹 Detected Function Name:", function_name, "at column:", col)
+				gu.print_custom("🔹 Detected Function Name:", function_name, "at column:", col)
 				vim.api.nvim_win_set_cursor(0, { target_line, col })
 			else
-				_G.print_custom("❌ Function name not found using regex. Using fallback LSP position.")
+				gu.print_custom("❌ Function name not found using regex. Using fallback LSP position.")
 				vim.api.nvim_win_set_cursor(0, { target_line, target_col })
 			end
 		else
-			_G.print_custom("❌ No function found.")
+			gu.print_custom("❌ No function found.")
 		end
 	end)
 end
@@ -130,9 +130,9 @@ function M.get_function_calls()
 	traverse(root)
 
 	-- 🔹 Debugging Output: Print All Found Calls
-	-- _G.print_custom("📌 [DEBUG] Function Calls Found:")
+	-- gu.print_custom("📌 [DEBUG] Function Calls Found:")
 	-- for _, call in ipairs(calls) do
-	--  _G.print_custom("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
+	--  gu.print_custom("  🔹 " .. call.name .. " at line " .. call.line .. ", column " .. call.col)
 	-- end
 
 	return calls
@@ -141,7 +141,7 @@ end
 function M.goto_next_function_call()
 	local calls = M.get_function_calls()
 	if #calls == 0 then
-		_G.print_custom("❌ No function calls found in this file.")
+		gu.print_custom("❌ No function calls found in this file.")
 		return nil
 	end
 
@@ -157,18 +157,18 @@ function M.goto_next_function_call()
 	end
 
 	if next_call then
-		_G.print_custom("🔹 Jumping to function call:", next_call.name, "at line", next_call.line, "column", next_call.col)
+		gu.print_custom("🔹 Jumping to function call:", next_call.name, "at line", next_call.line, "column", next_call.col)
 		vim.api.nvim_win_set_cursor(0, { next_call.line, next_call.col })
 		return next_call
 	else
-		_G.print_custom("❌ No next function call found.")
+		gu.print_custom("❌ No next function call found.")
 	end
 end
 
 function M.goto_previous_function_call()
 	local calls = M.get_function_calls()
 	if #calls == 0 then
-		_G.print_custom("❌ No function calls found in this file.")
+		gu.print_custom("❌ No function calls found in this file.")
 		return nil
 	end
 
@@ -185,11 +185,11 @@ function M.goto_previous_function_call()
 	end
 
 	if prev_call then
-		_G.print_custom("🔹 Jumping to function call:", prev_call.name, "at line", prev_call.line, "column", prev_call.col)
+		gu.print_custom("🔹 Jumping to function call:", prev_call.name, "at line", prev_call.line, "column", prev_call.col)
 		vim.api.nvim_win_set_cursor(0, { prev_call.line, prev_call.col })
 		return prev_call
 	else
-		_G.print_custom("❌ No previous function call found.")
+		gu.print_custom("❌ No previous function call found.")
 	end
 end
 
@@ -208,7 +208,7 @@ function M.select_and_write_function()
 					local func_name_and_symbol_type = selection.ordinal or selection.display or "unknown"
 					-- local func_name = selection.display
 					local func_name = vim.split(func_name_and_symbol_type, "%s+")[1]
-					_G.print_custom("the function name is: \n" .. vim.inspect(func_name))
+					gu.print_custom("the function name is: \n" .. vim.inspect(func_name))
 					vim.api.nvim_put({ func_name .. "()" }, "", true, true)
 				end
 			end

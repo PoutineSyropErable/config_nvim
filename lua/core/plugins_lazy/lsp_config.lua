@@ -1,6 +1,7 @@
 local hl = "core.plugins_lazy.helper.lsp"
 return {
 	"neovim/nvim-lspconfig",
+	lazy = true,
 	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
 		{ "williamboman/mason.nvim", build = ":MasonUpdate" },
@@ -17,12 +18,23 @@ return {
 
 	config = function()
 		require("mason").setup()
-		require("mason-lspconfig").setup()
 
 		require("lspconfig.ui.windows").default_options.border = "rounded"
-
 		local cmp = require("cmp")
 		local luasnip = require("luasnip")
+
+		---- Is this needed ---- ?
+		local lspconfig = require("lspconfig")
+		-- Enhance default capabilities with cmp capabilities
+		local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+		local lsp_defaults = lspconfig.util.default_config
+		lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
+
+		local lua_lsp = require("core.lsps.lua")
+		local python_lsp = require("core.lsps.lua")
+
+		local mason_lspconfig = require("mason-lspconfig")
+		mason_lspconfig.setup()
 
 		-- Register your custom bash source here:
 		cmp.register_source("bash", {
@@ -134,8 +146,5 @@ return {
 			update_in_insert = false,
 			severity_sort = true,
 		})
-
-		-- Autoload language LSPs
-		-- local lsps = require("core.lsps")
 	end,
 }

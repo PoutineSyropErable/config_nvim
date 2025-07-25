@@ -1,17 +1,17 @@
-local lspconfig = require("lspconfig")
-
-lspconfig.pyright.setup({
-	on_attach = function(client, bufnr)
-		require("core.plugins_lazy.helper.lsp").add_keybinds(client, bufnr)
-		--
-	end,
+-- lua/core/lsps/pyright.lua
+return {
 	settings = {
 		python = {
 			analysis = {
-				typeCheckingMode = "basic", -- Can be "off", "basic", or "strict"
 				autoSearchPaths = true,
+				diagnosticMode = "openFilesOnly",
 				useLibraryCodeForTypes = true,
 			},
 		},
 	},
-})
+	on_attach = function(client, bufnr)
+		-- your on_attach logic
+		local lsp_helper = require("core.plugins_lazy.helper.lsp")
+		lsp_helper.add_keybinds()
+	end,
+}
