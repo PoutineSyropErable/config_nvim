@@ -19,7 +19,8 @@ function M.print_custom(...)
 end
 
 function M.get_lsp_project_root()
-	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+	local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })
+
 	for _, client in ipairs(clients) do
 		-- Try root_dir first
 		if client.config and client.config.root_dir then
@@ -106,6 +107,51 @@ function M.find_project_root(debug)
 	return root
 end
 
+----------------------------------------------- Super utils -----------------------------------
+
+function M.not_invert()
+	local word = vim.fn.expand("<cword>")
+	local replacements = {
+		["true"] = "false",
+		["false"] = "true",
+		["True"] = "False",
+		["False"] = "True",
+	}
+
+	if replacements[word] then
+		vim.cmd("normal! ciw" .. replacements[word])
+	else
+		_G.print_custom("NotInvert: No matching word to invert")
+	end
+end
+
+function M.search_word(direction)
+	-- Get the word under the cursor
+	local word = vim.fn.expand("<cword>")
+	if word == nil or word == "" then
+		_G.print_custom("No word under cursor!")
+		return
+	end
+
+	-- Perform the search
+	local function bool_cast(value) return (value and true) or false end
+	local found = false
+	if direction == "next" then
+		found = bool_cast(vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "W")) -- Case-sensitive forward search
+	elseif direction == "prev" then
+		found = bool_cast(vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "bW")) -- Case-sensitive backward search
+	else
+		_G.print_custom("Invalid direction: Use 'next' or 'prev'")
+		return
+	end
+
+	if found ~= 0 then
+		_G.print_custom("Found word: " .. word)
+	else
+		_G.print_custom("Word not found: " .. word)
+	end
+end
+
 function M.SearchNextWord() M.search_word("next") end
 
 function M.SearchPrevWord() M.search_word("prev") end
@@ -131,7 +177,8 @@ function M.cdHere()
 		dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(file_path), ":p:h")
 	else
 		-- No file in buffer; check if first CLI argument is a dir
-		local first_arg = vim.fn.argv(0)
+		local first_arg = vim.fn.argv()
+		first_arg = first_arg[1] or "" -- get first arg from the array or empty string
 		if first_arg ~= "" and vim.fn.isdirectory(first_arg) == 1 then
 			dir_to_cd = vim.fn.fnamemodify(vim.fn.resolve(first_arg), ":p")
 		end
@@ -147,17 +194,12 @@ function M.cdHere()
 	vim.cmd("lcd " .. escaped_dir)
 	vim.cmd("cd " .. escaped_dir)
 
+	local tapi = package.loaded["nvim-tree.api"]
 	if tapi and tapi.tree and tapi.tree.change_root then
 		tapi.tree.change_root(dir_to_cd) -- Sync Nvim-Tree, if available
 	end
 
 	M.print_custom("Changed directory to: " .. dir_to_cd)
-end
-
--- placeholder for your search_word function, define it here or require if external
-function M.search_word(direction)
-	-- Implement or require your search_word functionality
-	print("Search word: " .. tostring(direction))
 end
 
 return M

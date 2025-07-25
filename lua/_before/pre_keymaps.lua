@@ -325,6 +325,7 @@ local gu_path = "_before.general_utils"
 keymap.set("n", "<leader>ni", function() require(gu_path).not_invert() end, opts("Invert true/false under cursor"))
 keymap.set("n", "<Leader>cf", function() require(gu_path).CopyFilePath() end, opts("Copy file path to clipboard"))
 keymap.set("n", "<Leader>cp", function() require(gu_path).CopyDirPath() end, opts("Copy directory path to clipboard"))
+keymap.set("n", "<leader>cd", function() require(gu_path).cdHere() end, opts("cd to current dir (in tabs)"))
 
 keymap.set("n", "<leader><Left>", function() require(gu_path).SearchPrevWord() end, opts("Search Previous occurance of this word"))
 keymap.set("n", "<leader><Right>", function() require(gu_path).SearchNextWord() end, opts("Search Next occurance of this word"))
