@@ -468,8 +468,4 @@ require("lazy").setup({
 	},
 
 	--
-}, {
-	rocks = {
-		hererocks = true, -- Enables hererocks globally for all plugins
-	},
 })

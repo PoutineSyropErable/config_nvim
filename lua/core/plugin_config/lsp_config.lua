@@ -23,16 +23,15 @@ require("mason-lspconfig").setup({
 	automatic_enable = false,
 	-- automatic enable will double these lsps
 })
+---- what if shitty mason lsp config was the one doing it?
 
 local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
-lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+local merged_capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
+lsp_defaults.capabilities = merged_capabilities
 
-local capabilities = vim.tbl_deep_extend(
-	"force",
-	require("lspconfig").clangd.document_config.default_config.capabilities,
-	require("cmp_nvim_lsp").default_capabilities()
-)
+local c_capabilities = vim.tbl_deep_extend("force", require("lspconfig").clangd.document_config.default_config.capabilities, merged_capabilities)
 
 require("lint").linters_by_ft = {
 	-- python = { "pylint" }, -- Primary linter
@@ -137,7 +136,7 @@ end, {})
 
 ------------------------------------------ Open CL -----------------------------
 lspconfig.opencl_ls.setup({
-	cmd = { "opencl-language-server" },
+	cmd = { "opencl-language-server123123" },
 	filetypes = { "opencl" },
 	root_dir = lspconfig.util.root_pattern(".git", ".asm-lsp.toml"),
 	capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, {
@@ -150,6 +149,33 @@ lspconfig.opencl_ls.setup({
 })
 
 -- Not needed, or else it would add two clients
+
+--------------------------------------- R ---------------------------------------
+lspconfig.r_language_server.setup({
+	cmd = { "R", "--slave", "-e", "languageserver::run()" },
+	filetypes = { "r", "rmd" },
+	root_dir = lspconfig.util.root_pattern(".git", ".Rproj", ".here"),
+	settings = {},
+	on_attach = function(client, bufnr) _G.print_custom("R LSP attached: " .. client.name) end,
+})
+
+--------------------------------------- Perl ---------------------------------------
+lspconfig.perlnavigator.setup({
+	cmd = { "perlnavigator" },
+	filetypes = { "perl" },
+	root_dir = lspconfig.util.root_pattern(".git", "*.pl", "*.pm", "*.t", "Makefile.PL", "Build.PL"),
+	settings = {
+		perlnavigator = {
+			perlPath = "perl", -- adjust if using perlbrew or plenv
+			enableWarnings = true,
+			includePaths = {}, -- additional `-I` paths if needed
+			formatting = {
+				enabled = true,
+			},
+		},
+	},
+	on_attach = function(client, bufnr) _G.print_custom("Perl LSP attached: " .. client.name) end,
+})
 
 --------------------------------------- C/C++ ---------------------------------------
 
@@ -179,7 +205,8 @@ lspconfig.clangd.setup({
 			"-xcl", -- Force OpenCL mode
 		},
 	},
-	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
+	-- capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
+	capabilities = c_capabilities,
 	filetypes = { "c", "cpp", "objc", "objcpp", "x", "opencl" },
 	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
 	settings = {
