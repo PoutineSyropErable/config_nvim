@@ -225,6 +225,7 @@ end
 function M.add_keybinds(client, bufnr)
 	local opts = function(desc) return { noremap = true, silent = true, desc = desc, buffer = bufnr } end
 	local hl = "core.plugins_lazy.helper.lsp"
+	local tb = "telescope.builtin"
 
 	-- LSP Information
 	keymap.set("n", "<leader>Lg", M.safe_lsp_call("hover"), opts("Show LSP hover info"))
@@ -241,24 +242,14 @@ function M.add_keybinds(client, bufnr)
 		end
 	end, opts("List workspace folders"))
 
-	keymap.set(
-		"n",
-		"<leader>de",
-		function() require("telescope.builtin").diagnostics({ default_text = ":E:" }) end,
-		opts("Show Errors and diagnostics (Telescope UI)")
-	)
+	keymap.set("n", "<leader>de", function() require(tb).diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
 	keymap.set(
 		"n",
 		"<leader>dw",
-		function() require("telescope.builtin").diagnostics({ default_text = ":W:" }) end,
+		function() require(tb).diagnostics({ default_text = ":W:" }) end,
 		opts("Show Warning and diagnostics (Telescope UI)")
 	)
-	keymap.set(
-		"n",
-		"<leader>dH",
-		function() require("telescope.builtin").diagnostics({ default_text = ":H:" }) end,
-		opts("Show Hints and diagnostics (Telescope UI)")
-	)
+	keymap.set("n", "<leader>dH", function() require(tb).diagnostics({ default_text = ":H:" }) end, opts("Show Hints and diagnostics (Telescope UI)"))
 
 	-- Rename / Actions
 	keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, opts("Manually trigger linting"))

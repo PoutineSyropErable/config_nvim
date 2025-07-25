@@ -19,13 +19,24 @@ return {
 			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 				callback = function()
 					local ft = vim.bo.filetype
-					if ft and not parsers.has_parser(ft) then
-						-- Install parser asynchronously if missing
-						vim.schedule(function() install.install(ft) end)
+
+					-- Prevent trying to install unsupported or unknown filetypes
+					if not ft or ft == "" then
+						return
+					end
+
+					local lang = parsers.ft_to_lang(ft)
+
+					-- Don't install if no parser exists for this language
+					if not parsers.get_parser_configs()[lang] then
+						return
+					end
+
+					-- Only install if not already available
+					if not parsers.has_parser(lang) then
+						vim.schedule(function() install.install(lang) end)
 					end
 				end,
-				-- Possbily skips the first file, and race condition.
-				-- TODO.
 			})
 
 			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {

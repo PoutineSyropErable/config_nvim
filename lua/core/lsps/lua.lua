@@ -1,8 +1,11 @@
 local lspconfig = require("lspconfig")
+local gu = require("_before.general_utils")
 
 lspconfig.lua_ls.setup({
 	on_attach = function(client, bufnr)
+		gu.print_custom("attached")
 		require("core.plugins_lazy.helper.lsp").add_keybinds(client, bufnr)
+
 		--
 	end,
 	settings = {

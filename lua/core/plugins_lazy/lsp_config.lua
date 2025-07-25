@@ -136,6 +136,6 @@ return {
 		})
 
 		-- Autoload language LSPs
-		require("core.lsps")
+		-- local lsps = require("core.lsps")
 	end,
 }
