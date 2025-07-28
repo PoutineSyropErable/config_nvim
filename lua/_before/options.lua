@@ -101,4 +101,15 @@ vim.filetype.add({
 	},
 })
 
+vim.diagnostic.config({
+	virtual_text = {
+		spacing = 4,
+		prefix = "■", -- or "■", or "" for no symbol
+	},
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+})
+
 -- vim.cmd('set verbose=10')
