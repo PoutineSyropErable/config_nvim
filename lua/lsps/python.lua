@@ -13,7 +13,7 @@ M.config = {
 	},
 	on_attach = function(client, bufnr)
 		-- your on_attach logic
-		local lsp_helper = require("core.plugins_lazy.helper.lsp_keybind")
+		local lsp_helper = require("lsps.helper.lsp_config_helper")
 		lsp_helper.add_keybinds()
 	end,
 }

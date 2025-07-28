@@ -229,7 +229,8 @@ M.add_keybinds = function(client, bufnr)
 	keymap.set("n", "<leader>Lc", vim.lsp.buf.code_action, opts("Show code actions"))
 
 	-- Goto / navigation
-	keymap.set("n", "gd", function() keybind_helper.safe_telescope_call("lsp_definitions") end, opts("Goto definition"))
+	keymap.set("n", "gd", function() keybind_helper.safe_telescope_call("lsp_definitions") end, opts("Go to definition"))
+	keymap.set("n", "gd", function() require(tb).lsp_definitions() end, opts("Go to definition"))
 
 	keymap.set("n", "gD", function() keybind_helper.safe_lsp_call("declaration")() end, opts("Goto declaration"))
 

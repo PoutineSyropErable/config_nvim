@@ -16,7 +16,7 @@ end
 function M.safe_telescope_call(fn)
 	local ok, telescope_builtin = pcall(require, "telescope.builtin")
 	if ok and telescope_builtin[fn] then
-		gu.print_custom(vim.inspect(telescope_builtin[fn]))
+		gu.print_custom("safe telescope call: " .. vim.inspect(fn) .. " " .. vim.inspect(telescope_builtin[fn]))
 
 		telescope_builtin[fn]()
 		return 0
