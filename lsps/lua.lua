@@ -1,5 +1,7 @@
 -- lua/core/lsps/lua.lua
-return {
+M = {}
+
+M.config = {
 	settings = {
 		Lua = {
 			runtime = { version = "LuaJIT" },
@@ -17,3 +19,5 @@ return {
 		lsp_helper.add_keybinds()
 	end,
 }
+
+return M

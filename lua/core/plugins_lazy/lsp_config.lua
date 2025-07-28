@@ -24,17 +24,20 @@ return {
 		local luasnip = require("luasnip")
 
 		---- Is this needed ---- ?
-		local lspconfig = require("lspconfig")
+		-- local lspconfig = require("lspconfig")
+		-- local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+		-- local lsp_defaults = lspconfig.util.default_config
+		-- lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
+		--
+		-- local lua_lsp = require("core.lsps.lua")
+		-- local python_lsp = require("core.lsps.lua")
 		-- Enhance default capabilities with cmp capabilities
-		local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-		local lsp_defaults = lspconfig.util.default_config
-		lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
-
-		local lua_lsp = require("core.lsps.lua")
-		local python_lsp = require("core.lsps.lua")
 
 		local mason_lspconfig = require("mason-lspconfig")
-		mason_lspconfig.setup()
+		mason_lspconfig.setup({
+			ensure_installed = {},
+			automatic_enable = { "pyright", exclude = { "lua_ls" } },
+		})
 
 		-- Register your custom bash source here:
 		cmp.register_source("bash", {
