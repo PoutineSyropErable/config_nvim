@@ -34,6 +34,7 @@ require("_before.options")
 require("core.lazy") -- lazy load here
 require("core.lazy_keymaps")
 -- require("z_after.something")
+require("after.tabcd")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number

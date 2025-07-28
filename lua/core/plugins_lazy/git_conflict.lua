@@ -18,7 +18,7 @@ return {
 	event = { "BufReadPost" },
 	config = function()
 		require("git-conflict").setup({
-			default_mappings = true, -- Enable default keymaps
+			default_mappings = false, -- Enable default keymaps
 			disable_diagnostics = true, -- Disable LSP diagnostics during conflicts
 			highlights = {
 				incoming = "DiffAdd",
