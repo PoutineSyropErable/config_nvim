@@ -45,7 +45,7 @@ function M.find_project_root(debug)
 	buffer_dir = vim.fn.getcwd()
 
 	if debug then
-		_G.print_custom("buffer_dir =" .. vim.inspect(buffer_dir))
+		M.print_custom("buffer_dir =" .. vim.inspect(buffer_dir))
 	end
 	local script_path = vim.fn.expand("$HOME/.config/nvim/scripts/find_project_root")
 
@@ -63,12 +63,12 @@ function M.find_project_root(debug)
 	if result.stderr and result.stderr ~= "" and debug then
 		local stderr_msg = "🔧 [C++ stderr]\n" .. result.stderr
 		vim.schedule(function() vim.notify(stderr_msg, vim.log.levels.DEBUG) end)
-		_G.print_custom(stderr_msg)
+		M.print_custom(stderr_msg)
 	end
 
 	local root = vim.trim(result.stdout or "")
 	local code = result.code or 1
-	_G.print_custom("fpr: root =" .. vim.inspect(root))
+	M.print_custom("fpr: root =" .. vim.inspect(root))
 
 	if code == 1 then
 		if debug then
@@ -123,7 +123,7 @@ function M.not_invert()
 	if replacements[word] then
 		vim.cmd("normal! ciw" .. replacements[word])
 	else
-		_G.print_custom("NotInvert: No matching word to invert")
+		M.print_custom("NotInvert: No matching word to invert")
 	end
 end
 
@@ -131,7 +131,7 @@ function M.search_word(direction)
 	-- Get the word under the cursor
 	local word = vim.fn.expand("<cword>")
 	if word == nil or word == "" then
-		_G.print_custom("No word under cursor!")
+		M.print_custom("No word under cursor!")
 		return
 	end
 
@@ -143,20 +143,36 @@ function M.search_word(direction)
 	elseif direction == "prev" then
 		found = bool_cast(vim.fn.search("\\V" .. vim.fn.escape(word, "\\"), "bW")) -- Case-sensitive backward search
 	else
-		_G.print_custom("Invalid direction: Use 'next' or 'prev'")
+		M.print_custom("Invalid direction: Use 'next' or 'prev'")
 		return
 	end
 
 	if found ~= 0 then
-		_G.print_custom("Found word: " .. word)
+		M.print_custom("Found word: " .. word)
 	else
-		_G.print_custom("Word not found: " .. word)
+		M.print_custom("Word not found: " .. word)
 	end
 end
 
 function M.SearchNextWord() M.search_word("next") end
 
 function M.SearchPrevWord() M.search_word("prev") end
+
+--- Search current word and go to next or previous match
+---@param reverse boolean? If true, jump backward (NN), else just search forward (/word<CR>)
+function M.search_current_word(reverse)
+	local word = vim.fn.expand("<cword>")
+	if word ~= "" then
+		if reverse then
+			-- Search forward first to set the search, then skip current with NN backward
+			vim.fn.feedkeys("/" .. vim.fn.escape(word, "/\\") .. "\n", "n")
+			vim.schedule(function() vim.api.nvim_feedkeys("NN", "n", false) end)
+		else
+			-- Just search forward once
+			vim.fn.feedkeys("/" .. vim.fn.escape(word, "/\\") .. "\n", "n")
+		end
+	end
+end
 
 function M.CopyFilePath()
 	local path = vim.fn.expand("%:p") -- Get absolute file path

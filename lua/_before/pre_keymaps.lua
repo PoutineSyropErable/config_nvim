@@ -4,8 +4,9 @@ local keymap = vim.keymap
 -- makes keymap seting easier
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
-notify_debug = require("_before.general_utils").send_notification
-print_custom = require("_before.general_utils").print_custom
+local gu = require("_before.general_utils")
+local notify_debug = gu.send_notification
+local print_custom = gu.print_custom
 
 -------- Apply 'jk' to exit insert mode and visual mode ----------
 keymap.set("i", "jk", "<Esc>", opts("Exit Insert Mode"))
@@ -196,7 +197,7 @@ function RunCurrentFile()
 		local autoMakeScript = home .. AutoMakeJava_location .. "/src/automake.py"
 		vim.cmd("!python3 " .. vim.fn.shellescape(autoMakeScript) .. " " .. vim.fn.shellescape(filepath))
 	else
-		_G.print_custom("File type not supported for running with F4")
+		print_custom("File type not supported for running with F4")
 	end
 end
 
@@ -214,7 +215,7 @@ end
 
 local function run_build_script() vim.cmd("!bash ./build.sh") end
 local function run_do_all()
-	local proj_root = general_utils_franck.find_project_root(true)
+	local proj_root = gu.find_project_root(true)
 	if not proj_root then
 		vim.notify("❌ Project root not found", vim.log.levels.ERROR)
 		return
@@ -223,7 +224,7 @@ local function run_do_all()
 	--"proj_root = " .. proj_root)
 
 	local all_cmd = "cd " .. vim.fn.shellescape(proj_root) .. " && bash ./aaa_do_all.sh"
-	_G.print_custom("all cmd = " .. all_cmd, vim.log.levels.INFO)
+	print_custom("all cmd = " .. all_cmd, vim.log.levels.INFO)
 
 	local output = vim.fn.system(all_cmd)
 	vim.notify("Output:\n" .. output, vim.log.levels.INFO)
@@ -250,17 +251,19 @@ keymap.set("n", "+", ":Oil<CR>", { noremap = true, silent = true })
 --- Weird stuff
 
 local toggle_invisible_char = function()
-	vim.opt.list = not vim.opt.list:get()
-	_G.print_custom("List mode: " .. (vim.opt.list:get() and "ON" or "OFF"))
+	-- vim.opt.list = not vim.opt.list:get()
+	vim.o.list = not vim.o.list
+
+	print_custom("List mode: " .. (vim.o.list and "ON" or "OFF"))
 end
 
 local toggle_linting = function()
 	if vim.g.linting_enabled then
 		vim.diagnostic.enable()
-		_G.print_custom("🔍 Linting Enabled")
+		print_custom("🔍 Linting Enabled")
 	else
 		vim.diagnostic.enable(false)
-		_G.print_custom("🚫 Linting Disabled")
+		print_custom("🚫 Linting Disabled")
 	end
 	vim.g.linting_enabled = not vim.g.linting_enabled
 end
@@ -285,7 +288,7 @@ end
 local function get_current_tab_name()
 	local tabnr = vim.api.nvim_get_current_tabpage()
 	local tab_name = get_tab_name(tabnr)
-	_G.print_custom("Current Tab Name: " .. tab_name)
+	print_custom("Current Tab Name: " .. tab_name)
 end
 
 keymap.set("n", "<leader>.N", get_current_tab_name, opts("Show current tab name"))
@@ -327,7 +330,21 @@ keymap.set("n", "<Leader>cf", function() require(gu_path).CopyFilePath() end, op
 keymap.set("n", "<Leader>cp", function() require(gu_path).CopyDirPath() end, opts("Copy directory path to clipboard"))
 keymap.set("n", "<leader>cd", function() require(gu_path).cdHere() end, opts("cd to current dir (in tabs)"))
 
-keymap.set("n", "<leader><Left>", function() require(gu_path).SearchPrevWord() end, opts("Search Previous occurance of this word"))
-keymap.set("n", "<leader><Right>", function() require(gu_path).SearchNextWord() end, opts("Search Next occurance of this word"))
+keymap.set("n", "<leader>/", function() require(gu_path).SearchPrevWord() end, opts("Search Previous occurance of this word"))
+keymap.set("n", "<leader>*", function() require(gu_path).SearchNextWord() end, opts("Search Next occurance of this word"))
+
+vim.keymap.set("n", "<leader><left>", function() require(gu_path).search_current_word(true) end, { desc = "Search word under cursor backward" })
+vim.keymap.set("n", "<leader><right>", function() require(gu_path).search_current_word(false) end, { desc = "Search word under cursor forward" })
 
 vim.api.nvim_create_user_command("CdHere", function() require(gu_path).cdHere() end, { desc = "Cd to current working directory" })
+
+keymap.set("n", "<C-w>=", "<C-w>=") -- make split windows equal width
+keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
+keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
+
+keymap.set("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Left>", ":vertical resize -5<CR>", { noremap = true, silent = true })
+keymap.set("n", "<C-Right>", ":vertical resize +5<CR>", { noremap = true, silent = true })
+
+keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })

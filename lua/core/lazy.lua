@@ -45,6 +45,7 @@ require("lazy").setup({
 	},
 
 	"preservim/vimux",
+	"szw/vim-maximizer",
 	{
 		"m00qek/baleia.nvim",
 		version = "*",
