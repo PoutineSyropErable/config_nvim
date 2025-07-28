@@ -6,7 +6,7 @@ M.useMyJavaDap = true
 
 M.useMasonLspConfig = true -- masonlspconfig, or regular lspconfig
 
-M.use_git_confict = true
+M.use_git_confict = false
 -- etc.
 
 -- Function to print the current config state

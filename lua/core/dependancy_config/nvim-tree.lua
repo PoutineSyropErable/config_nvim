@@ -1,4 +1,5 @@
 -- ~/.config/nvim/lua/core/dependancy_config/nvim-tree.lua
+--- This is just for pedagogical reason, if i ever need to use that type of syntax one day, it's saved
 local M = {}
 
 function M.setup()
