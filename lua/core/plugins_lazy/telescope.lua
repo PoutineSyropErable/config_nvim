@@ -36,12 +36,12 @@ return {
 
 			{
 				"<leader>fs",
-				function() require("core.plugins_lazy.helper.lsp").all_document_symbols() end,
+				function() require("core.plugins_lazy.helper.lsp_keybind").all_document_symbols() end,
 				desc = "All Variable/Symbols Information (Document)",
 			},
 			{
 				"<leader>fS",
-				function() require("core.plugins_lazy.helper.lsp").all_workspace_symbols() end,
+				function() require("core.plugins_lazy.helper.lsp_keybind").all_workspace_symbols() end,
 				desc = "All Variable/Symbols Information (Workspace)",
 			},
 			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },

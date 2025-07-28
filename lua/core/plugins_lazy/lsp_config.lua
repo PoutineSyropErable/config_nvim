@@ -1,4 +1,4 @@
-local hl = "core.plugins_lazy.helper.lsp"
+local hl = "core.plugins_lazy.helper.lsp_keybind"
 return {
 	"neovim/nvim-lspconfig",
 	lazy = true,
@@ -24,14 +24,22 @@ return {
 		local luasnip = require("luasnip")
 
 		---- Is this needed ---- ?
-		-- local lspconfig = require("lspconfig")
-		-- local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-		-- local lsp_defaults = lspconfig.util.default_config
-		-- lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
-		--
-		-- local lua_lsp = require("core.lsps.lua")
-		-- local python_lsp = require("core.lsps.lua")
+		local lspconfig = require("lspconfig")
+		local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+		local lsp_defaults = lspconfig.util.default_config
+		local merged_capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
+		lsp_defaults.capabilities = merged_capabilities
+
+		local function extend_capabilities(lsp_conf)
+			lsp_conf.capabilities = merged_capabilities
+			return lsp_conf
+		end
+
+		local lua_lsp = require("lsps.lua")
+		local python_lsp = require("lsps.python")
 		-- Enhance default capabilities with cmp capabilities
+
+		lspconfig.lua_ls.setup(extend_capabilities(lua_lsp.config))
 
 		local mason_lspconfig = require("mason-lspconfig")
 		mason_lspconfig.setup({

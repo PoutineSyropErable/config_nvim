@@ -6,8 +6,10 @@ function M.send_notification(msg)
 	M.print_custom("🟢 Debug: " .. msg)
 end
 
+M.PRINT_CUSTOM_DEBUG = true
+
 function M.print_custom(...)
-	if not vim.g.PRINT_CUSTOM_DEBUG then
+	if not M.PRINT_CUSTOM_DEBUG then
 		return
 	end
 	local parts = {}

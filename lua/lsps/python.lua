@@ -1,5 +1,7 @@
 -- lua/core/lsps/pyright.lua
-return {
+M = {}
+
+M.config = {
 	settings = {
 		python = {
 			analysis = {
@@ -11,7 +13,9 @@ return {
 	},
 	on_attach = function(client, bufnr)
 		-- your on_attach logic
-		local lsp_helper = require("core.plugins_lazy.helper.lsp")
+		local lsp_helper = require("core.plugins_lazy.helper.lsp_keybind")
 		lsp_helper.add_keybinds()
 	end,
 }
+
+return M

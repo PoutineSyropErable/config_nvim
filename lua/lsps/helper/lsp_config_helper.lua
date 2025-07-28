@@ -1,5 +1,4 @@
 M = {}
-
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 M.extension_to_filetype = {
@@ -158,8 +157,6 @@ local function attach_lsp_to_buffer(name, bufnr)
 	try_attach()
 end
 
-function M.add_keybinds(client, bufnr) end -- function declaration
-
 --- Function to check active buffers and attach corresponding LSPs
 local function attach_lsp_to_all_buffers()
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -193,9 +190,10 @@ local function attach_lsp_to_all_buffers()
 	end
 end
 
-function M.add_keybinds(client, bufnr)
-	local opts = function(desc) return { noremap = true, silent = true, desc = desc, buffer = bufnr } end
-	local hl = "core.plugins_lazy.helper.lsp"
+M.add_keybinds = function(client, bufnr)
+	local keymap = vim.keymap
+	local gu = require("_before.general_utils")
+	local hl = "core.plugins_lazy.helper.lsp_keybind"
 	local tb = "telescope.builtin"
 
 	local keybind_helper = require(hl)
