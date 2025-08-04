@@ -6,6 +6,7 @@ local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	{
 		"numToStr/Comment.nvim",
 		config = function() require("Comment").setup() end,
@@ -60,7 +61,6 @@ require("lazy").setup({
 		config = function() end, -- No extra config needed
 	},
 	buffer_plugin,
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 
 	"andymass/vim-matchup", -- better %
 	{
