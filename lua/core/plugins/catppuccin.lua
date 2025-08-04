@@ -22,23 +22,23 @@ return {
 				},
 				which_key = true,
 			},
-			-- custom_highlights = function(colors)
-			-- 	return {
-			-- 		-- Force transparency in all float elements
-			-- 		NormalFloat = { bg = "NONE" },
-			-- 		FloatBorder = { bg = "NONE", fg = colors.blue },
-			-- 		TelescopeNormal = { bg = "NONE" },
-			-- 		TelescopeBorder = { bg = "NONE", fg = colors.blue },
-			-- 		WhichKeyFloat = { bg = "NONE" },
-			-- 		LazyNormal = { bg = "NONE" }, -- For Lazy.nvim
-			-- 	}
-			-- end,
+			custom_highlights = function(colors)
+				return {
+					-- Force transparency in all float elements
+					NormalFloat = { bg = "NONE" },
+					FloatBorder = { bg = "NONE", fg = colors.blue },
+					TelescopeNormal = { bg = "NONE" },
+					TelescopeBorder = { bg = "NONE", fg = colors.blue },
+					WhichKeyFloat = { bg = "NONE" },
+					LazyNormal = { bg = "NONE" }, -- For Lazy.nvim
+				}
+			end,
 		})
 
 		vim.o.termguicolors = true
 		vim.cmd.colorscheme("catppuccin")
 
-		local extra = false
+		local extra = true
 		if extra then
 			-- Additional fixes for specific plugins
 			vim.api.nvim_create_autocmd("ColorScheme", {
