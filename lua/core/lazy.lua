@@ -11,7 +11,6 @@ require("lazy").setup({
 		enabled = true, -- Optional, for conditional toggling
 		version = false,
 	},
-	{ "HawkinsT/pathfinder.nvim", lazy = true },
 	{
 		"AckslD/nvim-neoclip.lua",
 		dependencies = {
@@ -45,18 +44,11 @@ require("lazy").setup({
 	},
 
 	"preservim/vimux",
-	"szw/vim-maximizer",
+	"szw/vim-maximizer", -- good full screen toggle
 	{
-		"m00qek/baleia.nvim",
-		version = "*",
-		config = function()
-			vim.g.baleia = require("baleia").setup({})
-
-			-- Command to colorize the current buffer
-			vim.api.nvim_create_user_command("BaleiaColorize", function() vim.g.baleia.once(vim.api.nvim_get_current_buf()) end, { bang = true })
-
-			-- Command to show logs
-			vim.api.nvim_create_user_command("BaleiaLogs", vim.g.baleia.logger.show, { bang = true })
-		end,
+		-- This does what i wanted baleia to do. Baleia is destructive
+		"powerman/vim-plugin-AnsiEsc",
+		ft = { "log", "ansi", "txt" },
+		cmd = { "AnsiEsc" },
 	},
 })
