@@ -4,11 +4,7 @@ if not use_git_conflict then
 	return {
 		{
 			"PoutineSyropErable/meld-like-merge.nvim",
-			config = function()
-				require("meld_like_merge").setup({
-					use_git_conflict = use_git_conflict, -- or true if you want the other mode
-				})
-			end,
+			config = function() require("meld_like_merge").setup({}) end,
 		},
 	}
 end

@@ -1,5 +1,9 @@
-return {
+local fugitive = {
+	lazy = true,
 	"tpope/vim-fugitive",
+	dependencies = {
+		"tpope/vim-rhubarb",
+	},
 	cmd = { "Git", "Gdiffsplit", "Gblame", "Gwrite", "Gread", "Glog" },
 	keys = {
 		{ "<leader>Gf", ":Git<CR>", desc = "Git status (Fugitive)" },
@@ -25,5 +29,20 @@ return {
 	config = function()
 		-- Optional: disable fugitive’s default mappings if you want full control
 		vim.g.fugitive_no_maps = 1
+		local function opts(desc) return { noremap = true, silent = true, desc = desc } end
+		vim.keymap.set("n", "<leader>Go", ":GBrowse<CR>", opts("Open file/line on GitHub (Rhubarb)"))
 	end,
 }
+
+local rhubarb = {
+	"tpope/vim-rhubarb",
+	dependencies = { "tpope/vim-fugitive" }, -- Rhubarb depends on Fugitive
+	lazy = true,
+	cmd = { "GBrowse" },
+	keys = {
+		{ "<leader>Go", ":GBrowse<CR>", desc = "Open file/line on GitHub (Rhubarb)" },
+		{ "<leader>Gc", ":GBrowse<CR>", desc = "Open current commit on GitHub (Rhubarb)" },
+	},
+}
+
+return { fugitive, rhubarb }
