@@ -1,0 +1,6 @@
+[submodule "lua/meld_like_merge"]
+	path = lua/meld_like_merge
+	url = https://github.com/PoutineSyropErable/meld-like-merge.nvim.git
+[submodule "meld_like_merge"]
+	path = meld_like_merge
+	url = https://github.com/PoutineSyropErable/meld-like-merge.nvim.git
