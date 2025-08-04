@@ -3,12 +3,32 @@ local hd = "core.plugins_lazy.helper.barbar"
 return {
 	{
 		"mfussenegger/nvim-dap",
-		event = { "BufReadPre", "BufNewFile" },
+		lazy = true,
+		keys = {
+			{ "<leader>bb", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint at current line" },
+			{ "<leader>dc", function() require("dap").continue() end, desc = "Start/continue debugging session" },
+		},
+		cmd = {
+			"DapContinue",
+			"DapToggleBreakpoint",
+			"DapStepOver",
+			"DapStepInto",
+			"DapStepOut",
+			"DapPause",
+			"DapTerminate",
+			"DapRestart",
+			"DapRunLast",
+			"DapDisconnect",
+			"DapSetExceptionBreakpoints",
+			"DapReplOpen",
+			"DapRunToCursor",
+			"DapToggleRepl",
+		},
+
 		dependencies = {
 			"williamboman/mason.nvim",
 			"jay-babu/mason-nvim-dap.nvim",
 		},
-		lazy = true,
 		config = function()
 			local dap = require("dap")
 
@@ -24,10 +44,12 @@ return {
 			local dapui = require("dapui")
 			local widgets = require("dap.ui.widgets")
 
+			local gu = require("_before.general_utils")
+
 			local function debug_next_function()
 				local session = require("dap").session()
 				if not session then
-					_G.print_custom("❌ Debugger is not running!")
+					gu.print_custom("❌ Debugger is not running!")
 					return
 				end
 
@@ -35,7 +57,7 @@ return {
 					-- Move to the next function call
 					local next_call = gu.goto_next_function_call()
 					if not next_call then
-						_G.print_custom("❌ No next function call found.")
+						gu.print_custom("❌ No next function call found.")
 						return
 					end
 
@@ -43,7 +65,7 @@ return {
 					-- dap.continue()
 					dap.run_to_cursor()
 				else
-					_G.print_custom("⏸ Debugger must be paused before running to the next function call!")
+					gu.print_custom("⏸ Debugger must be paused before running to the next function call!")
 				end
 			end
 

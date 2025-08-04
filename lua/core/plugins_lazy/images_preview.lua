@@ -1,7 +1,16 @@
+-- In your Neovim config somewhere (before plugins load)
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+	pattern = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" },
+	callback = function() vim.bo.filetype = "image" end,
+})
+
 return {
 	{
 		"3rd/image.nvim",
+		lazy = true,
+		ft = { "markdown", "vimwiki", "image" }, -- load only for these filetypes
 		opts = {
+
 			backend = "kitty", -- or "ueberzug"
 			integrations = {
 				markdown = {

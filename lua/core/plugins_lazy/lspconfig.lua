@@ -3,7 +3,6 @@ local pre_config = require("_before.pre_config")
 local use_mason = pre_config.useMasonLspConfig
 local use_lsp_config = not use_mason
 
-local hl = "core.plugins_lazy.helper.lsp_keybind"
 return {
 	"neovim/nvim-lspconfig",
 	lazy = true,
@@ -11,6 +10,7 @@ return {
 	dependencies = {
 		{ "williamboman/mason.nvim", build = ":MasonUpdate" },
 		"williamboman/mason-lspconfig.nvim",
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		"hrsh7th/nvim-cmp",
 	},
 
@@ -44,8 +44,41 @@ return {
 		if use_mason then
 			local mason_lspconfig = require("mason-lspconfig")
 			mason_lspconfig.setup({
-				ensure_installed = {},
+				ensure_installed = {
+					"lua_ls",
+					"solargraph",
+					"ts_ls",
+					"pyright",
+					"clangd",
+					"rust_analyzer",
+					"texlab",
+				},
+				automatic_installation = false, -- or true if you want automatic installs
 				automatic_enable = { "pyright", "lua_ls", exclude = {} },
+			})
+
+			require("mason-tool-installer").setup({
+				ensure_installed = {
+					-- Formatters, linters, debuggers, etc. (non-LSP servers)
+					"black",
+					"debugpy", -- debugger for python
+					"flake8",
+					"isort",
+					"mypy",
+					"pylint",
+					"ruff",
+
+					"prettier",
+					"clang-format", -- formatter
+					-- "clang-tidy",  -- optional (commented)
+
+					-- "chktex",       -- manually compiled, so exclude here
+
+					"latexindent", -- formatter for LaTeX
+				},
+				run_on_start = true,
+				auto_update = false,
+				start_delay = 3000,
 			})
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
