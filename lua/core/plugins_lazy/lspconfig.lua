@@ -1,7 +1,8 @@
 -- use mason lsp config, or regular lspconfig, to do your language dependant setups
 local pre_config = require("_before.pre_config")
 local use_mason = pre_config.useMasonLspConfig
-local use_lsp_config = not use_mason
+local use_lsp_config = pre_config.useRegularLspConfig
+local use_merged = pre_config.useMergedLspConfig
 
 return {
 	"neovim/nvim-lspconfig",
@@ -52,7 +53,6 @@ return {
 					"clangd",
 					"rust_analyzer",
 					"texlab",
-					"bash-language-server",
 				},
 				automatic_installation = true, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
@@ -84,11 +84,16 @@ return {
 			})
 			vim.lsp.config("lua_ls", extend_capabilities(lua_lsp.config))
 			vim.lsp.config("pyright", extend_capabilities(python_lsp.config))
-			vim.lsp.config("bashls", extend_capabilities(bash_lsp.config))
-			vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
-			vim.lsp.config("clangd", extend_capabilities(c_lsp.config))
-			vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
-			vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
+
+			-- It seems the others don't quite works if i set them up like that
+			local they_work = false
+			if they_work then
+				vim.lsp.config("bash-language-server", extend_capabilities(bash_lsp.config))
+				vim.lsp.config("opencl_ls", extend_capabilities(opencl_lsp.config))
+				vim.lsp.config("clangd", extend_capabilities(c_lsp.config))
+				vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
+				vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
+			end
 		end
 
 		-- This
@@ -98,15 +103,23 @@ return {
 			lspconfig.lua_ls.setup(lua_lsp.config)
 			lspconfig.pyright.setup(python_lsp.config)
 			lspconfig.bashls.setup(bash_lsp.config)
-			lspconfig.opencl_ls.setup(opencl_lsp.config)
-			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 			lspconfig.texlab.setup(latex_lsp.config)
+
+			lspconfig.clangd.setup(c_lsp.config)
+			lspconfig.opencl_ls.setup(opencl_lsp.config)
+			-- lspconfig.opencl_language_server.setup()
 
 			lspconfig.solargraph.setup({})
 			lspconfig.ts_ls.setup({})
 			lspconfig.gopls.setup({})
 			lspconfig.tailwindcss.setup({})
+
+			-- end of if statement
+		end
+
+		if use_merged then
+			-- not coded yet
 		end
 
 		vim.diagnostic.config({
