@@ -27,7 +27,7 @@ M.config = {
 	on_attach = function(client, bufnr)
 		-- your on_attach logic
 		local lsp_helper = require("lsps.helper.lsp_config_helper")
-		print("lua lsp attached")
+		print("rust lsp attached")
 		lsp_helper.add_keybinds()
 	end,
 }

@@ -52,9 +52,11 @@ return {
 					"clangd",
 					"rust_analyzer",
 					"texlab",
+					"bash-language-server",
 				},
-				automatic_installation = false, -- or true if you want automatic installs
-				automatic_enable = { "pyright", "lua_ls", exclude = {} },
+				automatic_installation = true, -- or true if you want automatic installs
+				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
+				automatic_enable = true,
 			})
 
 			require("mason-tool-installer").setup({

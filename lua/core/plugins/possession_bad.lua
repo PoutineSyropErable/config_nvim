@@ -7,13 +7,12 @@ local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/shar
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
 
-local nvim_possession = require("nvim-possession")
 if true then
 	return {}
 end
-local nvim_possession = require("nvim-possession")
 -- local bufferline = require("bufferline")
 -- local tabpage = require("bufferline.tabpages") -- Ensure it exists
+local nvim_possession = require("nvim-possession")
 
 local DEBUG = false -- Set to `true` to enable debug logs
 
