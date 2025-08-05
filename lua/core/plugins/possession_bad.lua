@@ -8,6 +8,10 @@ local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
 
 local nvim_possession = require("nvim-possession")
+if true then
+	return {}
+end
+local nvim_possession = require("nvim-possession")
 -- local bufferline = require("bufferline")
 -- local tabpage = require("bufferline.tabpages") -- Ensure it exists
 
@@ -171,3 +175,5 @@ local function ensure_session_exists()
 end
 
 -- ensure_session_exists()
+
+return {}

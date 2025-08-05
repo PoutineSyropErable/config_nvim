@@ -78,7 +78,7 @@ vim.cmd([[
 -- vim.opt.wildmenu = true
 -- vim.opt.wildmode = { "list", "longest", "full" } -- Ensure proper completion
 
-vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
+-- vim.g.python3_host_prog = "/home/francois/MainPython_Virtual_Environment/pip_venv/bin/python"
 
 vim.opt.sessionoptions = { -- required
 	"buffers",
