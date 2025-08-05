@@ -39,4 +39,6 @@ require("after.tabcd")
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
-vim.opt.lazyredraw = true
+
+-- for noice, must be false
+vim.opt.lazyredraw = false
