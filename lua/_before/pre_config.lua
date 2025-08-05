@@ -4,7 +4,7 @@ M.use_bufferline = false
 M.useJavaLspConfig = false
 M.useMyJavaDap = true
 
-M.useMasonLspConfig = false -- masonlspconfig, or regular lspconfig
+M.useMasonLspConfig = true -- masonlspconfig, or regular lspconfig
 M.useRegularLspConfig = true -- lspconfig
 M.useMergedLspConfig = false
 

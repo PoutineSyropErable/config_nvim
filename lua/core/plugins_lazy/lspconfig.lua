@@ -56,7 +56,8 @@ return {
 				},
 				automatic_installation = true, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
-				automatic_enable = true,
+				automatic_enable = { "clangd" },
+				-- automatic_enable = true,
 			})
 
 			require("mason-tool-installer").setup({
@@ -106,7 +107,7 @@ return {
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 			lspconfig.texlab.setup(latex_lsp.config)
 
-			lspconfig.clangd.setup(c_lsp.config)
+			-- lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
 			-- lspconfig.opencl_language_server.setup()
 
