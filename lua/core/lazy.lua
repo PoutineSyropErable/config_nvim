@@ -51,4 +51,11 @@ require("lazy").setup({
 		ft = { "log", "ansi", "txt" },
 		cmd = { "AnsiEsc" },
 	},
+	{
+		dir = "~/.config/nvim/tabout_tree",
+		-- "PoutineSyropErable/tabout-tree.nvim",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		config = function() require("treesitter_inspect").setup() end,
+		-- lazy = false  -- Remove comment if you want immediate loading
+	},
 })
