@@ -192,7 +192,7 @@ local function get_child_nodes_around_cursor(node)
 		table.insert(children, {
 			node = child,
 			index = i,
-			is_after = (cursor_row < end_row) or (cursor_row == end_row and cursor_col <= end_col),
+			is_after = (cursor_row < end_row) or (cursor_row == end_row and cursor_col < end_col),
 		})
 	end
 
@@ -249,3 +249,6 @@ vim.keymap.set({ "i", "n" }, "<M-d>", jump_out_forward, { noremap = true, silent
 vim.keymap.set({ "i", "n" }, "<M-a>", jump_out_backward, { noremap = true, silent = true, desc = "Jump back into pair" })
 vim.keymap.set({ "i", "n" }, "<M-w>", jump_to_next_child, { noremap = true, silent = true, desc = "Jump to next child node" })
 vim.keymap.set({ "i", "n" }, "<M-s>", jump_to_prev_child, { noremap = true, silent = true, desc = "Jump to previous child node" })
+
+-- once cousins works, then the movement tree must be added.
+-- after that, i'll have some awesome insert mode navigation

@@ -41,7 +41,6 @@ local rhubarb = {
 	cmd = { "GBrowse" },
 	keys = {
 		{ "<leader>Go", ":GBrowse<CR>", desc = "Open file/line on GitHub (Rhubarb)" },
-		{ "<leader>Gc", ":GBrowse<CR>", desc = "Open current commit on GitHub (Rhubarb)" },
 	},
 }
 
