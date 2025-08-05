@@ -58,4 +58,17 @@ require("lazy").setup({
 		config = function() require("treesitter_inspect").setup() end,
 		-- lazy = false  -- Remove comment if you want immediate loading
 	},
+	{
+		"PoutineSyropErable/nvim-possession", --- TODO, make my own
+		branch = "main", -- Ensure you're using the correct branch
+		dependencies = {
+			"ibhagwan/fzf-lua",
+			{
+				"tiagovla/scope.nvim",
+				lazy = false,
+				config = true,
+			},
+		},
+		config = true,
+	},
 })
