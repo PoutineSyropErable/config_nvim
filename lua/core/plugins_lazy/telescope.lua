@@ -33,6 +33,11 @@ return {
 				function() require(hp).live_grep_current_word() end,
 				desc = "Live grep current word",
 			},
+			{
+				"gW",
+				"<cmd>Telescope grep_string<cr>",
+				desc = "Live grep current word (till spaces)",
+			},
 
 			{
 				"<leader>fs",
@@ -47,7 +52,7 @@ return {
 			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
 
 			{ "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Fuzzy Find in Buffer" },
-			{ "<leader>fG", "<cmd>Telescope grep_string", desc = "grep string" },
+			{ "<leader>fG", "<cmd>Telescope grep_string<cr>", desc = "grep string" },
 
 			{ "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recently Used Files" },
 			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },

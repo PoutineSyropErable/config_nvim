@@ -2,6 +2,9 @@
 set -e
 
 # This file is to add and compile chtek, the latex linter
+printf "Are you sure you want to install it? (Read the text) [y/N] "
+read REPLY
+[[ "$REPLY" =~ ^[Yy]$ ]] || exit 1
 
 # Variables
 CHKURL="https://git.savannah.nongnu.org/cgit/chktex.git"

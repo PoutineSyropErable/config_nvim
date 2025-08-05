@@ -20,7 +20,7 @@ return {
 					enabled = true,
 					style = "nvchad", -- More transparent style
 				},
-				which_key = true,
+				-- which_key = true,
 			},
 			custom_highlights = function(colors)
 				return {
@@ -36,9 +36,10 @@ return {
 		})
 
 		vim.o.termguicolors = true
+		-- vim.o.background = "dark"
 		vim.cmd.colorscheme("catppuccin")
 
-		local extra = true
+		local extra = false
 		if extra then
 			-- Additional fixes for specific plugins
 			vim.api.nvim_create_autocmd("ColorScheme", {

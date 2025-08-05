@@ -10,6 +10,7 @@ return {
 	-- toggle terminals with directions
 	keys = {
 		{ "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", desc = "Toggle Floating Terminal" },
+		{ "<C-t>", "<cmd>ToggleTerm direction=float<CR>", desc = "Toggle Floating Terminal" },
 		{ "<leader>tv", "<cmd>ToggleTerm direction=horizontal<CR>", desc = "Toggle Horizontal Terminal" },
 		{ "<leader>th", "<cmd>ToggleTerm direction=vertical<CR>", desc = "Toggle Vertical Terminal" },
 		{ "<leader>tu", function() end, desc = "Float Terminal Top Left" }, -- placeholders for lazy loading

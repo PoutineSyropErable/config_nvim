@@ -52,7 +52,7 @@ return {
 
 		vim.keymap.set(
 			"n",
-			"<leader>pn",
+			"<leader>pa",
 			function() vim.notify(get_all_tab_names(), vim.log.levels.INFO, { title = "Tab Names" }) end,
 			{ desc = "Show all tab names" }
 		)

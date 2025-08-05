@@ -14,6 +14,10 @@ M.config = {
 				checkThirdParty = false,
 			},
 			telemetry = { enable = false },
+			hint = {
+				enable = true,
+				-- arrayIndex = "Disable", -- Makes table.access more visible
+			},
 		},
 	},
 	on_attach = function(client, bufnr)

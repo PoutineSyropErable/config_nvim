@@ -9,7 +9,10 @@ return {
 				-- ensure_installed = { "asm", "c", "cpp", "lua", "rust", "vim", "html", "python", "java", "css", "xml" },
 				sync_install = false,
 				auto_install = false, -- disable auto_install here since we'll handle manually
-				highlight = { enable = true },
+				highlight = {
+					enable = true,
+					-- additional_vim_regex_highlighting = false, -- maybe not necessary
+				},
 				indent = { enable = true, disable = { "latex" } },
 			})
 
