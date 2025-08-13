@@ -1,6 +1,14 @@
-[submodule "lua/meld_like_merge"]
-	path = lua/meld_like_merge
-	url = https://github.com/PoutineSyropErable/meld-like-merge.nvim.git
+
 [submodule "meld_like_merge"]
 	path = meld_like_merge
 	url = https://github.com/PoutineSyropErable/meld-like-merge.nvim.git
+
+[submodule "tabout_tree"]
+	path = tabout_tree
+	url = https://github.com/PoutineSyropErable/tabout-tree.nvim
+
+[submodule "nvim-possession"]
+	path = nvim-possession
+	url = https://github.com/PoutineSyropErable/nvim-possession
+
+
