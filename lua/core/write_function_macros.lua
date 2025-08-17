@@ -2,7 +2,14 @@
 
 local keymap = vim.keymap
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
-local gu = require("_before.general_utils")
+local gu = function() return require("_before.general_utils") end
+
+local builtin = function() return require("telescope.builtin") end
+local finders = function() return require("telescope.finders") end
+local pickers = function() return require("telescope.pickers") end
+local conf = function() return require("telescope.config").values end
+local actions = function() return require("telescope.actions") end
+local action_state = function() return require("telescope.actions.state") end
 
 -- Function to fetch symbols (LSP + buffer fallback)
 
@@ -114,14 +121,14 @@ local function select_symbol(callback)
 	local symbols = get_symbols()
 
 	if #symbols == 0 then
-		gu.print_custom("No symbols found!")
+		gu().print_custom("No symbols found!")
 		return
 	end
 
-	pickers
+	pickers()
 		.new({}, {
 			prompt_title = "Select Symbol",
-			finder = finders.new_table({
+			finder = finders().new_table({
 				results = symbols,
 				entry_maker = function(entry)
 					return {
@@ -131,11 +138,11 @@ local function select_symbol(callback)
 					}
 				end,
 			}),
-			sorter = conf.generic_sorter({}),
+			sorter = conf().generic_sorter({}),
 			attach_mappings = function(_, map)
 				map("i", "<CR>", function(prompt_bufnr)
-					local selection = action_state.get_selected_entry()
-					actions.close(prompt_bufnr)
+					local selection = action_state().get_selected_entry()
+					actions().close(prompt_bufnr)
 					if selection and callback then
 						callback(selection.value) -- Call the callback function with selected value
 					end
@@ -152,7 +159,7 @@ end
 
 --------------------------------- WRITE FUNCTIONS MACRO --------------------------------------
 
-gu.debug_utils = {}
+local debug_utils = {}
 
 local function get_indent()
 	local indent_level = vim.fn.indent(".") -- Get indentation level in spaces
@@ -168,18 +175,20 @@ local function get_indent()
 end
 
 -- Simple write function to print variable name and value.
-function gu.debug_utils.write_function_simple()
+function debug_utils.write_function_simple()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
 			local print_statement = string.format("%sprint(f'%s = {%s}')", indent, input, input)
 			vim.api.nvim_put({ print_statement }, "l", true, true)
+			-- Exit insert mode if needed
+			vim.api.nvim_command("stopinsert")
 		end
 	end)
 end
 
 -- Write function for NumPy variables to print shape and value.
-function gu.debug_utils.write_function_numpy()
+function debug_utils.write_function_numpy()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
@@ -199,7 +208,7 @@ function gu.debug_utils.write_function_numpy()
 end
 
 -- Function to write debug prints for max, mean, std dev of a variable
-function gu.debug_utils.write_function_stats()
+function debug_utils.write_function_stats()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
@@ -219,7 +228,7 @@ function gu.debug_utils.write_function_stats()
 end
 
 -- Write function for NumPy variables to print shape and value (new line version).
-function gu.debug_utils.write_function_np_newline()
+function debug_utils.write_function_np_newline()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
@@ -238,7 +247,7 @@ function gu.debug_utils.write_function_np_newline()
 	end)
 end
 
-function gu.debug_utils.write_function_newline()
+function debug_utils.write_function_newline()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
@@ -249,7 +258,7 @@ function gu.debug_utils.write_function_newline()
 end
 
 -- Enhanced debug function for more robust NumPy variable checks.
-function gu.debug_utils.write_function_debug()
+function debug_utils.write_function_debug()
 	get_variable_name(function(input)
 		if input and input ~= "" then
 			local indent = get_indent()
@@ -285,14 +294,14 @@ local function select_symbol_and_jump()
 	local symbols = get_symbols()
 
 	if #symbols == 0 then
-		gu.print_custom("❌ No symbols found!")
+		gu().print_custom("❌ No symbols found!")
 		return
 	end
 
-	pickers
+	pickers()
 		.new({}, {
 			prompt_title = "Select Symbol",
-			finder = finders.new_table({
+			finder = finders().new_table({
 				results = symbols,
 				entry_maker = function(entry)
 					return {
@@ -302,11 +311,11 @@ local function select_symbol_and_jump()
 					}
 				end,
 			}),
-			sorter = conf.generic_sorter({}),
+			sorter = conf().generic_sorter({}),
 			attach_mappings = function(_, map)
 				map("i", "<CR>", function(prompt_bufnr)
-					local selection = action_state.get_selected_entry()
-					actions.close(prompt_bufnr)
+					local selection = action_state().get_selected_entry()
+					actions().close(prompt_bufnr)
 					if selection and selection.value then
 						vim.cmd("normal! gg") -- Move to top before searching
 						vim.fn.search("\\<" .. selection.value.name .. "\\>", "w") -- Search for symbol
@@ -318,18 +327,18 @@ local function select_symbol_and_jump()
 		:find()
 end
 
-select_and_write_function = function()
-	builtin.treesitter({
+function debug_utils.select_and_write_function()
+	builtin().treesitter({
 		default_text = ":function:",
 		attach_mappings = function(_, map)
 			local insert_function_call = function(prompt_bufnr)
-				local selection = action_state.get_selected_entry()
-				actions.close(prompt_bufnr)
+				local selection = action_state().get_selected_entry()
+				actions().close(prompt_bufnr)
 				if selection and selection.value then
 					local func_name_and_symbol_type = selection.ordinal or selection.display or "unknown"
 					-- local func_name = selection.display
 					local func_name = vim.split(func_name_and_symbol_type, "%s+")[1]
-					gu.print_custom("the function name is: \n" .. vim.inspect(func_name))
+					gu().print_custom("the function name is: \n" .. vim.inspect(func_name))
 					vim.api.nvim_put({ func_name .. "()" }, "", true, true)
 				end
 			end
@@ -343,9 +352,10 @@ select_and_write_function = function()
 end
 
 ---- Bind the functions to keymaps -----
-keymap.set("n", "<leader>wfs", gu.debug_utils.write_function_simple, opts("Write Function Simple"))
-keymap.set("n", "<leader>wfn", gu.debug_utils.write_function_numpy, opts("Write Function Numpy"))
-keymap.set("n", "<leader>wfN", gu.debug_utils.write_function_np_newline, opts("Write Function Numpy NewLine"))
-keymap.set("n", "<leader>wfl", gu.debug_utils.write_function_newline, opts("Write Function NewLine"))
-keymap.set("n", "<leader>wfd", gu.debug_utils.write_function_debug, opts("Write Function Debug"))
-keymap.set("n", "<leader>wfS", gu.debug_utils.write_function_stats, opts("Write Function Stats"))
+keymap.set("n", "<leader>wfs", debug_utils.write_function_simple, opts("Write Function Simple"))
+keymap.set("n", "<leader>wfn", debug_utils.write_function_numpy, opts("Write Function Numpy"))
+keymap.set("n", "<leader>wfN", debug_utils.write_function_np_newline, opts("Write Function Numpy NewLine"))
+keymap.set("n", "<leader>wfl", debug_utils.write_function_newline, opts("Write Function NewLine"))
+keymap.set("n", "<leader>wfd", debug_utils.write_function_debug, opts("Write Function Debug"))
+keymap.set("n", "<leader>wfS", debug_utils.write_function_stats, opts("Write Function Stats"))
+keymap.set("n", "<leader>wsw", debug_utils.select_and_write_function, opts("Select and write function"))
