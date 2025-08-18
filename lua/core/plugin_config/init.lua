@@ -9,14 +9,15 @@ require("core.plugin_config.telescope")
 require("core.plugin_config.neoclip")
 require("core.plugin_config.terminal_file_manager")
 
-require("core.plugin_config.mason")
 if PRE_CONFIG_FRANCK.useNvimJava then
 	require("core.plugin_config.nvim-java")
 end
 require("core.plugin_config.lsp_config")
+require("core.plugin_config.lsp_config_helper")
 require("core.plugin_config.completions")
 require("core.plugin_config.conform")
 require("core.plugin_config.black")
+require("core.plugin_config.lsp_saga")
 
 require("core.plugin_config.nvim-dap-config")
 require("core.plugin_config.nvim-dap-virtual-text")
@@ -31,6 +32,7 @@ end
 
 require("core.plugin_config.fugitive")
 require("core.plugin_config.undotree")
+require("core.plugin_config.pathfinder")
 require("core.plugin_config.toggleterm")
 require("core.plugin_config.markview")
 require("core.plugin_config.image")
@@ -39,16 +41,20 @@ require("core.plugin_config.mini_surround")
 require("core.plugin_config.gitsigns")
 require("core.plugin_config.tressj")
 
-require("core.plugin_config.swagger-preview")
 require("core.plugin_config.vim-test")
 require("core.plugin_config.colors-highlight")
 
 require("core.plugin_config.lualine")
-require("core.plugin_config.bufferline")
--- require("core.plugin_config.barbar")
+if _G.PRE_CONFIG_FRANCK.use_bufferline then
+	require("core.plugin_config.bufferline")
+else
+	require("core.plugin_config.barbar")
+end
 
 require("core.plugin_config.nvim-possession")
 require("core.plugin_config.nvim-ufo")
+require("core.plugin_config.color_picker_ccc")
+require("core.plugin_config.spectre")
 
 ------ ##### DEACTIVATED ##### -------
 

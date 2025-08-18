@@ -1,6 +1,16 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+local FIND_PRINT = false
+
+if FIND_PRINT then
+	local original_print = print
+	print = function(...)
+		original_print(...)
+		original_print(debug.traceback()) -- This prints the stack trace
+	end
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
@@ -16,13 +26,13 @@ vim.opt.rtp:prepend(lazypath)
 
 require("pre_keymaps")
 require("pre_config") -- The config before the plugins loading
-require("core.options")
-require("core.plugins")
+require("core.options") --filetype association here
+require("core.plugins") -- lazy load here
 require("core.plugin_config")
 require("core.spellcheck")
 require("core.keymaps")
 require("pre_keymaps") -- need a repeat in case plugins default cahnged it
--- require("core.plugin_config.noice")
+require("core.plugin_config.noice")
 
 vim.api.nvim_set_hl(0, "LineNr", { fg = "#ef2f81" }) -- Change this to your desired color for relative line numbers
 -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#00ff00" }) -- Change this to your desired color for the current line number

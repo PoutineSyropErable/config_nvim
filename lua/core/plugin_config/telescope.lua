@@ -17,6 +17,22 @@ end
 -- Setup Telescope with defaults and picker configurations
 telescope.setup({
 	defaults = {
+		layout_strategies = "horizontal",
+		-- layout_strategies = "vertical",
+		-- layout_strategies = "flex",
+		-- changing it doesn't do shit
+		layout_config = {
+			horizontal = {
+				width = 0.95, -- 95% of total screen width
+				height = 0.9, -- 90% of screen height
+				preview_width = 0.5, -- 50% of that width goes to preview
+			},
+			vertical = {
+				width = 0.9,
+				height = 0.95,
+				preview_height = 0.5,
+			},
+		},
 		-- Ignore node_modules directory
 		file_ignore_patterns = { "node_modules/.*", "%.git/.*", ".nvim-session/.*" }, -- Ignore node_modules
 	},
@@ -27,6 +43,7 @@ telescope.setup({
 			follow = true, -- Follow symbolic links
 			attach_mappings = function(_, map)
 				map("i", "<C-n>", create_new_file)
+				-- C-v to open in a split
 				return true
 			end,
 		},
@@ -52,7 +69,7 @@ telescope.setup({
 							local file_dir = vim.fn.fnamemodify(entry.path, ":h") -- Get directory of selected file
 							vim.cmd("tcd " .. vim.fn.fnameescape(file_dir)) -- Change tab-local directory
 							tapi.tree.change_root(file_dir) -- Sync Nvim-Tree
-							print("Telescope: Changed tab directory to: " .. file_dir)
+							_G.print_custom("Telescope: Changed tab directory to: " .. file_dir)
 						end
 
 						actions.select_default(prompt_bufnr) -- Open file

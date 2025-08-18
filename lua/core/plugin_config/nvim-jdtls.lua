@@ -60,7 +60,7 @@ end)
 if not status then
 	vim.notify("Error loading Java Debug plugin: " .. debug_plugin, vim.log.levels.ERROR)
 else
-	print("Using Debug Plugin:", debug_plugin)
+ _G.print_custom("Using Debug Plugin:", debug_plugin)
 end
 
 -- Use the jdtls_home variable to find the JDTLS configuration path

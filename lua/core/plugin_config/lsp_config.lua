@@ -1,48 +1,47 @@
-require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "jdtls" },
-	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
-	automatic_installation = true,
-})
+require("mason").setup()
 
 require("mason-tool-installer").setup({
-
 	ensure_installed = {
-		"black",
-		"debugpy",
-		"flake8",
-		"isort",
-		"mypy",
-		"pylint",
-		"ruff",
+		"black", -- Python Formatter
+		"isort", -- Import sorter
+		"pylint", -- Python Linter (keep this)
+		"debugpy", -- Python Debugger
 
-		"prettier",
-		"clangd",
-		"clang-format",
-		-- "clang-tidy",
+		"clang-format", -- C auto formatter
 
-		"texlab", -- lsp parser
+		"texlab", -- Latex LSP
+		"latexindent", -- LaTex autoformatter
 
-		-- "chktex", -- Linter for LaTeX
-		-- Get chktex by compiling it, figure it out lol.
-		-- (http://git.savannah.nongnu.org/cgit/chktex.git)
-		-- download, extract, cd
-		-- /autogen.sh
-		--./configure --prefix=/usr/local^J
-		--make -j$(nproc)^J
-		--sudo make install^J
-		--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
-		--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
-		-- chatgpt to I.T./Debug/Make it work
-
-		"latexindent", -- Formatter for LaTeX
+		"prettier", -- json and other web
 	},
 })
 
+require("mason-lspconfig").setup({
+	ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "jdtls" },
+	-- ensure_installed = { "lua_ls", "solargraph", "ts_ls", "pyright", "clangd", "rust_analyzer", "texlab" },
+	automatic_installation = true,
+	automatic_enable = false,
+	-- automatic enable will double these lsps
+})
+---- what if shitty mason lsp config was the one doing it?
+
 local lspconfig = require("lspconfig")
 local lsp_defaults = lspconfig.util.default_config
-_G.MyRootDir = nil -- Global variable to hold the root directory
+local cmp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+local merged_capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, cmp_capabilities)
+lsp_defaults.capabilities = merged_capabilities
 
-lsp_defaults.capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, require("cmp_nvim_lsp").default_capabilities())
+local c_capabilities = vim.tbl_deep_extend("force", require("lspconfig").clangd.document_config.default_config.capabilities, merged_capabilities)
+
+require("lint").linters_by_ft = {
+	-- python = { "pylint" }, -- Primary linter
+	-- clangtidy is already a flag from clangd
+}
+
+-- Run pylint on save
+vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+	callback = function() require("lint").try_lint() end,
+})
 
 vim.diagnostic.config({
 	virtual_text = {
@@ -55,8 +54,11 @@ vim.diagnostic.config({
 	severity_sort = true,
 })
 
----------------------------------------- ASM -------------------------------------
+-- vim.diagnostic.config({ virtual_text = false })
 
+_G.MyRootDir = nil -- Global variable to hold the root directory
+
+---------------------------------------- ASM -------------------------------------
 lspconfig.asm_lsp.setup({
 	cmd = { "asm-lsp" },
 	filetypes = { "asm", "s", "S" },
@@ -77,7 +79,7 @@ lspconfig.bashls.setup({
 })
 
 --------------------------------------- LUA ---------------------------------------
-require("neodev").setup({})
+-- Use lazydev
 lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
@@ -93,8 +95,15 @@ lspconfig.lua_ls.setup({
 			},
 		},
 	},
-})
 
+	on_attach = function(client, bufnr)
+		-- This function will be called when the LSP is fully initialized
+		general_utils_franck.send_notification("please work")
+		_G.print_custom("LSP " .. client.name .. " is attached!")
+		_G.print_custom("LSP " .. client.name .. vim.inspect(client.initialized))
+		-- You can perform additional actions here, for example, setting some custom configurations
+	end,
+})
 --------------------------------------- PYTHON ---------------------------------------
 lspconfig.pyright.setup({
 
@@ -117,7 +126,7 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	local clients = vim.lsp.get_clients()
 	for _, client in ipairs(clients) do
 		if client.name == "pyright" then
-			print("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
+			_G.print_custom("🛠 Pyright Root: " .. (client.config.root_dir or "Unknown"))
 		end
 	end
 
@@ -125,22 +134,80 @@ vim.api.nvim_create_user_command("PyrightDebug", function()
 	vim.cmd("!pyright --verbose")
 end, {})
 
+------------------------------------------ Open CL -----------------------------
+lspconfig.opencl_ls.setup({
+	cmd = { "opencl-language-server123123" },
+	filetypes = { "opencl" },
+	root_dir = lspconfig.util.root_pattern(".git", ".asm-lsp.toml"),
+	capabilities = vim.tbl_deep_extend("force", lsp_defaults.capabilities, {
+		offsetEncoding = "utf-8",
+		positionEncodings = "utf-8",
+	}),
+	init_options = {
+		offsetEncoding = "utf-8", -- Some servers need this too
+	},
+})
+
+-- Not needed, or else it would add two clients
+
+--------------------------------------- R ---------------------------------------
+lspconfig.r_language_server.setup({
+	cmd = { "R", "--slave", "-e", "languageserver::run()" },
+	filetypes = { "r", "rmd" },
+	root_dir = lspconfig.util.root_pattern(".git", ".Rproj", ".here"),
+	settings = {},
+	on_attach = function(client, bufnr) _G.print_custom("R LSP attached: " .. client.name) end,
+})
+
+--------------------------------------- Perl ---------------------------------------
+lspconfig.perlnavigator.setup({
+	cmd = { "perlnavigator" },
+	filetypes = { "perl" },
+	root_dir = lspconfig.util.root_pattern(".git", "*.pl", "*.pm", "*.t", "Makefile.PL", "Build.PL"),
+	settings = {
+		perlnavigator = {
+			perlPath = "perl", -- adjust if using perlbrew or plenv
+			enableWarnings = true,
+			includePaths = {}, -- additional `-I` paths if needed
+			formatting = {
+				enabled = true,
+			},
+		},
+	},
+	on_attach = function(client, bufnr) _G.print_custom("Perl LSP attached: " .. client.name) end,
+})
+
 --------------------------------------- C/C++ ---------------------------------------
 
 lspconfig.clangd.setup({
 	cmd = {
 		-- clangd command with additional options
 		"clangd",
-		"--offset-encoding=utf-16",
+		-- "--offset-encoding=utf-8",
 		"--background-index", -- Enable background indexing
 		"--clang-tidy", -- Enable clang-tidy diagnostics
-		"--completion-style=bundled", -- Style for autocompletion
+		"--completion-style=detailed", -- Shows full signatures
+		"--function-arg-placeholders", -- Displays parameter names
 		"--cross-file-rename", -- Support for renaming symbols across files
 		"--header-insertion=iwyu", -- Include "what you use" insertion
 		"--log=verbose",
+		"--query-driver=/opt/rocm/llvm/bin/*", -- Critical for ROCm OpenCL
+		"--fallback-style=llvm",
 	},
-	capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
-	filetypes = { "c", "cpp", "objc", "objcpp", "x" },
+	init_options = {
+		clangdFileStatus = true,
+		usePlaceholders = true,
+		completeUnimported = true,
+		fallbackFlags = {
+			"-I/opt/rocm/opencl/include", -- ROCm OpenCL headers
+			"-I/usr/include/clc", -- Generic OpenCL headers
+			"-cl-std=CL2.0", -- OpenCL version flag
+			"-xcl", -- Force OpenCL mode
+		},
+	},
+	-- capabilities = lsp_defaults.capabilities, -- Auto-completion capabilities
+	capabilities = c_capabilities,
+	filetypes = { "c", "cpp", "objc", "objcpp", "x", "opencl" },
 	root_dir = lspconfig.util.root_pattern("compile_commands.json", ".clang-format", ".clangd", "compile_flags.txt", "Makefile", "build.sh", ".git"),
 	settings = {
 		clangd = {
@@ -150,7 +217,8 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		local root = client.config.root_dir
 		_G.MyRootDir = client.config.root_dir
-		-- print("Clangd root directory detected: " .. (root or "none"))
+		general_utils_franck.send_notification("attaching clangd")
+		_G.print_custom("Clangd root directory detected: " .. (root or "none"))
 	end,
 })
 
@@ -181,10 +249,6 @@ lspconfig.rust_analyzer.setup({
 	on_attach = function(client, bufnr)
 		-- Keymaps specific to Rust LSP
 		_G.MyRootDir = client.config.root_dir
-		local opts = { buffer = bufnr }
-		-- vim.keymap.set("n", "<leader>cr", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-		-- vim.keymap.set("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-		-- vim.keymap.set("n", "<leader>f", "<cmd>lua vim.lsp.buf.format({ async = true })<CR>", opts)
 	end,
 })
 
@@ -224,7 +288,7 @@ if useJavaLspConfig then
 	end
 
 	debug_plugin = get_debug_plugin()
-	print("Java Debug Plugin Path:", debug_plugin)
+	_G.print_custom("Java Debug Plugin Path:", debug_plugin)
 
 	local general_utils = _G.general_utils_franck
 	if not general_utils then
@@ -269,7 +333,7 @@ if useJavaLspConfig then
 		on_attach = function(client, bufnr)
 			-- Update the global variable when the LSP attaches
 			_G.MyRootDir = client.config.root_dir
-			-- print("Java root directory detected: " .. (_G.MyRootDir or "none"))
+			-- _G.print_custom("Java root directory detected: " .. (_G.MyRootDir or "none"))
 		end,
 	})
 end
@@ -291,7 +355,7 @@ lspconfig.tailwindcss.setup({})
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 	pattern = { "*.hl", "hypr*.conf" },
 	callback = function(event)
-		-- print(string.format("starting hyprls for %s", vim.inspect(event)))
+		-- _G.print_custom(string.format("starting hyprls for %s", vim.inspect(event)))
 		vim.lsp.start({
 			name = "hyprlang",
 			cmd = { "hyprls" },
@@ -350,11 +414,11 @@ lspconfig.texlab.setup({
 	},
 	capabilities = lsp_defaults.capabilities,
 	on_attach = function(client, bufnr)
-		print("LaTeX File:", tex_file)
-		print("Aux Directory:", tex_output)
-		print("PDF Output Directory:", pdf_output_dir)
-		print("PDF File:", pdf_file)
-		print(
+		_G.print_custom("LaTeX File:", tex_file)
+		_G.print_custom("Aux Directory:", tex_output)
+		_G.print_custom("PDF Output Directory:", pdf_output_dir)
+		_G.print_custom("PDF File:", pdf_file)
+		_G.print_custom(
 			"Compile Command: latexmk -pdf -interaction=nonstopmode -synctex=1 -aux-directory="
 				.. tex_output
 				.. " -output-directory="
@@ -362,7 +426,7 @@ lspconfig.texlab.setup({
 				.. " "
 				.. tex_file
 		)
-		print("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
+		_G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
 
@@ -382,13 +446,25 @@ vim.g.vimtex_compiler_latexmk = {
 -- vim.api.nvim_create_user_command("CheckLSP", function()
 -- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
 -- 	if #clients > 1 then
--- 		print("🚀 More than one LSP server is attached to this buffer:")
+-- 	 _G.print_custom("🚀 More than one LSP server is attached to this buffer:")
 -- 		for _, client in ipairs(clients) do
--- 			print(" - " .. client.name)
+-- 		 _G.print_custom(" - " .. client.name)
 -- 		end
 -- 	elseif #clients == 1 then
--- 		print("✅ Only one LSP server is attached: " .. clients[1].name)
+-- 	 _G.print_custom("✅ Only one LSP server is attached: " .. clients[1].name)
 -- 	else
--- 		print("❌ No LSP servers attached to this buffer")
+-- 	 _G.print_custom("❌ No LSP servers attached to this buffer")
 -- 	end
 -- end, {})
+
+-- "chktex" installation guide -- Linter for LaTeX
+-- Get chktex by compiling it, figure it out lol.
+-- (http://git.savannah.nongnu.org/cgit/chktex.git)
+-- download, extract, cd
+-- /autogen.sh
+--./configure --prefix=/usr/local^J
+--make -j$(nproc)^J
+--sudo make install^J
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.bashrc
+--echo 'export CHKTEXRC=/usr/local/etc/chktexrc' >> ~/.zshrc
+-- chatgpt to I.T./Debug/Make it work
