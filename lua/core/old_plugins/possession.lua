@@ -212,6 +212,7 @@ local function opts(desc) return { noremap = true, silent = true, desc = desc } 
 keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
 keymap.set("n", "<leader>pc", function() require("nvim-possession").new() end, opts("📌create new session"))
 keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
+keymap.set("n", "<leader>pD", function() require("nvim-possession").wipe_all_sessions() end, opts("📌wipe all session files"))
 keymap.set("n", "<leader>pm", ":ScopeMoveBuf", opts("move current buffer to the tab nbr"))
 
 local function rename_tab()
