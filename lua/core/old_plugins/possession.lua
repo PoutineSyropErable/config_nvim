@@ -7,9 +7,6 @@ local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/shar
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
 
-if true then
-	return {}
-end
 -- local bufferline = require("bufferline")
 -- local tabpage = require("bufferline.tabpages") -- Ensure it exists
 local nvim_possession = require("nvim-possession")
@@ -173,6 +170,5 @@ local function ensure_session_exists()
 	end
 end
 
--- ensure_session_exists()
-
-return {}
+ensure_session_exists()
+gu.print_custom("possession loaded")

@@ -72,3 +72,5 @@ require("lazy").setup({
 		config = true,
 	},
 })
+
+require("core.old_plugins.possession")
