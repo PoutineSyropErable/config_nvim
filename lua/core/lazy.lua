@@ -70,6 +70,7 @@ require("lazy").setup({
 			},
 		},
 		config = true,
+		lazy = false,
 	},
 })
 

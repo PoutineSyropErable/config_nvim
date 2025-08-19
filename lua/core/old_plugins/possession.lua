@@ -127,7 +127,7 @@ nvim_possession.setup({
 
 		-- vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
 
-		load_tab_names()
+		-- load_tab_names()
 		-- vim.cmd([[AttachAllLSPs]])
 	end,
 

@@ -44,7 +44,8 @@ def open_nvim(files: List[str], remote_session_name: str = DEFAULT_RSM):
     send_files_output_queue: Queue[str] = Queue()
     attach_lsps_output_queue: Queue[str] = Queue()
     if files:
-        delay_action(0.5, send_to_nvim, files, remote_session_name, False, send_files_output_queue)
+        # delay_action(10, send_to_nvim, files, remote_session_name, False, send_files_output_queue)
+        pass
     # delay_action(1, attach_lsp_to_all_buffers, socket, False, attach_lsps_output_queue)
     neovim_process = subprocess.run(command)
 
