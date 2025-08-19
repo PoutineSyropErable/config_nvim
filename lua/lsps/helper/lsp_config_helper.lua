@@ -159,6 +159,7 @@ end
 
 --- Function to check active buffers and attach corresponding LSPs
 M.attach_lsp_to_all_buffers = function()
+	M.print_attach("Attaching all LSPs")
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 		local filetype = vim.bo[bufnr].filetype
 

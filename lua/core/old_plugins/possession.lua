@@ -3,6 +3,10 @@
 local gu = require("_before.general_utils")
 local ggu = function() return require("_before.general_utils") end
 
+-- maybe make it so that it requires lsp helper only if there's filename with extension filetype...
+local lsp_helper = require("lsps.helper.lsp_config_helper")
+-- Define the command to attach all LSPs
+
 local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
@@ -75,6 +79,7 @@ end
 
 -- This doesnt work cause we need one without user input
 local function set_session_dir()
+	gu.print_custom("Set session dir is called")
 	local project_root = gu.find_project_root(false)
 	-- gu.print_custom("setting session dir")
 	if project_root == nil then
@@ -120,9 +125,10 @@ nvim_possession.setup({
 			gu.print_custom("📂 Loaded session:", session_file)
 		end
 
-		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
+		-- vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
+
 		load_tab_names()
-		vim.cmd([[AttachAllLSPs]])
+		-- vim.cmd([[AttachAllLSPs]])
 	end,
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session
@@ -170,7 +176,7 @@ local function ensure_session_exists()
 	end
 end
 
-ensure_session_exists()
+-- ensure_session_exists()
 gu.print_custom("possession loaded")
 
 local keymap = vim.keymap
@@ -191,11 +197,3 @@ local function rename_tab()
 	end
 end
 keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
-
-local lsp_helper = require("lsps.helper.lsp_config_helper")
--- Define the command to attach all LSPs
-vim.api.nvim_create_user_command(
-	"AttachAllLSPs",
-	function() lsp_helper.attach_lsp_to_all_buffers() end,
-	{ desc = "Attach all LSPs to active buffers" }
-)

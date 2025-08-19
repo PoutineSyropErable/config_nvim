@@ -1,0 +1,1 @@
+/home/francois/.config/nvim/scripts/pythonScripts/open_remote_nvim.py
