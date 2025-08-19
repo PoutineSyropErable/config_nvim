@@ -1,7 +1,6 @@
 --  Store session directory once when Neovim starts
 
-local gu = require("_before.general_utils")
-local ggu = function() return require("_before.general_utils") end
+local guu = function() return require("_before.general_utils") end
 
 -- maybe make it so that it requires lsp helper only if there's filename with extension filetype...
 local lsp_helper = require("lsps.helper.lsp_config_helper")
@@ -33,7 +32,7 @@ local function get_all_tab_names()
 end
 local function save_tab_names()
 	if not session_dir or not session_name then
-		gu.print_custom("❌ No valid session directory or name")
+		guu().print_custom("❌ No valid session directory or name")
 		return
 	end
 
@@ -43,14 +42,14 @@ local function save_tab_names()
 
 	vim.fn.writefile({ json_data }, tab_names_file)
 	if DEBUG then
-		gu.print_custom("💾 Tab names saved to: " .. tab_names_file)
+		guu().print_custom("💾 Tab names saved to: " .. tab_names_file)
 	end
 end
 
 local function load_tab_names()
 	if not session_dir or not session_name then
 		if DEBUG then
-			gu.print_custom("❌ No valid session directory or name")
+			guu().print_custom("❌ No valid session directory or name")
 		end
 		return
 	end
@@ -59,7 +58,7 @@ local function load_tab_names()
 
 	if vim.fn.filereadable(tab_names_file) == 0 then
 		if DEBUG then
-			gu.print_custom("❌ No saved tab names found.")
+			guu().print_custom("❌ No saved tab names found.")
 		end
 		return
 	end
@@ -75,12 +74,12 @@ local function load_tab_names()
 	end
 
 	if DEBUG then
-		gu.print_custom("✅ Tab names loaded from: " .. tab_names_file)
+		guu().print_custom("✅ Tab names loaded from: " .. tab_names_file)
 	end
 end
 
 local function set_session_dir(use_cwd_if_no_project)
-	local project_root = gu.find_project_root(false)
+	local project_root = guu().find_project_root(false)
 	if project_root then
 		session_dir = project_root .. "/.nvim-session/"
 	elseif use_cwd_if_no_project then
@@ -90,23 +89,23 @@ local function set_session_dir(use_cwd_if_no_project)
 		-- no session directory
 		session_dir = original_location
 		if DEBUG then
-			gu.print_custom("❌ No project root found; session will not be created")
+			guu().print_custom("❌ No project root found; session will not be created")
 		end
 		return original_location
 	end
 
 	vim.fn.mkdir(session_dir, "p") -- ensure the directory exists
 	if DEBUG then
-		gu.print_custom("✅ Session directory set to: " .. session_dir)
+		guu().print_custom("✅ Session directory set to: " .. session_dir)
 	end
 	return session_dir
 end
 
 local function set_session_dir_flattened()
-	local project_root = gu.find_project_root(false)
+	local project_root = guu().find_project_root(false)
 	if not project_root then
 		if DEBUG then
-			gu.print_custom("❌ No project root found; session will not be at ~/.local/share/nvim/sessions")
+			guu().print_custom("❌ No project root found; session will not be at ~/.local/share/nvim/sessions")
 		end
 		return original_location
 	end
@@ -118,7 +117,7 @@ local function set_session_dir_flattened()
 
 	vim.fn.mkdir(session_dir, "p")
 	if DEBUG then
-		gu.print_custom("✅ Session directory set to: " .. session_dir)
+		guu().print_custom("✅ Session directory set to: " .. session_dir)
 	end
 	return session_dir
 end
@@ -148,7 +147,7 @@ nvim_possession.setup({
 	post_hook = function()
 		local session_file = session_dir .. "/" .. session_name .. ".vim"
 		if DEBUG then
-			gu.print_custom("📂 Loaded session:", session_file)
+			guu().print_custom("📂 Loaded session:", session_file)
 		end
 
 		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
@@ -164,7 +163,7 @@ nvim_possession.setup({
 		-- general_utils_franck.send_notification("auto saving")
 
 		if DEBUG then
-			gu.print_custom("💾 Auto-saved session:", session_file)
+			guu().print_custom("💾 Auto-saved session:", session_file)
 		end
 		vim.cmd([[ScopeSaveState]]) -- Save Scope.nvim tab states
 		save_tab_names()
@@ -195,7 +194,7 @@ local function ensure_session_exists()
 		return
 	end
 	local session_file = session_dir .. session_name .. ".vim"
-	gu.print_custom("session file = " .. session_file)
+	guu().print_custom("session file = " .. session_file)
 	--
 	-- If no session exists, create "default" session
 	if vim.fn.filereadable(session_file) == 0 then
@@ -220,7 +219,7 @@ local function rename_tab()
 	if new_buffer_name ~= "" then
 		require("bufferline").rename_tab({ new_buffer_name }) -- Pass as a table/array
 	else
-		gu.print_custom("❌ Tab rename canceled (empty input)")
+		guu().print_custom("❌ Tab rename canceled (empty input)")
 	end
 end
 keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
