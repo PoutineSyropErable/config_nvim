@@ -172,3 +172,22 @@ end
 
 ensure_session_exists()
 gu.print_custom("possession loaded")
+
+local keymap = vim.keymap
+-- makes keymap seting easier
+local function opts(desc) return { noremap = true, silent = true, desc = desc } end
+
+keymap.set("n", "<leader>pl", function() require("nvim-possession").list() end, opts("📌list sessions"))
+keymap.set("n", "<leader>pc", function() require("nvim-possession").new() end, opts("📌create new session"))
+keymap.set("n", "<leader>pu", function() require("nvim-possession").update() end, opts("📌update current session"))
+keymap.set("n", "<leader>pm", ":ScopeMoveBuf", opts("move current buffer to the tab nbr"))
+
+local function rename_tab()
+	local new_buffer_name = vim.fn.input("Enter new tab name: ")
+	if new_buffer_name ~= "" then
+		require("bufferline").rename_tab({ new_buffer_name }) -- Pass as a table/array
+	else
+		gu.print_custom("❌ Tab rename canceled (empty input)")
+	end
+end
+keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
