@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
 M.extension_to_filetype = {
@@ -158,7 +158,7 @@ local function attach_lsp_to_buffer(name, bufnr)
 end
 
 --- Function to check active buffers and attach corresponding LSPs
-local function attach_lsp_to_all_buffers()
+M.attach_lsp_to_all_buffers = function()
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 		local filetype = vim.bo[bufnr].filetype
 
@@ -287,9 +287,9 @@ M.add_keybinds = function(client, bufnr)
 end
 
 -- Define the command to attach all LSPs
-vim.api.nvim_create_user_command("AttachAllLSPs", function() attach_lsp_to_all_buffers() end, { desc = "Attach all LSPs to active buffers" })
+vim.api.nvim_create_user_command("AttachAllLSPs", function() M.attach_lsp_to_all_buffers() end, { desc = "Attach all LSPs to active buffers" })
 
 -- Keybinding to call the command
-vim.keymap.set("n", "<leader>La", attach_lsp_to_all_buffers, opts("Attach all LSPs to active buffers"))
+vim.keymap.set("n", "<leader>La", M.attach_lsp_to_all_buffers, opts("Attach all LSPs to active buffers"))
 
 return M

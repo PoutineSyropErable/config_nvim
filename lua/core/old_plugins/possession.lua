@@ -191,3 +191,11 @@ local function rename_tab()
 	end
 end
 keymap.set("n", "<leader>.r", rename_tab, opts("Rename current tab"))
+
+local lsp_helper = require("lsps.helper.lsp_config_helper")
+-- Define the command to attach all LSPs
+vim.api.nvim_create_user_command(
+	"AttachAllLSPs",
+	function() lsp_helper.attach_lsp_to_all_buffers() end,
+	{ desc = "Attach all LSPs to active buffers" }
+)
