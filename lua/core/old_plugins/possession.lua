@@ -7,6 +7,8 @@ local ggu = function() return require("_before.general_utils") end
 local lsp_helper = require("lsps.helper.lsp_config_helper")
 -- Define the command to attach all LSPs
 
+local USE_CWD_IF_NO_PROJECT = false
+
 local original_location = vim.fn.stdpath("data") .. "/sessions" -- ~/.local/share/nvim/sessions/
 local session_dir = original_location
 local session_name = vim.g["current_session"] or "default"
@@ -77,30 +79,33 @@ local function load_tab_names()
 	end
 end
 
--- This doesnt work cause we need one without user input
-local function set_session_dir()
-	gu.print_custom("Set session dir is called")
+local function set_session_dir(use_cwd_if_no_project)
 	local project_root = gu.find_project_root(false)
-	-- gu.print_custom("setting session dir")
-	if project_root == nil then
-		-- gu.print_custom("is nill")
+	if project_root then
+		session_dir = project_root .. "/.nvim-session/"
+	elseif use_cwd_if_no_project then
+		-- fallback to current working directory
+		session_dir = vim.fn.getcwd() .. "/.nvim-session/"
+	else
+		-- no session directory
 		session_dir = original_location
+		if DEBUG then
+			gu.print_custom("❌ No project root found; session will not be created")
+		end
 		return original_location
 	end
-	-- gu.print_custom("project_root = " .. vim.inspect(project_root))
 
-	session_dir = project_root .. "/.nvim-session/"
+	vim.fn.mkdir(session_dir, "p") -- ensure the directory exists
 	if DEBUG then
-		gu.print_custom("session dir is : " .. session_dir)
+		gu.print_custom("✅ Session directory set to: " .. session_dir)
 	end
-	vim.fn.mkdir(session_dir, "p")
 	return session_dir
 end
 
 -- Ensure session_dir is available in `nvim-possession`
 nvim_possession.setup({
 	sessions = {
-		sessions_path = set_session_dir(), -- Use stored session_dir
+		sessions_path = set_session_dir(USE_CWD_IF_NO_PROJECT), -- Use stored session_dir
 		sessions_variable = "current_session", -- Global variable to track active session
 		sessions_icon = "󰀚 ", -- Icon for session names in statusline/UI
 		sessions_prompt = "📌 Select Session >", -- Prompt when listing sessions
@@ -125,10 +130,11 @@ nvim_possession.setup({
 			gu.print_custom("📂 Loaded session:", session_file)
 		end
 
-		-- vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
+		vim.cmd([[ScopeLoadState]]) -- Restore Scope.nvim tab states
 
-		-- load_tab_names()
-		-- vim.cmd([[AttachAllLSPs]])
+		load_tab_names()
+		vim.cmd("doautocmd User PossessionSessionLoaded")
+		vim.cmd([[AttachAllLSPs]])
 	end,
 
 	-- ✅ Hook: Save Scope.nvim state when saving a session
@@ -176,8 +182,7 @@ local function ensure_session_exists()
 	end
 end
 
--- ensure_session_exists()
-gu.print_custom("possession loaded")
+ensure_session_exists()
 
 local keymap = vim.keymap
 -- makes keymap seting easier

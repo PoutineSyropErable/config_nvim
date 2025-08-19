@@ -1,4 +1,5 @@
 local M = {}
+local gu = function() return require("_before.general_utils") end
 
 -- root markers
 local ROOT_MARKERS = {
@@ -93,7 +94,7 @@ function M.find_project_root(debug)
 	local root = M.get_lsp_project_root()
 	if root then
 		if debug then
-			vim.notify("🔍 Using LSP project root: " .. root, vim.log.levels.DEBUG)
+			gu().print_custom("🔍 Using LSP project root: " .. root)
 		end
 		return root
 	end
@@ -101,14 +102,14 @@ function M.find_project_root(debug)
 	root = find_project_root_lua(buffer_dir, debug)
 	if root then
 		if debug then
-			vim.notify("🔍 Using the lua fpr: " .. root, vim.log.levels.DEBUG)
+			gu().print_custom("🔍 Using Lua calculated root: " .. root)
 		end
 		return root
 	else
 		if debug then
-			vim.notify("ℹ️ Falling back to cwd: " .. vim.fn.getcwd(), vim.log.levels.INFO)
+			gu().print_custom("🔍 Returning Null, don't make a session" .. root)
 		end
-		return vim.fn.getcwd()
+		return nil
 	end
 end
 

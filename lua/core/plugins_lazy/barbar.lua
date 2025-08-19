@@ -8,6 +8,8 @@ return {
 		"nvim-tree/nvim-web-devicons", -- optional: for file icons
 		-- "echasnovski/mini.bufremove", -- is loaded by doing a bufferclose. in helper
 	},
+	-- event = { "BufReadPre", "BufNewFile" }, -- Lazy-load at buffer read or new
+	event = { "BufReadPre", "BufNewFile", "User PossessionSessionLoaded" }, -- Lazy-load at buffer read or new
 	keys = {
 		{
 			"<leader>q",
@@ -135,5 +137,4 @@ return {
 
 		-- keys, keybinds, keymaps, keyboard shortcut --
 	end,
-	event = { "BufReadPre", "BufNewFile" }, -- Lazy-load at buffer read or new
 }

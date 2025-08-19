@@ -24,36 +24,34 @@ def open_nvim(files: List[str], remote_session_name: str = DEFAULT_RSM):
     """
     # Prepare the command to run Neovim in the foreground
 
-    real_files = [os.path.realpath(file) for file in files]
     socket: FsFilePathStr = f"/tmp/nvim_session_socket_{remote_session_name}"
+
+    # Properly quote file paths for Lua
+    lua_files = "{" + ",".join(f"'{os.path.realpath(f)}'" for f in files) + "}"
+    lua_session = f"'{remote_session_name}'"  # Properly quote the session name too
+    lua_cmd = f"require('nvim-possession').load_session_and_open({lua_session}, {lua_files})"
 
     command = [
         "nvim",
         "--listen",
         socket,
         "--cmd",
-        f"autocmd VimEnter * NvimPossessionLoadOrCreate {remote_session_name}",
+        f"autocmd VimEnter * ++once lua {lua_cmd}",
     ]
+
+    plugin_code = "$HOME/.config/nvim/nvim-possession/lua/nvim-possession/regular_init.lua"
 
     if INFORM_MESSAGE:
         # Start Neovim (blocking, but it will allow other threads to run)
-        print(f"Neovim started with socket: {socket}")
+        print(f"Neovim started with socket: {socket}\n")
+        print(f"The lua command: {lua_cmd}\n")
+        print(f"Neovim started with command: {command}\n\n")
 
-    # Run Neovim (non-blocking)
-
-    send_files_output_queue: Queue[str] = Queue()
     attach_lsps_output_queue: Queue[str] = Queue()
-    if files:
-        # delay_action(10, send_to_nvim, files, remote_session_name, False, send_files_output_queue)
-        pass
     # delay_action(1, attach_lsp_to_all_buffers, socket, False, attach_lsps_output_queue)
     neovim_process = subprocess.run(command)
 
     # Wait for Neovim to finish (this will block the main thread until Neovim exits)
-
-    # Optional: Retrieve output from the queue after Neovim finishes
-    while not send_files_output_queue.empty():
-        print(send_files_output_queue.get())
 
     while not attach_lsps_output_queue.empty():
         print(attach_lsps_output_queue.get())
