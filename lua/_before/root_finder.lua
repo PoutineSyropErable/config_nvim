@@ -86,6 +86,8 @@ function M.get_lsp_project_root()
 	return nil -- fallback to cwd or manual override
 end
 
+M.use_cwd_if_no_project = true
+
 --- Entry function: pick Lua method first, fallback to cwd
 function M.find_project_root(debug)
 	local buffer_path = vim.fn.expand("%:p")
@@ -106,10 +108,17 @@ function M.find_project_root(debug)
 		end
 		return root
 	else
-		if debug then
-			gu().print_custom("🔍 Returning Null, don't make a session" .. root)
+		if M.use_cwd_if_no_project then
+			if debug then
+				vim.notify("ℹ️ Falling back to cwd: " .. vim.fn.getcwd(), vim.log.levels.INFO)
+			end
+			return vim.fn.getcwd()
+		else
+			if debug then
+				gu().print_custom("🔍 Returning Nil, don't make a session" .. root)
+			end
+			return nil
 		end
-		return nil
 	end
 end
 

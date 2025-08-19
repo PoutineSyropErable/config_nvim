@@ -102,10 +102,31 @@ local function set_session_dir(use_cwd_if_no_project)
 	return session_dir
 end
 
+local function set_session_dir_flattened()
+	local project_root = gu.find_project_root(false)
+	if not project_root then
+		if DEBUG then
+			gu.print_custom("❌ No project root found; session will not be at ~/.local/share/nvim/sessions")
+		end
+		return original_location
+	end
+
+	-- Replace path separators with __
+	local flat_path = project_root:gsub("/", "--")
+	local base_session_dir = vim.fn.stdpath("data") .. "/sessions/"
+	session_dir = base_session_dir .. flat_path .. "/"
+
+	vim.fn.mkdir(session_dir, "p")
+	if DEBUG then
+		gu.print_custom("✅ Session directory set to: " .. session_dir)
+	end
+	return session_dir
+end
+
 -- Ensure session_dir is available in `nvim-possession`
 nvim_possession.setup({
 	sessions = {
-		sessions_path = set_session_dir(USE_CWD_IF_NO_PROJECT), -- Use stored session_dir
+		sessions_path = set_session_dir_flattened(USE_CWD_IF_NO_PROJECT), -- Use stored session_dir
 		sessions_variable = "current_session", -- Global variable to track active session
 		sessions_icon = "󰀚 ", -- Icon for session names in statusline/UI
 		sessions_prompt = "📌 Select Session >", -- Prompt when listing sessions
