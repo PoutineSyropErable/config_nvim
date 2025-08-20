@@ -3,4 +3,4 @@ no_tracking
 **/.nvim-session
 
 .luarc.json
-old_vim
+old_vim/**
