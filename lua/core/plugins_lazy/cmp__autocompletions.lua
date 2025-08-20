@@ -99,6 +99,20 @@ return {
 		end
 
 		setup_cmdline("/", { { name = "buffer" } })
-		setup_cmdline(":", { { name = "path" }, { name = "cmdline" }, { name = "bash" } })
+		cmp.setup.cmdline(":", {
+			mapping = cmp.mapping.preset.cmdline(),
+			sources = cmp.config.sources({
+				{ name = "path" },
+				{ name = "cmdline" },
+			}, {
+				{
+					name = "bash",
+					entry_filter = function()
+						local cmdline = vim.fn.getcmdline()
+						return cmdline:sub(1, 1) == "!"
+					end,
+				},
+			}),
+		})
 	end,
 }
