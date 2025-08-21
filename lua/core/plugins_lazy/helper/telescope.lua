@@ -1,36 +1,46 @@
 local M = {}
 
-local gu = require("_before.general_utils")
-
-M.use_project_root = false
-
-local function telescope_cwd()
-	if M.use_project_root then
-		return gu.get_lsp_project_root()
-		-- return gu.find_project_root(true)
-	else
-		return vim.fn.getcwd()
-	end
-end
-
-function M.toggle_find_files()
-	M.use_project_root = not M.use_project_root
-	print("toggled . " .. vim.inspect(M.use_project_root))
-end
+local ggu = function() return require("_before.general_utils") end
+local get_root = function() return ggu().find_project_root() or vim.fn.getcwd() end
 
 function M.find_files()
 	local builtin = require("telescope.builtin")
-	builtin.find_files({ cwd = telescope_cwd() })
+	builtin.find_files({ cwd = vim.fn.getcwd() })
+end
+
+function M.find_files_in_project()
+	local builtin = require("telescope.builtin")
+	builtin.find_files({ cwd = get_root() })
 end
 
 function M.live_grep()
 	local builtin = require("telescope.builtin")
-	builtin.live_grep({ cwd = telescope_cwd() })
+	builtin.live_grep({ cwd = vim.fn.getcwd() })
+end
+
+function M.live_grep_in_project()
+	local builtin = require("telescope.builtin")
+	builtin.live_grep({ cwd = get_root() })
 end
 
 function M.live_grep_current_word()
 	local builtin = require("telescope.builtin")
-	builtin.live_grep({ default_text = vim.fn.expand("<cword>"), cwd = telescope_cwd() })
+	builtin.live_grep({ default_text = vim.fn.expand("<cword>"), cwd = vim.fn.getcwd() })
+end
+
+function M.live_grep_current_word_in_project()
+	local builtin = require("telescope.builtin")
+	builtin.live_grep({ default_text = vim.fn.expand("<cword>"), cwd = get_root() })
+end
+
+function M.grep_current_big_word()
+	local builtin = require("telescope.builtin")
+	builtin.grep_string({ search = vim.fn.expand("<cword>"), cwd = vim.fn.getcwd() })
+end
+
+function M.grep_current_big_word_in_project()
+	local builtin = require("telescope.builtin")
+	builtin.grep_string({ search = vim.fn.expand("<cword>"), cwd = get_root() })
 end
 
 local all_symbols = {

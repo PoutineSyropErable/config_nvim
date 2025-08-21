@@ -13,9 +13,9 @@ return {
 			},
 
 			{
-				"<leader>ft",
-				function() require("core.plugins_lazy.helper.telescope").toggle_find_files() end,
-				desc = "Toggle Find Files (Project Root / CWD)",
+				"<leader>fF",
+				function() require(hp).find_files_in_project() end,
+				desc = "Find Files in Project",
 			},
 
 			{
@@ -24,9 +24,20 @@ return {
 				desc = "Live grep",
 			},
 			{
+				"<leader>fG",
+				function() require(hp).live_grep_in_project() end,
+				desc = "Live grep in Project",
+			},
+
+			{
 				"<leader>fw",
-				function() require(hp).live_grep_current_word() end,
-				desc = "Live grep current word",
+				function() require(hp).grep_current_big_word() end,
+				desc = "Live grep current big word (Till spaces)",
+			},
+			{
+				"<leader>fW",
+				function() require(hp).grep_current_big_word_in_project() end,
+				desc = "Live grep current big word in project (Till spaces)",
 			},
 			{
 				"gw",
@@ -35,8 +46,18 @@ return {
 			},
 			{
 				"gW",
-				"<cmd>Telescope grep_string<cr>",
-				desc = "Live grep current word (till spaces)",
+				function() require(hp).live_grep_current_word_in_project() end,
+				desc = "Live grep current in project",
+			},
+			{
+				"ga",
+				function() require(hp).grep_current_big_word() end,
+				desc = "Live grep current big word (Till spaces)",
+			},
+			{
+				"ga",
+				function() require(hp).grep_current_big_word_in_project() end,
+				desc = "Live grep current big word in project (Till spaces)",
 			},
 
 			{
@@ -52,7 +73,7 @@ return {
 			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Find Keymaps" },
 
 			{ "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Fuzzy Find in Buffer" },
-			{ "<leader>fG", "<cmd>Telescope grep_string<cr>", desc = "grep string" },
+			{ "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "grep string" },
 
 			{ "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recently Used Files" },
 			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
@@ -62,7 +83,7 @@ return {
 			{ "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help Tags" },
 			{ "<leader>fi", "<cmd>Telescope lsp_incoming_calls<CR>", desc = "Incoming Calls" },
 			{ "<leader>fm", "<cmd>Telescope treesitter default_text=:method:<CR>", desc = "Find Methods" },
-			{ "<leader>fF", "<cmd>Telescope treesitter default_text=:function:<CR>", desc = "Find Functions" },
+			{ "<leader>fu", "<cmd>Telescope treesitter default_text=:function:<CR>", desc = "Find Functions" },
 			{ "<leader>fn", "<cmd>Telescope neoclip<CR>", desc = "Telescope Neoclip" },
 			{ "<leader>fr", "<cmd>lua select_and_write_function()<CR>", desc = "Select and Write Function" },
 			{ "<leader>fc", "<cmd>Telescope colorscheme<CR>", desc = "Change Color Scheme" },
