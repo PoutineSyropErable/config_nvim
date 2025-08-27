@@ -10,7 +10,30 @@ return {
 		local dap = require("dap")
 		local dapui = require("dapui")
 
-		dapui.setup({})
+		-- dapui.setup({})
+		dapui.setup({
+			layouts = {
+				{
+					elements = {
+						"scopes",
+						"breakpoints",
+						"stacks",
+						"watches",
+						-- "repl",  -- 🚫 remove this line
+					},
+					size = 40,
+					position = "left",
+				},
+				{
+					elements = {
+						"console",
+						-- "repl", -- 🚫 no repl in bottom layout either
+					},
+					size = 10,
+					position = "bottom",
+				},
+			},
+		})
 
 		local focusOnDapTerminal = function()
 			vim.schedule(function()

@@ -1,1 +1,0 @@
-/home/francois/.config/nvim/scripts/pythonScripts/send_to_nvim.py

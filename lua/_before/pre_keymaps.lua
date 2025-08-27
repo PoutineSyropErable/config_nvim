@@ -348,3 +348,23 @@ keymap.set("n", "<C-Left>", ":vertical resize -5<CR>", { noremap = true, silent 
 keymap.set("n", "<C-Right>", ":vertical resize +5<CR>", { noremap = true, silent = true })
 
 keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+
+-- Toggle word wrapping for writing text vs coding
+function ToggleWrap()
+	if vim.wo.wrap then
+		-- Currently ON → turn OFF
+		vim.wo.wrap = false
+		vim.wo.linebreak = false
+		vim.wo.breakindent = false
+		print("Word wrap OFF (coding mode)")
+	else
+		-- Currently OFF → turn ON
+		vim.wo.wrap = true
+		vim.wo.linebreak = true
+		vim.wo.breakindent = true
+		print("Word wrap ON (writing mode)")
+	end
+end
+
+-- Map it to <leader>w for convenience
+vim.keymap.set("n", "<leader>.w", ToggleWrap, { desc = "Toggle word wrap" })

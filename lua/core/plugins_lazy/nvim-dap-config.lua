@@ -201,7 +201,7 @@ return {
 					request = "launch",
 					name = "Launch file",
 					console = "integratedTerminal", -- Output goes here
-					justMyCode = false, -- Optional: set to true for just your code
+					justMyCode = true, -- Optional: set to true for just your code
 					pythonPath = function()
 						-- Use the active virtual environment if available
 						if vim.env.VIRTUAL_ENV then
@@ -213,7 +213,9 @@ return {
 						return vim.fn.exepath("python3") or "python"
 					end,
 
-					program = "${file}", -- Run the currently open file
+					-- program = "${file}", -- Run the currently open file
+
+					program = "/home/francois/Documents/Work/RQC/2025/Fraud/code/example_usage.py", -- Run the currently open file
 					-- cwd = "/home/francois/Documents/University (Real)/Semester 10/Comp 303/Project",
 					-- cwd = "/home/francois/Documents/Linux Documents/University (real)/Semester 10/Comp 303/Project/",
 					-- module = "303MUD.client_local",

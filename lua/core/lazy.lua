@@ -19,7 +19,6 @@ require("lazy").setup({
 		config = function() require("neoclip").setup() end,
 		lazy = true,
 	},
-	"andymass/vim-matchup", -- better %
 	{ -- autocomplete () {}
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",

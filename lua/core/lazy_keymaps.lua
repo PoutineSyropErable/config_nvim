@@ -2,6 +2,8 @@ local keymap = vim.keymap
 -- makes keymap seting easier
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 
+-- Press o in visual mode to switch between the start and the end cursor
+
 -- =================================== TABOUT =========================
 
 local ts_utils = require("nvim-treesitter.ts_utils")

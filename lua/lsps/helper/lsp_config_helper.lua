@@ -1,5 +1,6 @@
 local M = {}
 local function opts(desc) return { noremap = true, silent = true, desc = desc } end
+local gu = function() return require("_before.general_utils") end
 
 M.extension_to_filetype = {
 	lua = "lua",
@@ -15,22 +16,6 @@ M.extension_to_filetype = {
 }
 
 M.LSP_MSG = false
-function M.print_attach(...)
-	-- This function serves as a print message for on attach
-	if not M.LSP_MSG then
-		return
-	end -- suppress if debug off
-
-	local args = { ... }
-	local parts = {}
-	for i, v in ipairs(args) do
-		parts[i] = tostring(v)
-	end
-	local msg = table.concat(parts, "\t")
-
-	-- Use vim.notify to show as notification or just silent log
-	vim.notify(msg, vim.log.levels.INFO)
-end
 
 -- Function to detect filetype based on extension or shebang
 function M.detect_filetype(bufnr)
@@ -111,7 +96,7 @@ function M.try_attach_lsp_to_buffer(name, bufnr)
 	-- Check if the LSP client is already attached
 	for _, client in ipairs(clients) do
 		if client.name == name then
-			M.print_attach("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
+			gu().print_custom("ℹ️ LSP " .. name .. " is already attached to buffer " .. bufnr)
 			return true
 		end
 	end
@@ -120,13 +105,13 @@ function M.try_attach_lsp_to_buffer(name, bufnr)
 	for _, client in ipairs(vim.lsp.get_clients()) do
 		if client.name == name then
 			vim.lsp.buf_attach_client(bufnr, client.id)
-			M.print_attach("✅ LSP " .. name .. " attached to buffer " .. bufnr)
+			gu().print_custom("✅ LSP " .. name .. " attached to buffer " .. bufnr)
 			return true
 		end
 	end
 
 	-- LSP is not initialized, start it
-	M.print_attach("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
+	gu().print_custom("⚠️ LSP " .. name .. " not found to attach to buffer " .. bufnr)
 	-- require("lspconfig")[name].setup({}) -- Start the LSP if not running
 	return false
 end
@@ -142,14 +127,14 @@ local function attach_lsp_to_buffer(name, bufnr)
 			return
 		end
 
-		M.print_attach("Couldn't attach LSP. Attempt #" .. attempt)
+		gu().print_custom("Couldn't attach LSP. Attempt #" .. attempt)
 
 		-- Retry after 1 second if max tries are not reached
 		if attempt < max_try then
 			attempt = attempt + 1
 			vim.defer_fn(try_attach, 1000) -- Retry after 1000 ms (1 second)
 		else
-			M.print_attach("Couldn't attach LSP " .. name .. " to buffer")
+			gu().print_custom("Couldn't attach LSP " .. name .. " to buffer")
 		end
 	end
 
@@ -159,23 +144,23 @@ end
 
 --- Function to check active buffers and attach corresponding LSPs
 M.attach_lsp_to_all_buffers = function()
-	M.print_attach("Attaching all LSPs")
+	gu().print_custom("Attaching all LSPs")
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 		local filetype = vim.bo[bufnr].filetype
 
 		-- If the filetype is empty, trigger filetype detection
 		if filetype == nil or filetype == "" then
-			M.print_attach("Filetype is empty, detecting filetype for buffer: " .. vim.api.nvim_buf_get_name(bufnr))
+			gu().print_custom("Filetype is empty, detecting filetype for buffer: " .. vim.api.nvim_buf_get_name(bufnr))
 			vim.cmd("filetype detect") -- Trigger filetype detection
 			filetype = vim.bo[bufnr].filetype
 		end
 		local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":t")
 
 		if filetype == nil or filetype == "" then
-			M.print_attach("Could not get filetype for " .. vim.inspect(bufnr) .. " with name " .. vim.inspect(filename))
+			gu().print_custom("Could not get filetype for " .. vim.inspect(bufnr) .. " with name " .. vim.inspect(filename))
 			filetype = M.detect_filetype(bufnr)
 		else
-			M.print_attach("The filetype detect worked")
+			gu().print_custom("The filetype detect worked")
 		end
 
 		-- Check if there's a corresponding LSP for this filetype
@@ -184,7 +169,7 @@ M.attach_lsp_to_all_buffers = function()
 			-- Try to attach the LSP to the buffer
 			attach_lsp_to_buffer(lsp_name, bufnr)
 		else
-			M.print_attach(
+			gu().print_custom(
 				"No LSP for filetype " .. vim.inspect(filetype) .. " at bufnr: " .. vim.inspect(bufnr) .. " with filename: " .. vim.inspect(filename)
 			)
 		end
@@ -193,7 +178,6 @@ end
 
 M.add_keybinds = function(client, bufnr)
 	local keymap = vim.keymap
-	local gu = require("_before.general_utils")
 	local hl = "core.plugins_lazy.helper.lsp_keybind"
 	local tb = "telescope.builtin"
 
@@ -208,9 +192,9 @@ M.add_keybinds = function(client, bufnr)
 	keymap.set("n", "<leader>LR", keybind_helper.safe_lsp_call("remove_workspace_folder"), opts("Remove workspace folder"))
 	keymap.set("n", "<leader>LL", function()
 		if vim.lsp.buf.list_workspace_folders then
-			gu.print_custom(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+			gu().print_custom(vim.inspect(vim.lsp.buf.list_workspace_folders()))
 		else
-			gu.print_custom("LSP function 'list_workspace_folders' not available")
+			gu().print_custom("LSP function 'list_workspace_folders' not available")
 		end
 	end, opts("List workspace folders"))
 
