@@ -23,9 +23,36 @@ mkdir -p ~/.config/nvim_logs
 # Backup existing ~/.config/nvim if it exists, using numbered backups (~1, ~2, etc.)
 [ -d ~/.config/nvim ] && mv --backup=numbered ~/.config/nvim ~/.config/nvim_backup
 
-# Clone the Neovim configuration repository
-git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+# Clone the Neovim configuration repository and the submodules
+git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim --recurse-submodules
 
+#or, two parter:
+git clone https://github.com/PoutineSyropErable/config_nvim ~/.config/nvim
+cd ~/.config/nvim
+git submodule update --init --recursive
+
+
+# and other update: 
+git pull --recurse-submodules
+git submodule update --recursive --remote
+
+
+
+```
+
+more git submodules commands: 
+```bash
+git submodule init
+# This reads .gitmodules and sets up the local configuration for the submo
+
+git submodule update --recursive
+# This fetches all submodule commits and checks them out.
+
+git submodule update --remote --recursive
+# --remote tells Git to pull the latest commit from the submodule’s remote branch instead of just the commit recorded in the superproject.
+# --recursive ensures nested submodules are also update
+
+# --recursive isn't always needed
 ```
 
 Packages to install:
