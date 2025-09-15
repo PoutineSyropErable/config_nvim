@@ -1,4 +1,5 @@
 -- lua/core/lsps/c.lua
+-- Note the c23 fallback flags. If you have an oldass pc, need to change it
 M = {}
 
 M.config = {
@@ -20,7 +21,8 @@ M.config = {
 		completeUnimported = true,
 		fallbackFlags = {
 			-- Standard C/C++ flags (comment out OpenCL-specific ones)
-			"-std=c17",
+			"-std=c23",
+			-- "-std=c17",
 			-- "-std=c++17",
 			-- "-I/usr/local/include",  -- Common include paths
 			-- Keep OpenCL flags only for actual OpenCL files
@@ -38,7 +40,7 @@ M.config = {
 	),
 	settings = {
 		clangd = {
-			fallbackFlags = { "-std=c17" }, -- Changed from C++ to C standard
+			fallbackFlags = { "-std=c23" }, -- Changed from C++ to C standard
 		},
 	},
 	on_attach = function(client, bufnr)

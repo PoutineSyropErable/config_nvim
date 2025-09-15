@@ -3,6 +3,7 @@ local pre_config = require("_before.pre_config")
 local use_mason = pre_config.useMasonLspConfig
 local use_lsp_config = pre_config.useRegularLspConfig
 local use_merged = pre_config.useMergedLspConfig
+local ggu = function() return require("_before.general_utils") end
 
 return {
 	"neovim/nvim-lspconfig",
@@ -47,17 +48,17 @@ return {
 			mason_lspconfig.setup({
 				ensure_installed = {
 					"lua_ls",
-					"solargraph",
-					"ts_ls",
 					"pyright",
 					"clangd",
 					"rust_analyzer",
 					"texlab",
+					"solargraph",
+					"ts_ls",
 				},
 				automatic_installation = true, -- or true if you want automatic installs
 				-- automatic_enable = { "pyright", "lua_ls", exclude = {} },
-				automatic_enable = { "clangd" },
-				-- automatic_enable = true,
+				-- automatic_enable = { "clangd" },
+				automatic_enable = false,
 			})
 
 			require("mason-tool-installer").setup({
@@ -97,8 +98,10 @@ return {
 			end
 		end
 
-		-- This
 		if use_lsp_config then
+			-- Need the black magic calls above
+			local clangd_defaults = lspconfig.clangd.document_config.default_config
+			-- ^ Due to black magic, this call is necessary. It has side effects, and force the initialisation of the default clangd
 			lsp_defaults.capabilities = merged_capabilities
 
 			lspconfig.lua_ls.setup(lua_lsp.config)
@@ -107,7 +110,7 @@ return {
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 			lspconfig.texlab.setup(latex_lsp.config)
 
-			-- lspconfig.clangd.setup(c_lsp.config)
+			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
 			-- lspconfig.opencl_language_server.setup()
 
@@ -133,5 +136,23 @@ return {
 			update_in_insert = false,
 			severity_sort = true,
 		})
+
+		-- local lsp_helper = require("lsps.helper.lsp_config_helper")
+		--
+		-- vim.api.nvim_create_autocmd("LspAttach", {
+		-- 	callback = function(args)
+		-- 		local client = vim.lsp.get_client_by_id(args.data.client_id)
+		-- 		if not client then
+		-- 			ggu().print_custom("Warning: LSP client not found for LspAttach event")
+		-- 			return
+		-- 		end
+		-- 		if client.name == "clangd" then
+		-- 			ggu().print_custom("C LSP attached")
+		-- 			lsp_helper.add_keybinds(client, args.buf)
+		-- 		end
+		-- 	end,
+		-- })
+
+		-- End of config
 	end,
 }
