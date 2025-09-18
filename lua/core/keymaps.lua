@@ -224,11 +224,11 @@ end
 
 -- Create keybindings for m1-9 to switch between windows
 for i = 1, 9 do
-	keymap.set("n", "m" .. i, function() move_to_window(i) end, opts("Move to window " .. i))
+	keymap.set("n", "z" .. i, function() move_to_window(i) end, opts("Move to window " .. i))
 end
 
 -- m0 to go to the last window in the visible list
-keymap.set("n", "m0", function()
+keymap.set("n", "z0", function()
 	local windows = get_visible_windows()
 	if #windows > 0 then
 		vim.api.nvim_set_current_win(windows[#windows]) -- Switch to last window

@@ -6,6 +6,7 @@ local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 -- using preconfig like that is dumb for the current setup, but one day, it could be useful
 
 require("lazy").setup({
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 	{
 		"numToStr/Comment.nvim", -- check
 		config = function() require("Comment").setup() end,
@@ -60,8 +61,13 @@ require("lazy").setup({
 		config = function() end, -- No extra config needed
 	},
 	buffer_plugin,
+<<<<<<< HEAD
 	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }, -- check
 	"andymass/vim-matchup", -- better %-- check
+=======
+
+	"andymass/vim-matchup", -- better %
+>>>>>>> 317702eb9fcdbe60deade0257434bd21f1aa536c
 	{
 		"windwp/nvim-autopairs", -- check
 		event = "InsertEnter",
@@ -451,8 +457,4 @@ require("lazy").setup({
 	},
 
 	--
-}, {
-	rocks = {
-		hererocks = true, -- Enables hererocks globally for all plugins
-	},
 })
