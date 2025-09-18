@@ -187,10 +187,10 @@ return {
 			telescope.load_extension("dap")
 
 			-- wrap your existing keymap picker with a function
-			vim.keymap.set("n", "<leader>fk", function()
-				-- now open Telescope keymaps
-				require("telescope.builtin").keymaps()
-			end, { desc = "Find Keymaps" })
+			-- vim.keymap.set("n", "<leader>fk", function()
+			-- 	-- now open Telescope keymaps
+			-- 	require("telescope.builtin").keymaps()
+			-- end, { desc = "Find Keymaps" })
 
 			-- Optional extensions can be loaded as needed:
 			-- telescope.load_extension("undo")

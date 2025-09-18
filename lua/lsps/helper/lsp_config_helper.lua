@@ -211,7 +211,7 @@ M.add_keybinds = function(client, bufnr)
 	keymap.set("n", "<leader>Ll", function() require("lint").try_lint() end, opts("Manually trigger linting"))
 
 	keymap.set("n", "<leader>Lr", vim.lsp.buf.rename, opts("Rename symbol"))
-	keymap.set("n", "<leader>Lc", vim.lsp.buf.code_action, opts("Show code actions"))
+	keymap.set("n", "<leader>Lc", vim.lsp.buf.code_action, opts("Show code actions (buf lsp)"))
 
 	-- Goto / navigation
 	keymap.set("n", "gd", function() keybind_helper.safe_telescope_call("lsp_definitions") end, opts("Go to definition"))
