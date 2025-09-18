@@ -18,6 +18,7 @@ return {
 		{ "<leader>tj", function() end, desc = "Float Terminal Bottom Left" },
 		{ "<leader>tl", function() end, desc = "Float Terminal Bottom Right" },
 		{ "<leader>tb", function() end, desc = "Float Terminal Bottom Right" },
+		{ "<leader>tn", function() end, desc = "Float Terminal Bottom Right" },
 	},
 	config = function()
 		local Terminal = require("toggleterm.terminal").Terminal
@@ -114,6 +115,7 @@ return {
 		keymap.set("n", "<leader>tj", function() move_float_terminal("bottomleft") end, opts("Float Terminal Bottom Left"))
 		keymap.set("n", "<leader>tl", function() move_float_terminal("bottomright") end, opts("Float Terminal Bottom Right"))
 		keymap.set("n", "<leader>tb", function() move_float_terminal("bottomright") end, opts("Float Terminal Bottom Right"))
+		keymap.set("n", "<leader>tn", function() move_float_terminal("bottomright") end, opts("Float Terminal Bottom Right"))
 
 		-- Terminal mode keymap: jk to exit terminal mode
 		keymap.set("t", "jk", "<C-\\><C-n>", opts("Terminal: jk to normal mode"))

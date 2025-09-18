@@ -157,6 +157,7 @@ keymap.set("v", "<BS>", '"_d', { noremap = true, silent = true })
 ---------------------- Fixes
 -- To have access to a way to increase an number
 keymap.set("n", "<leader>y", "<C-a>", { noremap = true, silent = true })
+keymap.set("v", "<leader>y", "<C-a>", { noremap = true, silent = true })
 -- Remap Ctrl+v to Ctrl+q in all modes so block visual mode works
 keymap.set({ "" }, "<C-v>", "<C-q>", { noremap = true, silent = true })
 
