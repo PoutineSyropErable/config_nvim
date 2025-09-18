@@ -36,6 +36,7 @@ require("lazy").setup({
 		tag = "0.1.4", -- Specific version/tag for stable release
 		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
 	},
+	buffer_plugin,
 
 	-- UI Select extension
 	{
@@ -60,14 +61,8 @@ require("lazy").setup({
 		version = false,
 		config = function() end, -- No extra config needed
 	},
-	buffer_plugin,
-<<<<<<< HEAD
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }, -- check
 	"andymass/vim-matchup", -- better %-- check
-=======
 
-	"andymass/vim-matchup", -- better %
->>>>>>> 317702eb9fcdbe60deade0257434bd21f1aa536c
 	{
 		"windwp/nvim-autopairs", -- check
 		event = "InsertEnter",
