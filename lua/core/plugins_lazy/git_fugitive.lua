@@ -31,6 +31,7 @@ local fugitive = {
 		vim.g.fugitive_no_maps = 1
 		local function opts(desc) return { noremap = true, silent = true, desc = desc } end
 		vim.keymap.set("n", "<leader>Go", ":GBrowse<CR>", opts("Open file/line on GitHub (Rhubarb)"))
+		vim.keymap.set("n", "<leader>Gb", ":GBrowse<CR>", opts("Open file/line on GitHub (Rhubarb)"))
 	end,
 }
 
@@ -41,6 +42,7 @@ local rhubarb = {
 	cmd = { "GBrowse" },
 	keys = {
 		{ "<leader>Go", ":GBrowse<CR>", desc = "Open file/line on GitHub (Rhubarb)" },
+		{ "<leader>Gb", ":GBrowse<CR>", desc = "Open file/line on GitHub (Rhubarb)" },
 	},
 }
 
