@@ -125,6 +125,10 @@ keymap.set("v", "e", "e", { noremap = true, silent = true })
 keymap.set("v", "q", "b", { noremap = true, silent = true })
 keymap.set("v", "Q", "B", { noremap = true, silent = true })
 
+----
+-- simply adding these for <leader>fk (keymap searching)
+keymap.set("v", "o", "o", opts("Change cursor selection in visual mode. Top/Bottom"))
+
 ---------------------------------------------- Other useful keymaps:
 
 ----------------------------------------- Clipboard
@@ -342,13 +346,17 @@ vim.api.nvim_create_user_command("CdHere", function() require(gu_path).cdHere() 
 keymap.set("n", "<C-w>=", "<C-w>=") -- make split windows equal width
 keymap.set("n", "<C-w>h", ":vsplit<CR>", opts("Vertical split"))
 keymap.set("n", "<C-w>v", ":split<CR>", opts("Horizontal split"))
+keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
+
+keymap.set("n", "<C-w>c", "<Cmd>tabnew<CR>", opts("New tab"))
+keymap.set("n", "<C-w>x", "<Cmd>tabclose<CR>", opts("Close tab"))
+keymap.set("n", "<C-w>b", "<Cmd>tabprevious<CR>", opts("Previous buffer"))
+keymap.set("n", "<C-w>n", "<Cmd>tabnext<CR>", opts("Next buffer"))
 
 keymap.set("n", "<C-Up>", ":resize +5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-Down>", ":resize -5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-Left>", ":vertical resize -5<CR>", { noremap = true, silent = true })
 keymap.set("n", "<C-Right>", ":vertical resize +5<CR>", { noremap = true, silent = true })
-
-keymap.set("n", "<C-w>f", ":MaximizerToggle<CR>", { noremap = true, silent = true })
 
 -- Toggle word wrapping for writing text vs coding
 function ToggleWrap()
