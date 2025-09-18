@@ -42,6 +42,7 @@ return {
 		local c_lsp = require("lsps.c")
 		local rust_lsp = require("lsps.rust")
 		local latex_lsp = require("lsps.latex")
+		local asm_lsp = require("lsps.asm")
 
 		if use_mason then
 			local mason_lspconfig = require("mason-lspconfig")
@@ -109,6 +110,7 @@ return {
 			lspconfig.bashls.setup(bash_lsp.config)
 			lspconfig.rust_analyzer.setup(rust_lsp.config)
 			lspconfig.texlab.setup(latex_lsp.config)
+			lspconfig.asm_lsp.setup(asm_lsp.config)
 
 			lspconfig.clangd.setup(c_lsp.config)
 			lspconfig.opencl_ls.setup(opencl_lsp.config)
