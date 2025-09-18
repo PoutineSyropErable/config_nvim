@@ -310,9 +310,11 @@ M.setupCommands = {
 }
 
 function M.find_executable()
+	print("test")
 	debug_log("find_executable")
 	compile_project()
 	local exe = parse_automake() or find_in_build() or find_elf_in_cwd() or parse_makefile()
+	print("exe = " .. vim.inspect(exe))
 	store_debug_file()
 
 	vim.notify("\n")

@@ -4,6 +4,11 @@ return {
 	{
 		"mfussenegger/nvim-dap",
 		lazy = true,
+		dependencies = {
+			"williamboman/mason.nvim",
+			"jay-babu/mason-nvim-dap.nvim",
+			"nvim-telescope/telescope.nvim",
+		},
 		keys = {
 			{ "<leader>bb", function() require("dap").toggle_breakpoint() end, desc = "Toggle breakpoint at current line" },
 			{ "<leader>dc", function() require("dap").continue() end, desc = "Start/continue debugging session" },
@@ -25,10 +30,6 @@ return {
 			"DapToggleRepl",
 		},
 
-		dependencies = {
-			"williamboman/mason.nvim",
-			"jay-babu/mason-nvim-dap.nvim",
-		},
 		config = function()
 			local dap = require("dap")
 
@@ -248,7 +249,16 @@ return {
 			}
 			--
 
-			local dap_helper = require("core.plugins_lazy.helper.barbar")
+			local dap_helper = require("core.plugins_lazy.helper.dap")
+
+			dap.adapters.cppdbg = {
+				id = "cppdbg",
+				type = "executable",
+				command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.26.5/debugAdapters/bin/OpenDebugAD7",
+				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.24.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
+				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.6-linux-x64/debugAdapters/bin/OpenDebugAD7",
+				-- command = vim.fn.expand("~") .. "/.vscode/extensions/ms-vscode.cpptools-1.23.5-linux-x64/debugAdapters/bin/OpenDebugAD7",
+			}
 
 			dap.configurations.c = {
 

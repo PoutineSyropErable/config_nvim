@@ -1,4 +1,6 @@
 -- File: lua/plugins/nvim-dap-ui.lua
+local ggu = function() return require("_before.general_utils") end
+local remove_repl = false
 
 return {
 	"rcarriga/nvim-dap-ui",
@@ -19,15 +21,15 @@ return {
 						"breakpoints",
 						"stacks",
 						"watches",
-						-- "repl",  -- 🚫 remove this line
+						"repl", -- 🚫 remove this line
 					},
 					size = 40,
 					position = "left",
 				},
 				{
 					elements = {
+						"repl", -- 🚫 no repl in bottom layout either
 						"console",
-						-- "repl", -- 🚫 no repl in bottom layout either
 					},
 					size = 10,
 					position = "bottom",
@@ -78,16 +80,18 @@ return {
 			-- dapui.close()
 		end
 
-		vim.api.nvim_create_autocmd("BufWinLeave", {
-			pattern = "dap-repl",
-			callback = function()
-				local dap_repl = require("dap.repl")
-				if dap_repl then
-					_G.print_custom("[DAP] Closing REPL...")
-					pcall(dap_repl.close)
-				end
-			end,
-		})
+		if remove_repl then
+			vim.api.nvim_create_autocmd("BufWinLeave", {
+				pattern = "dap-repl",
+				callback = function()
+					local dap_repl = require("dap.repl")
+					if dap_repl then
+						ggu().print_custom("[DAP] Closing REPL...")
+						pcall(dap_repl.close)
+					end
+				end,
+			})
+		end
 
 		dap.listeners.after.event_stopped["jump_to_error"] = function(session, body)
 			if body.reason == "exception" or body.reason == "error" then

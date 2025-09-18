@@ -14,6 +14,7 @@ return {
 		"williamboman/mason-lspconfig.nvim",
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		"hrsh7th/nvim-cmp",
+		"nvim-telescope/telescope.nvim",
 	},
 
 	config = function()
