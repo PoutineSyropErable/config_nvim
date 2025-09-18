@@ -2,4 +2,6 @@ lazy-lock.json
 no_tracking
 **/.nvim-session
 
+others/**
+
 .luarc.json
