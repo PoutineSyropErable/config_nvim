@@ -4,3 +4,5 @@ no_tracking
 
 .luarc.json
 old_vim/**
+
+others/**
