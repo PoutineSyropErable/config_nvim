@@ -33,8 +33,10 @@ return {
 		local opts = function(desc) return { noremap = true, silent = true, desc = desc } end
 
 		-- Accept changes
+		keymap.set("n", "<leader>kh", function() conflict.choose("ours") end, opts("Accept ours (HEAD)"))
 		keymap.set("n", "<leader>ko", function() conflict.choose("ours") end, opts("Accept ours (HEAD)"))
 		keymap.set("n", "<leader>kt", function() conflict.choose("theirs") end, opts("Accept theirs (incoming)"))
+		keymap.set("n", "<leader>ki", function() conflict.choose("theirs") end, opts("Accept theirs (incoming)"))
 		keymap.set("n", "<leader>kb", function() conflict.choose("both") end, opts("Accept both"))
 		keymap.set("n", "<leader>k0", function() conflict.choose("none") end, opts("Accept none"))
 

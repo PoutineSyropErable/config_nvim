@@ -8,7 +8,7 @@ M.useMasonLspConfig = true -- masonlspconfig, or regular lspconfig
 M.useRegularLspConfig = true -- lspconfig
 M.useMergedLspConfig = false
 
-M.use_git_confict = false
+M.use_git_confict = true
 -- etc.
 
 -- Function to print the current config state
