@@ -393,19 +393,18 @@ local function find_files() builtin.find_files({ cwd = telescope_cwd() }) end
 local function live_grep() builtin.live_grep({ cwd = telescope_cwd() }) end
 local function live_grep_current_word() builtin.live_grep({ default_text = vim.fn.expand("<cword>"), cwd = telescope_cwd() }) end
 
+local select_and_write_function
+local select_and_write_fn = function() return select_and_write_function() end -- defined later
+
 vim.keymap.set("n", "<leader>ft", toggle_find_files, { desc = "Toggle Find Files (Project Root / CWD)" })
+keymap.set("n", "<leader>ff", find_files, opts("Find Files"))
+keymap.set("n", "<leader>fg", live_grep, opts("Live Grep"))
+keymap.set("n", "<leader>fw", live_grep_current_word, opts("Live grep current word"))
 
 keymap.set("n", "<leader>fs", all_document_symbols, opts("All Variable/Symbols Information (Document)"))
 keymap.set("n", "<leader>fS", all_workspace_symbols, opts("All Variable/Symbols Information (Workspace)"))
 
 keymap.set("n", "<leader>fk", builtin.keymaps, opts("Find Keymaps"))
-
-local select_and_write_function
-local select_and_write_fn = function() return select_and_write_function() end -- defined later
-
-keymap.set("n", "<leader>ff", find_files, opts("Find Files"))
-keymap.set("n", "<leader>fg", live_grep, opts("Live Grep"))
-keymap.set("n", "<leader>fw", live_grep_current_word, opts("Live grep current word"))
 
 keymap.set("n", "<leader>fG", builtin.grep_string, opts("Grep String"))
 keymap.set("n", "<leader>fz", builtin.current_buffer_fuzzy_find, opts("Current Buffer Fuzzy Find"))
@@ -654,8 +653,8 @@ keymap.set("n", "gx", pathfinder.gx, opts("Enhanced Go to file with line"))
 
 -- LSP Definitions & References
 keymap.set("n", "gd", safe_telescope_call("lsp_definitions"), opts("Go to definition"))
-keymap.set("n", "gj", vim.lsp.buf.definition, opts("Go to definition (No telescope)"))
 keymap.set("n", "gD", safe_lsp_call("declaration"), opts("Go to declaration"))
+keymap.set("n", "gj", vim.lsp.buf.definition, opts("Go to definition (No telescope)"))
 keymap.set("n", "gI", safe_telescope_call("lsp_implementations"), opts("Find implementations"))
 keymap.set("n", "gr", safe_telescope_call("lsp_references"), opts("Find references"))
 
@@ -846,6 +845,80 @@ local function push_hunk(direction)
 	end
 end
 
+-- Function to apply a selected version's hunk to all other buffers
+local function apply_hunk_to_all(version)
+	local current_win = vim.api.nvim_get_current_win() -- Save the current window
+	local output_win = nil
+
+	-- Identify the output buffer
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+			output_win = win
+			break
+		end
+	end
+
+	-- Apply diffget from the chosen version to all buffers except the output buffer
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local target_buf = vim.api.nvim_win_get_buf(win)
+		if win ~= output_win then
+			vim.api.nvim_set_current_win(win) -- Move to target buffer
+			vim.cmd("diffget " .. version) -- Apply hunk from the selected version
+		end
+	end
+
+	-- Apply the selected hunk to the output buffer without moving to the next hunk
+	if output_win then
+		vim.api.nvim_set_current_win(output_win) -- Move to output buffer
+		vim.cmd("diffget " .. version) -- Apply hunk without changing cursor position
+	end
+
+	-- Return to the original window
+	vim.api.nvim_set_current_win(current_win)
+end
+
+-- Function to detect the current buffer type and apply it to all buffers
+local function apply_current_hunk_to_all()
+	local bufname = vim.api.nvim_buf_get_name(0)
+
+	if bufname:match("_LOCAL_") then
+		apply_hunk_to_all("LOCAL")
+	elseif bufname:match("_BASE_") then
+		apply_hunk_to_all("BASE")
+	elseif bufname:match("_REMOTE_") then
+		apply_hunk_to_all("REMOTE")
+	else
+		_G.print_custom("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
+	end
+end
+
+-- Function to push the current hunk into the final output buffer
+local function push_to_output()
+	local current_win = vim.api.nvim_get_current_win() -- Save current window
+	local current_buf = vim.api.nvim_get_current_buf() -- Save current buffer
+	local output_win = nil
+
+	-- Find the output buffer window (should be the one without _LOCAL_, _BASE_, _REMOTE_)
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
+		if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
+			output_win = win
+			break
+		end
+	end
+
+	if output_win then
+		vim.api.nvim_set_current_win(output_win) -- Switch to output buffer
+		vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
+		vim.api.nvim_set_current_win(current_win) -- Return to original buffer
+	else
+		_G.print_custom("Output buffer not found!")
+	end
+end
+
+------ Setting the keymaps
+
 local use_git_conflict = true
 
 if use_git_conflict then
@@ -892,29 +965,6 @@ if not use_git_conflict then
 	keymap.set("n", "<leader>ke", function() pull_hunk("right") end, opts("Pull hunk from the right buffer"))
 
 	-- Function to push the current hunk into the final output buffer
-	-- Function to push the current hunk into the final output buffer
-	local function push_to_output()
-		local current_win = vim.api.nvim_get_current_win() -- Save current window
-		local current_buf = vim.api.nvim_get_current_buf() -- Save current buffer
-		local output_win = nil
-
-		-- Find the output buffer window (should be the one without _LOCAL_, _BASE_, _REMOTE_)
-		for _, win in ipairs(vim.api.nvim_list_wins()) do
-			local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
-			if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
-				output_win = win
-				break
-			end
-		end
-
-		if output_win then
-			vim.api.nvim_set_current_win(output_win) -- Switch to output buffer
-			vim.cmd("diffget " .. current_buf) -- Pull hunk from the original buffer
-			vim.api.nvim_set_current_win(current_win) -- Return to original buffer
-		else
-			_G.print_custom("Output buffer not found!")
-		end
-	end
 
 	keymap.set("n", "<leader>kp", push_to_output, opts("Put current hunk into the final output buffer"))
 
@@ -924,54 +974,6 @@ if not use_git_conflict then
 	-- Jump to previous conflict
 	keymap.set("n", "<leader>kN", "[c", opts("Jump to previous conflict"))
 	keymap.set("n", "<leader>kv", "[c", opts("Jump to previous conflict"))
-
-	-- Function to apply a selected version's hunk to all other buffers
-	local function apply_hunk_to_all(version)
-		local current_win = vim.api.nvim_get_current_win() -- Save the current window
-		local output_win = nil
-
-		-- Identify the output buffer
-		for _, win in ipairs(vim.api.nvim_list_wins()) do
-			local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win))
-			if not bufname:match("_LOCAL_") and not bufname:match("_BASE_") and not bufname:match("_REMOTE_") then
-				output_win = win
-				break
-			end
-		end
-
-		-- Apply diffget from the chosen version to all buffers except the output buffer
-		for _, win in ipairs(vim.api.nvim_list_wins()) do
-			local target_buf = vim.api.nvim_win_get_buf(win)
-			if win ~= output_win then
-				vim.api.nvim_set_current_win(win) -- Move to target buffer
-				vim.cmd("diffget " .. version) -- Apply hunk from the selected version
-			end
-		end
-
-		-- Apply the selected hunk to the output buffer without moving to the next hunk
-		if output_win then
-			vim.api.nvim_set_current_win(output_win) -- Move to output buffer
-			vim.cmd("diffget " .. version) -- Apply hunk without changing cursor position
-		end
-
-		-- Return to the original window
-		vim.api.nvim_set_current_win(current_win)
-	end
-
-	-- Function to detect the current buffer type and apply it to all buffers
-	local function apply_current_hunk_to_all()
-		local bufname = vim.api.nvim_buf_get_name(0)
-
-		if bufname:match("_LOCAL_") then
-			apply_hunk_to_all("LOCAL")
-		elseif bufname:match("_BASE_") then
-			apply_hunk_to_all("BASE")
-		elseif bufname:match("_REMOTE_") then
-			apply_hunk_to_all("REMOTE")
-		else
-			_G.print_custom("Current buffer is not LOCAL, BASE, or REMOTE. Cannot apply hunk.")
-		end
-	end
 
 	-- Apply LOCAL hunk to all buffers
 	keymap.set("n", "<leader>kcl", function() apply_hunk_to_all("LOCAL") end, opts("Apply LOCAL hunk to all buffers"))

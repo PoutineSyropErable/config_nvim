@@ -7,11 +7,11 @@ local buffer_plugin = get_buffer_plugins(PRE_CONFIG_FRANCK.use_bufferline)
 
 require("lazy").setup({
 	{
-		"numToStr/Comment.nvim",
+		"numToStr/Comment.nvim", -- check
 		config = function() require("Comment").setup() end,
 	},
 	{
-		"nvim-tree/nvim-web-devicons",
+		"nvim-tree/nvim-web-devicons", -- check
 		opts = {
 			override = {
 				opencl = {
@@ -28,43 +28,42 @@ require("lazy").setup({
 		},
 	},
 
-	{ "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
+	{ "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } }, -- check
 
 	{
-		"nvim-telescope/telescope.nvim",
+		"nvim-telescope/telescope.nvim", -- check
 		tag = "0.1.4", -- Specific version/tag for stable release
 		dependencies = { "nvim-lua/plenary.nvim" }, -- Make sure plenary.nvim is available
 	},
 
 	-- UI Select extension
 	{
-		"nvim-telescope/telescope-ui-select.nvim",
+		"nvim-telescope/telescope-ui-select.nvim", -- check
 		after = "telescope.nvim", -- Load after telescope.nvim
 	},
 
 	{
-		"nvim-telescope/telescope-file-browser.nvim",
+		"nvim-telescope/telescope-file-browser.nvim", -- check
 		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
 	},
 
 	-- fzf-native extension (requires building with 'make')
 	{
-		"nvim-telescope/telescope-fzf-native.nvim",
+		"nvim-telescope/telescope-fzf-native.nvim", -- check
 		build = "make", -- Ensure it's compiled
 		after = "telescope.nvim", -- Load after telescope.nvim
 	},
-	"nvim-treesitter/nvim-treesitter",
+	"nvim-treesitter/nvim-treesitter", --check
 	{
-		"echasnovski/mini.bufremove",
+		"echasnovski/mini.bufremove", -- check
 		version = false,
 		config = function() end, -- No extra config needed
 	},
 	buffer_plugin,
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-
-	"andymass/vim-matchup", -- better %
+	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 }, -- check
+	"andymass/vim-matchup", -- better %-- check
 	{
-		"windwp/nvim-autopairs",
+		"windwp/nvim-autopairs", -- check
 		event = "InsertEnter",
 		config = true,
 		-- use opts = {} for passing setup options
@@ -73,7 +72,7 @@ require("lazy").setup({
 	},
 	{
 		-- "gennaro-tedesco/nvim-possession",
-		"PoutineSyropErable/nvim-possession",
+		"PoutineSyropErable/nvim-possession", --- TODO
 		branch = "main", -- Ensure you're using the correct branch
 		dependencies = {
 			"ibhagwan/fzf-lua",
@@ -85,24 +84,23 @@ require("lazy").setup({
 		},
 		config = true,
 	},
-	{ "tiagovla/scope.nvim", config = true },
+	{ "tiagovla/scope.nvim", config = true }, -- check
 
-	-- "chrisbra/csv.vim",
-	"nvim-lualine/lualine.nvim",
+	"nvim-lualine/lualine.nvim", -- check
 
 	--------------- completion
-	"hrsh7th/nvim-cmp",
-	"hrsh7th/cmp-nvim-lsp",
-	"L3MON4D3/LuaSnip",
-	"rafamadriz/friendly-snippets",
-	"hrsh7th/cmp-buffer",
-	"hrsh7th/cmp-path",
-	"hrsh7th/cmp-cmdline",
-	"saadparwaiz1/cmp_luasnip",
+	"hrsh7th/nvim-cmp", -- check
+	"hrsh7th/cmp-buffer", -- check
+	"hrsh7th/cmp-nvim-lsp", -- check
+	"hrsh7th/cmp-path", -- check
+	"hrsh7th/cmp-cmdline", -- check
+	"saadparwaiz1/cmp_luasnip", -- check
+	"L3MON4D3/LuaSnip", -- check
+	"rafamadriz/friendly-snippets", -- check
 
 	----------------- LSP
 	{
-		"folke/lazydev.nvim",
+		"folke/lazydev.nvim", -- check
 		ft = "lua", -- only load on lua files
 		opts = {
 			library = {
@@ -113,29 +111,16 @@ require("lazy").setup({
 		},
 	},
 
-	-- "jayp0521/mason-null-ls.nvim",
-	"williamboman/mason.nvim",
-	"jay-babu/mason-nvim-dap.nvim",
-	"williamboman/mason-lspconfig.nvim",
-	"WhoIsSethDaniel/mason-tool-installer.nvim",
-	"neovim/nvim-lspconfig",
-	"stevearc/conform.nvim", -- autoformatting
-
-	-- {
-	-- 	"glepnir/lspsaga.nvim",
-	-- 	event = "LspAttach",
-	-- 	opts = {
-	-- 		code_action = {
-	-- 			keys = {
-	-- 				quit = "<ESC>",
-	-- 				exec = "<CR>",
-	-- 			},
-	-- 		},
-	-- 	},
-	-- },
+	-- "jayp0521/mason-null-ls.nvim", -- check
+	"neovim/nvim-lspconfig", -- check
+	"williamboman/mason.nvim", -- check
+	"williamboman/mason-lspconfig.nvim", -- check
+	"WhoIsSethDaniel/mason-tool-installer.nvim", -- check
+	"jay-babu/mason-nvim-dap.nvim", -- check
+	"stevearc/conform.nvim", -- autoformatting -- check
 
 	{
-		"nvimdev/lspsaga.nvim",
+		"nvimdev/lspsaga.nvim", -- check
 		config = function() require("lspsaga").setup({}) end,
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter", -- optional
@@ -143,15 +128,15 @@ require("lazy").setup({
 		},
 	},
 
-	"bash-lsp/bash-language-server",
-	"psf/black",
-	"clangd/clangd",
-	"Civitasv/cmake-tools.nvim",
-	"elkowar/yuck.vim", -- eww filetype support
+	"bash-lsp/bash-language-server", -- check
+	"psf/black", -- check
+	"clangd/clangd", -- check
+	"Civitasv/cmake-tools.nvim", -- dont need it
+	"elkowar/yuck.vim", -- eww filetype support -- check
 	-- "gpanders/nvim-parinfer",
 	-- coc.nvm and my lsp seems to be going against each other, so i won't use it
 
-	"mfussenegger/nvim-lint",
+	"mfussenegger/nvim-lint", -- don't use it
 	-- {
 	--
 	-- 	"kosayoda/nvim-lightbulb",
@@ -175,7 +160,7 @@ require("lazy").setup({
 	-- 	end,
 	-- },
 	{
-		"mfussenegger/nvim-dap", -- Main nvim-dap plugin
+		"mfussenegger/nvim-dap", -- Main nvim-dap plugin -- check
 		dependencies = {
 			"rcarriga/nvim-dap-ui", -- UI for nvim-dap
 			"nvim-telescope/telescope-dap.nvim", -- Telescope integration with DAP
@@ -188,7 +173,7 @@ require("lazy").setup({
 
 	-- -- Python DAP support
 	{
-		"mfussenegger/nvim-dap-python",
+		"mfussenegger/nvim-dap-python", -- dont need it. ( i dont think)
 		dependencies = { "mfussenegger/nvim-dap" }, -- Ensure nvim-dap is loaded first
 		lazy = true,
 		ft = { "python" }, -- Only load when editing Python files
@@ -203,7 +188,7 @@ require("lazy").setup({
 	PRE_CONFIG_FRANCK.java,
 	-- BASH DAP support?
 
-	"preservim/vimux",
+	"preservim/vimux", -- TODO TODO NOW TODAY
 	-- {
 	-- 	"powerman/vim-plugin-AnsiEsc",
 	-- 	config = function()
@@ -227,27 +212,27 @@ require("lazy").setup({
 		end,
 	},
 
-	"norcalli/nvim-colorizer.lua",
+	"norcalli/nvim-colorizer.lua", -- dont need it
 	-- "ellisonleao/gruvbox.nvim",
 	-- "dracula/vim",
-	"brenoprata10/nvim-highlight-colors",
-	"uga-rosa/ccc.nvim", -- color picker
+	"brenoprata10/nvim-highlight-colors", -- check
+	"uga-rosa/ccc.nvim", -- color picker -- check
 
 	-------------------------------- 	START OF TERMINAL ----------------------------
 
 	-- Terminal file managers (lf)
 	{
-		"rolv-apneseth/tfm.nvim",
+		"rolv-apneseth/tfm.nvim", -- check
 		lazy = false, -- Load the plugin immediately
 	},
 	-- -- It just works vv
-	"voldikss/vim-floaterm",
+	"voldikss/vim-floaterm", -- dont need it
 
-	{ "akinsho/toggleterm.nvim", version = "*", config = true },
+	{ "akinsho/toggleterm.nvim", version = "*", config = true }, -- check
 
 	-------------------------------- 	END OF TERMINAL ----------------------------
 	{
-		"lukas-reineke/indent-blankline.nvim",
+		"lukas-reineke/indent-blankline.nvim", -- check
 		main = "ibl",
 		---@module "ibl"
 		---@type ibl.config
@@ -255,7 +240,7 @@ require("lazy").setup({
 	},
 
 	{
-		"ThePrimeagen/harpoon",
+		"ThePrimeagen/harpoon", --- MAYBE, TODO
 		config = function()
 			-- This function will be called after Harpoon is loaded
 			require("harpoon").setup({
@@ -266,7 +251,7 @@ require("lazy").setup({
 
 	is_linux
 			and {
-				"alexghergh/nvim-tmux-navigation",
+				"alexghergh/nvim-tmux-navigation", -- check
 				config = function()
 					Nvim_tmux_nav = require("nvim-tmux-navigation")
 					Nvim_tmux_nav.setup({
@@ -277,22 +262,21 @@ require("lazy").setup({
 		or nil, -- Use `nil` if the condition is false to skip loading
 
 	{
-		"jiaoshijie/undotree",
+		"jiaoshijie/undotree", -- check
 		dependencies = "nvim-lua/plenary.nvim",
 		config = true,
 	},
 
-	"lewis6991/gitsigns.nvim",
-	"tpope/vim-fugitive",
-	"kdheepak/lazygit.nvim",
-	"itchyny/vim-gitbranch",
+	"lewis6991/gitsigns.nvim", -- check
+	"tpope/vim-fugitive", -- check
+	"kdheepak/lazygit.nvim", -- check
 
 	-- {
 	-- 	"sindrets/diffview.nvim",
 	-- 	dependencies = { "nvim-lua/plenary.nvim" },
 	-- },
 	{
-		"akinsho/git-conflict.nvim",
+		"akinsho/git-conflict.nvim", -- check
 		event = { "BufReadPost" },
 		config = function()
 			require("git-conflict").setup({
@@ -312,7 +296,7 @@ require("lazy").setup({
 		end,
 	},
 	-- "f-person/git-blame.nvim",
-	"ThePrimeagen/git-worktree.nvim",
+	"ThePrimeagen/git-worktree.nvim", -- TODO, maybe later
 	-- New git plugins vv, needed? idk
 
 	-- {
@@ -327,18 +311,18 @@ require("lazy").setup({
 	-- 	config = true,
 	-- },
 
-	"tpope/vim-rhubarb",
-	"tpope/vim-surround",
+	"tpope/vim-surround", -- dont need it. replace <leader>Sa
 	-- "airblade/vim-gitgutter",
-	"mhinz/vim-signify",
+	"mhinz/vim-signify", -- dont need it, replace git signs
+	"tpope/vim-rhubarb", -- check
 
-	"szw/vim-maximizer",
-	"folke/which-key.nvim",
-	"stevearc/oil.nvim",
+	"szw/vim-maximizer", -- check
+	"folke/which-key.nvim", -- check
+	"stevearc/oil.nvim", -- dont need it
 
 	-- ✍️ Markdown Support
 	{
-		"OXY2DEV/markview.nvim",
+		"OXY2DEV/markview.nvim", -- check
 		lazy = false, -- Recommended
 		-- ft = "markdown" -- If you decide to lazy-load anyway
 
@@ -348,7 +332,7 @@ require("lazy").setup({
 		},
 	},
 	{
-		"lervag/vimtex",
+		"lervag/vimtex", -- check
 		lazy = false, -- we don't want to lazy load VimTeX
 		-- tag = "v2.15", -- uncomment to pin to a specific release
 	},
@@ -356,32 +340,32 @@ require("lazy").setup({
 	-- 🖼️ Image Preview (Kitty Terminal Required) -- Images
 
 	{
-		"3rd/image.nvim",
+		"3rd/image.nvim", -- check
 		opts = {},
 	},
 	-- this should be the right one
 
 	{
-		"goolord/alpha-nvim",
+		"goolord/alpha-nvim", -- check
 		-- dependencies = { "echasnovski/mini.icons" },
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
 
 	-- Need to configure
-	"folke/flash.nvim",
-	"abecodes/tabout.nvim",
-	"echasnovski/mini.surround",
-	"Wansmer/treesj",
+	"folke/flash.nvim", -- check
+	"abecodes/tabout.nvim", -- it sucks, make my own
+
+	"echasnovski/mini.surround", -- check
+	"Wansmer/treesj", -- check
 
 	{
-		"AckslD/nvim-neoclip.lua",
-		dependencies = { "kkharji/sqlite.lua", module = "sqlite" },
-		{ "nvim-telescope/telescope.nvim" },
+		"AckslD/nvim-neoclip.lua", -- check
+		dependencies = { { "kkharji/sqlite.lua", module = "sqlite" }, { "nvim-telescope/telescope.nvim" } },
 	},
 
 	{
 		-- Need work
-		"kevinhwang91/nvim-ufo",
+		"kevinhwang91/nvim-ufo", -- check (kinda)
 		dependencies = "kevinhwang91/promise-async",
 	},
 
@@ -395,8 +379,8 @@ require("lazy").setup({
 			vim.notify = require("mini.notify").make_notify()
 		end,
 	},
-	"nvim-pack/nvim-spectre",
-	{ "HawkinsT/pathfinder.nvim" },
+	"nvim-pack/nvim-spectre", -- check
+	{ "HawkinsT/pathfinder.nvim" }, -- check
 	-- ^^ For file search
 	"vim-test/vim-test",
 
@@ -411,45 +395,44 @@ require("lazy").setup({
 			-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
 			"MunifTanjim/nui.nvim",
 		},
-		{
-			"folke/trouble.nvim",
-			opts = {}, -- for default options, refer to the configuration section for custom setup.
-			cmd = "Trouble",
-			keys = {
-				{
-					"<leader>QD",
-					"<cmd>Trouble diagnostics toggle<cr>",
-					desc = "Diagnostics (Trouble)",
-				},
-				{
-					"<leader>Qd",
-					"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-					desc = "Buffer Diagnostics (Trouble)",
-				},
-				{
-					"<leader>Qs",
-					"<cmd>Trouble symbols toggle focus=false<cr>",
-					desc = "Symbols (Trouble)",
-				},
-				{
-					"<leader>Ql",
-					"<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-					desc = "LSP Definitions / references / ... (Trouble)",
-				},
-				{
-					"<leader>QL",
-					"<cmd>Trouble loclist toggle<cr>",
-					desc = "Location List (Trouble)",
-				},
-				{
-					"<leader>QQ",
-					"<cmd>Trouble qflist toggle<cr>",
-					desc = "Quickfix List (Trouble)",
-				},
+	},
+	{
+		"folke/trouble.nvim",
+		opts = {}, -- for default options, refer to the configuration section for custom setup.
+		cmd = "Trouble",
+		keys = {
+			{
+				"<leader>QD",
+				"<cmd>Trouble diagnostics toggle<cr>",
+				desc = "Diagnostics (Trouble)",
+			},
+			{
+				"<leader>Qd",
+				"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+				desc = "Buffer Diagnostics (Trouble)",
+			},
+			{
+				"<leader>Qs",
+				"<cmd>Trouble symbols toggle focus=false<cr>",
+				desc = "Symbols (Trouble)",
+			},
+			{
+				"<leader>Ql",
+				"<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+				desc = "LSP Definitions / references / ... (Trouble)",
+			},
+			{
+				"<leader>QL",
+				"<cmd>Trouble loclist toggle<cr>",
+				desc = "Location List (Trouble)",
+			},
+			{
+				"<leader>QQ",
+				"<cmd>Trouble qflist toggle<cr>",
+				desc = "Quickfix List (Trouble)",
 			},
 		},
 	},
-
 	{
 		"emmanueltouzery/decisive.nvim",
 		ft = { "csv" },

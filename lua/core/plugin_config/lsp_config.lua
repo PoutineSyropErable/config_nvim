@@ -353,6 +353,19 @@ local pdf_output_dir = vim.fn.expand("%:p:h") -- Directory where the PDF should 
 local tex_file = vim.fn.expand("%:p") -- Full path to the LaTeX file
 local pdf_file = pdf_output_dir .. "/" .. vim.fn.expand("%:t:r") .. ".pdf" -- PDF filename based on the LaTeX file
 
+vim.g.vimtex_view_method = "zathura"
+vim.g.vimtex_view_forward_search_on_start = false
+vim.g.vimtex_view_general_viewer = "zathura"
+vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
+
+vim.g.vimtex_compiler_latexmk = {
+	aux_dir = tex_output, -- Auxiliary files directory
+	out_dir = pdf_output_dir, -- Output directory
+	callback = false,
+	continuous = false, -- Enable continuous compilation
+	background = false,
+}
+
 lspconfig.texlab.setup({
 	cmd = { "texlab" },
 	filetypes = { "tex", "bib", "plaintex", "latex" },
@@ -402,19 +415,6 @@ lspconfig.texlab.setup({
 		_G.print_custom("View Command: zathura --synctex-forward %l:1:%f " .. pdf_file)
 	end,
 })
-
-vim.g.vimtex_view_method = "zathura"
-vim.g.vimtex_view_forward_search_on_start = false
-vim.g.vimtex_view_general_viewer = "zathura"
-vim.g.vimtex_view_general_options = "--synctex-forward @line:1:@tex"
-
-vim.g.vimtex_compiler_latexmk = {
-	aux_dir = tex_output, -- Auxiliary files directory
-	out_dir = pdf_output_dir, -- Output directory
-	callback = false,
-	continuous = false, -- Enable continuous compilation
-	background = false,
-}
 
 -- vim.api.nvim_create_user_command("CheckLSP", function()
 -- 	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
