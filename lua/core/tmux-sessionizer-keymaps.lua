@@ -6,3 +6,5 @@ keymap.set("n", "<M-h>", "<cmd>silent !tmux neww tmux-sessionizer -s 0<CR>", opt
 keymap.set("n", "<M-t>", "<cmd>silent !tmux neww tmux-sessionizer -s 1<CR>", opts("Create or switch to session 1"))
 keymap.set("n", "<M-n>", "<cmd>silent !tmux neww tmux-sessionizer -s 2<CR>", opts("Create or switch to session 2"))
 keymap.set("n", "<M-s>", "<cmd>silent !tmux neww tmux-sessionizer -s 3<CR>", opts("Create or switch to session 3"))
+-- These are for session commands, which i dont use. So learn what they are about.
+-- They aren't about create or switchgint to session n
