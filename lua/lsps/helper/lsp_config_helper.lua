@@ -366,10 +366,22 @@ M.add_keybinds = function()
 		end
 	end, opts("List workspace folders"))
 
-	keymap.set("n", "<leader>de", function() require(tb).diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
+	keymap.set(
+		"n",
+		"<leader>de",
+		function() require(tb).diagnostics({ default_text = ":E:", bufnr = 0 }) end,
+		opts("Show Errors and diagnostics (Telescope UI)")
+	)
+	keymap.set("n", "<leader>dE", function() require(tb).diagnostics({ default_text = ":E:" }) end, opts("Show Errors and diagnostics (Telescope UI)"))
 	keymap.set(
 		"n",
 		"<leader>dw",
+		function() require(tb).diagnostics({ default_text = ":W:", bufnr = 0 }) end,
+		opts("Show Warning and diagnostics (Telescope UI)")
+	)
+	keymap.set(
+		"n",
+		"<leader>dW",
 		function() require(tb).diagnostics({ default_text = ":W:" }) end,
 		opts("Show Warning and diagnostics (Telescope UI)")
 	)

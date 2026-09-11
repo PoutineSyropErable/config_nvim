@@ -21,6 +21,8 @@ return {
 		require("mason").setup()
 
 		local lspconfig = require("lspconfig")
+		local configs = require("lspconfig.configs")
+		local util = require("lspconfig.util")
 		require("lspconfig.ui.windows").default_options.border = "rounded"
 
 		local lsp_defaults = lspconfig.util.default_config
@@ -51,6 +53,8 @@ return {
 		local go_lsp = require("lsps.go")
 
 		local iverilog_lsp = require("lsps.verilog")
+		local vhdl_lsp = require("lsps.vhdl")
+		local tcl_lsp = require("lsps.tcl")
 
 		if use_mason then
 			local mason_lspconfig = require("mason-lspconfig")
@@ -94,6 +98,7 @@ return {
 					-- "chktex",       -- manually compiled, so exclude here
 
 					"latexindent", -- formatter for LaTeX
+					"vsg",
 				},
 				run_on_start = true,
 				auto_update = false,
@@ -127,6 +132,9 @@ return {
 				vim.lsp.config("rust_analyzer", extend_capabilities(rust_lsp.config))
 
 				vim.lsp.config("texlab", extend_capabilities(latex_lsp.config))
+
+				vim.lsp.config("vhdl_ls", extend_capabilities(vhdl_lsp.config))
+				vim.lsp.config("tcl_ls", extend_capabilities(tcl_lsp.config))
 
 				vim.lsp.enable({ "bashls", "asm_lsp", "clangd", "opencl_ls", "rust_analyzer", "texlab" })
 				vim.lsp.enable("ccls")
@@ -165,6 +173,15 @@ return {
 			lspconfig.tailwindcss.setup({})
 
 			lspconfig.svls.setup(iverilog_lsp.config)
+
+			lspconfig.vhdl_ls.setup(vhdl_lsp.config)
+
+			if not configs.tcl_lsp then
+				configs.tcl_lsp = {
+					default_config = tcl_lsp.config,
+				}
+			end
+			lspconfig.tcl_lsp.setup({})
 
 			-- end of if statement
 		end
